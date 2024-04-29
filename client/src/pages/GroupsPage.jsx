@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react';
+import { Box } from '@chakra-ui/react';
 
 const GroupsPage = () => {
 
@@ -16,11 +17,14 @@ const GroupsPage = () => {
 
 
     return (
-        <ul>
-            {groups.map((group, index) => (
-                <li key={index}>{group.name}</li>
-            ))}
-        </ul>
+        <Box mt={10}>
+            <ul>
+                {groups.map((group, index) => (
+                    <li key={index}>{group.name}</li>
+                ))}
+            </ul>
+        </Box>
+
 
     )
 }
