@@ -10,9 +10,9 @@ const groupManager = require('../services/groupService');
 router.post('/create', (req, res) => {
     // console.log(req.body);
     //деструктурираме за да валидираме данните идващи от request-a
-    const { name, location, description } = req.body;
+    const { name, location, category, description, imageUrl } = req.body;
 
-    const createdGroup = groupManager.create(name, location, description);
+    const createdGroup = groupManager.create(name, location, category, description, imageUrl);
     res.status(201).send(createdGroup);
 });
 

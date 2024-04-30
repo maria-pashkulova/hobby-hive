@@ -6,6 +6,8 @@ import './App.css'
 import StartPage from './pages/StartPage';
 import GroupsPage from './pages/GroupsPage';
 import LoggedInLayout from './layouts/LoggedInLayout';
+import MyGroupsPage from './pages/MyGroupsPage';
+import SingleGroupPage from './pages/SingleGroupPage';
 
 
 
@@ -17,6 +19,8 @@ function App() {
       <Routes>
         <Route path='/' element={<LoggedInLayout />}>
           <Route path='/' element={<GroupsPage />} />
+          <Route path='/my-groups' element={<MyGroupsPage />} />
+          <Route path='/in-group' element={<SingleGroupPage />} />
         </Route >
         <Route path='/notLogged' element={<StartPage />} />
       </Routes >
