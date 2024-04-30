@@ -1,31 +1,22 @@
 import Navbar from '../components/Navbar';
 import { Outlet } from 'react-router-dom';
-import { Grid, GridItem } from '@chakra-ui/react';
-import Sidebar from '../components/Sidebar';
+import { Box, useDisclosure } from '@chakra-ui/react';
+import Sidebar from '../components/navigation/Sidebar';
 
 const LoggedInLayout = () => {
+
+    const { isOpen, onOpen, onClose } = useDisclosure();
     return (
-        <Grid templateColumns='repeat(6, 1fr)' bg='gray.50'>
-            <GridItem
-                as='aside'
-                colSpan={{ base: 6, lg: 1 }}
-                bg='yellow.300'
-                minHeight={{ lg: '100vh' }}
-                p='5'
-            >
-                <Sidebar />
-            </GridItem>
-            <GridItem
-                as='main'
-                colSpan={{ base: 6, lg: 5 }}
-                mx='3'
-            >
-                <Navbar />
+        <Box minH="100vh" >
+            <Sidebar
+                onClose={onClose}
+                display={{ base: 'none', md: 'block' }}
+            />
+            <Box ml={{ base: 0, md: 60 }} p="4">
                 <Outlet />
-            </GridItem>
-        </Grid>
+            </Box>
 
-
+        </Box>
     )
 }
 
