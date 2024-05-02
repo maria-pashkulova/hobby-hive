@@ -15,7 +15,7 @@ function App() {
   const [count, setCount] = useState(0)
 
   return (
-    <>
+    <div className='App'>
       <Routes>
         <Route path='/' element={<LoggedInLayout />}>
           <Route path='/' element={<GroupsPage />} />
@@ -25,7 +25,7 @@ function App() {
         <Route path='/notLogged' element={<StartPage />} />
       </Routes >
 
-    </>
+    </div>
   )
 }
 
