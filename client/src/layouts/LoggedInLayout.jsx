@@ -7,7 +7,7 @@ const LoggedInLayout = () => {
 
     const { isOpen, onOpen, onClose } = useDisclosure();
     return (
-        <Box minH="100vh" >
+        <>
             <Sidebar
                 display={{ base: 'none', md: 'block' }}
             />
@@ -26,8 +26,9 @@ const LoggedInLayout = () => {
             <Box as='main' ml={{ base: 0, md: 60 }} p="4">
                 <Outlet />
             </Box>
+        </>
 
-        </Box>
+
     )
 }
 

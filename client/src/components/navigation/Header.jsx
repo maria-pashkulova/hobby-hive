@@ -1,4 +1,4 @@
-import { Flex, Heading, IconButton, Box, Text, HStack, VStack, Avatar, Menu, MenuButton, MenuList, MenuItem, MenuDivider } from '@chakra-ui/react';
+import { Flex, Heading, IconButton, Box, Text, HStack, Avatar, Menu, MenuButton, MenuList, MenuItem, MenuDivider } from '@chakra-ui/react';
 
 import { FiMenu, FiChevronDown, FiBell } from "react-icons/fi";
 
