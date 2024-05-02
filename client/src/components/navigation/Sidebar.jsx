@@ -14,14 +14,13 @@ const Sidebar = ({ onClose, display }) => {
     return (
         <Box
             as='nav'
-            transition="3s ease"
             bg='gray.100'
             w={{ base: 'full', md: 60 }}
             position="fixed"
             h="full"
             display={display}
         >
-            <Flex h="20" alignItems="center" mx="8" justifyContent="space-between">
+            <Flex h="20" alignItems="center" mx='8' justifyContent="space-between">
                 <Heading fontSize="2xl" >
                     Хоби Кошер
                 </Heading>
@@ -33,7 +32,9 @@ const Sidebar = ({ onClose, display }) => {
                         key={index}
                         title={link.title}
                         icon={link.icon}
-                        to={link.to} />
+                        to={link.to}
+                        onClose={onClose}
+                    />
                 ))
                 }
             </List>

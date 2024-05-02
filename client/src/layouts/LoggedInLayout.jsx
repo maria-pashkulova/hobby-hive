@@ -1,7 +1,7 @@
-import Navbar from '../components/Navbar';
 import { Outlet } from 'react-router-dom';
-import { Box, useDisclosure } from '@chakra-ui/react';
+import { Box, Drawer, DrawerContent, useDisclosure } from '@chakra-ui/react';
 import Sidebar from '../components/navigation/Sidebar';
+import Header from '../components/navigation/Header';
 
 const LoggedInLayout = () => {
 
@@ -9,10 +9,21 @@ const LoggedInLayout = () => {
     return (
         <Box minH="100vh" >
             <Sidebar
-                onClose={onClose}
                 display={{ base: 'none', md: 'block' }}
             />
-            <Box ml={{ base: 0, md: 60 }} p="4">
+            <Drawer
+                isOpen={isOpen}
+                placement="left"
+                size="full"
+                onClose={onClose}
+                onOverlayClick={onClose}
+            >
+                <DrawerContent>
+                    <Sidebar onClose={onClose} />
+                </DrawerContent>
+            </Drawer>
+            <Header onOpen={onOpen} />
+            <Box as='main' ml={{ base: 0, md: 60 }} p="4">
                 <Outlet />
             </Box>
 

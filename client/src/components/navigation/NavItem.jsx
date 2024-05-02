@@ -1,9 +1,9 @@
 import { Link } from "react-router-dom";
 import { Flex, Icon, ListItem } from '@chakra-ui/react';
 
-const NavItem = ({ title, icon, to }) => {
+const NavItem = ({ title, icon, to, onClose }) => {
     return (
-        <ListItem>
+        <ListItem onClick={onClose}>
             <Link to={to}>
                 <Flex
                     alignItems="center"
@@ -11,16 +11,20 @@ const NavItem = ({ title, icon, to }) => {
                     mx="4"
                     borderRadius="lg"
                     role="group"
-                    cursor="pointer"
                     _hover={{
                         bg: 'yellow.400'
                     }}
                 >
-                    <Icon
-                        mr="4"
-                        fontSize="18"
-                        as={icon}
-                    />
+                    {
+                        icon && (
+                            <Icon
+                                mr="4"
+                                fontSize="18"
+                                as={icon}
+                            />
+                        )
+                    }
+
                     {title}
                 </Flex>
             </Link>
