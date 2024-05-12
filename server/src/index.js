@@ -1,9 +1,10 @@
 const express = require('express');
 const path = require('path');
+require('dotenv').config();
 
 //инстанция на експрес сървър
 const app = express();
-const PORT = 5000;
+const PORT = process.env.PORT;
 
 const expressConfigurator = require('./config/expressConfigurator');
 const routes = require('./routes');

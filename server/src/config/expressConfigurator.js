@@ -22,6 +22,12 @@ function expressConfig(app) {
             '*');
         next();
     })
+
+    //logger middleware
+    app.use((req, res, next) => {
+        console.log(req.method, req.path);
+        next();
+    })
 }
 
 module.exports = expressConfig;
