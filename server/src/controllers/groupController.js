@@ -26,4 +26,12 @@ router.get('/:groupId/details', (req, res) => {
     res.send(group);
 })
 
+router.delete('/:id', (req, res) => {
+    res.json({ msg: 'Delete a group' });
+})
+
+router.patch('/:id', (req, res) => {
+    res.json({ msg: 'Update a group' });
+})
+
 module.exports = router;
