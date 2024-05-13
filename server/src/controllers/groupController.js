@@ -7,12 +7,12 @@ const groupManager = require('../services/groupService');
 //     res.send(groupManager.getAll());
 // });
 
-router.post('/create', (req, res) => {
+router.post('/create', async (req, res) => {
     // console.log(req.body);
     //деструктурираме за да валидираме данните идващи от request-a
     const { name, location, category, description, imageUrl } = req.body;
 
-    const createdGroup = groupManager.create(name, location, category, description, imageUrl);
+    const createdGroup = await groupManager.create(name, location, category, description, imageUrl);
     res.status(201).send(createdGroup);
 });
 

@@ -1,4 +1,6 @@
-// exports.create = (groupData)
+const Group = require('../models/Group')
+
+
 const groups = [{
     id: "1",
     name: "Swimming group",
@@ -37,10 +39,9 @@ exports.getAll = (name, category, location) => {
 
 exports.getById = (groupId) => groups.find(group => group.id == groupId);
 
-exports.create = (name, category, location, description, imageUrl) => {
+exports.create = async (name, category, location, description, imageUrl) => {
     //createdAt, editedAt...
-    const newGroup = {
-        id: groups.length + 1,
+    const newGroupData = {
         name,
         category,
         location,
@@ -48,7 +49,14 @@ exports.create = (name, category, location, description, imageUrl) => {
         imageUrl
     };
 
-    groups.push(newGroup);
+    // groups.push(newGroup);
+
+
+    const newGroup = await Group.create(newGroupData);
+    console.log(newGroup);
 
     return newGroup;
+
+
+
 }
