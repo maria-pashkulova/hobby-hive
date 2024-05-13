@@ -2,6 +2,8 @@ const router = require('express').Router();
 const groupManager = require('../services/groupService');
 
 
+
+//TODO : Search and filter
 //http://localhost:5000/?category=sport&location=Plovdiv
 router.get('/', async (req, res) => {
     const { name, category, location } = req.query;

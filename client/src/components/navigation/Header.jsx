@@ -7,7 +7,7 @@ const Header = ({ onOpen }) => {
         <Flex
             as='header'
             px='4'
-            mb='4'
+            // mb='4'
             height="20"
             alignItems="center"
             borderBottomWidth="1px"

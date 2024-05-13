@@ -35,6 +35,10 @@ const Login = () => {
                     </InputRightElement>
                 </InputGroup>
             </FormControl>
+            {/* <FormControl id='date' isRequired>
+                <FormLabel>дата</FormLabel>
+                <Input type='date' />
+            </FormControl> */}
             <Button
                 bg={'blue.400'}
                 w='100%'

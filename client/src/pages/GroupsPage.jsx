@@ -17,7 +17,7 @@ const GroupsPage = () => {
 
 
     return (
-        <SimpleGrid spacing={4} templateColumns={{ base: 'repeat(1,1fr)', lg: 'repeat(2,1fr)' }}>
+        <SimpleGrid spacing={4} templateColumns={{ base: '1fr', xl: 'repeat(2,1fr)' }}>
 
             {groups.map((group, i) => (
                 <Card
