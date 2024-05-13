@@ -1,11 +1,15 @@
 const router = require('express').Router();
 const groupManager = require('../services/groupService');
 
+
 //http://localhost:5000/?category=sport&location=Plovdiv
-router.get('/', (req, res) => {
+router.get('/', async (req, res) => {
     const { name, category, location } = req.query;
     // console.log(req.query);
-    res.send(groupManager.getAll(name, category, location));
+
+    const allGroups = await groupManager.getAll(name, category, location);
+
+    res.send(allGroups);
 });
 
 router.get('/404', (req, res) => {
