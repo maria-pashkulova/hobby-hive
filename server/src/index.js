@@ -1,6 +1,6 @@
 const express = require('express');
 const path = require('path');
-require('dotenv').config();
+require('dotenv').config(); //прави process.env обекта глобално достъпен
 
 
 const expressConfigurator = require('./config/expressConfigurator');
