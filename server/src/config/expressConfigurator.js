@@ -6,7 +6,7 @@ function expressConfig(app) {
     //обработва данни от форми с метод POST и querystrings също
     //в случай на SPA не мисля че се ползва - всъщност се ползва ако искаме
     //да имаме querystrings в req.query
-    //в случай на SPA служи да парсва form-urlencoded данни идващи от форма с action - 
+    //в случай на SPA НЕ служи за да парсва form-urlencoded данни идващи от форма с action - 
     //endpoint на сървъра и метод POST, а само за парсване на querystrings -> req.query
     app.use(express.urlencoded({ extended: false }));
     //Обработва данни от форма идващи в json формат - клиентът

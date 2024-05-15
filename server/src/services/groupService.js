@@ -1,7 +1,7 @@
 const Group = require('../models/Group')
 
 
-//Array storage
+//In-memory storage
 // const groups = [{
 //     id: "1",
 //     name: "Swimming group",
@@ -26,22 +26,23 @@ const Group = require('../models/Group')
 //awaitваме, защото на ниво контролер ще я awaitваме пак
 
 
-exports.getAll = (name, category, location) => {
+exports.getAll = async (name, category, location) => {
 
     //Search functionality with array storage (in-memory)
     // let result = groups.slice();
 
-    // if (name) {
-    //     result = result.filter(group => group.name.toLowerCase().includes(name.toLowerCase()));
-    // }
-    // if (category) {
-    //     result = result.filter(group => group.category === category);
-    // }
-    // if (location) {
-    //     result = result.filter(group => group.location === location);
-    // }
+    let groups = await Group.find();
 
-    const groups = Group.find();
+    //TODO: use mongoose to filter in the db
+    if (name) {
+        groups = groups.filter(group => group.name.toLowerCase().includes(name.toLowerCase()));
+    }
+    if (category) {
+        groups = groups.filter(group => group.category.toLowerCase() === category.toLowerCase());
+    }
+    if (location) {
+        groups = groups.filter(group => group.location === location);
+    }
 
     return groups;
 }

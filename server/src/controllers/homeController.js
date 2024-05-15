@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const groupManager = require('../services/groupService');
+const groupService = require('../services/groupService');
 
 
 //TODO: да го преместя може би в groupController
@@ -9,7 +9,7 @@ router.get('/', async (req, res) => {
     const { name, category, location } = req.query;
     // console.log(req.query);
 
-    const allGroups = await groupManager.getAll(name, category, location);
+    const allGroups = await groupService.getAll(name, category, location);
 
     res.send(allGroups);
 });
