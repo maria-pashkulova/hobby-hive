@@ -20,7 +20,7 @@ function App() {
         <Route path='/' element={<LoggedInLayout />}>
           <Route path='/' element={<GroupsPage />} />
           <Route path='/my-groups' element={<MyGroupsPage />} />
-          <Route path='/in-group' element={<SingleGroupPage />} />
+          <Route path='/groups/:groupId' element={<SingleGroupPage />} />
         </Route >
         <Route path='/notLogged' element={<StartPage />} />
       </Routes >

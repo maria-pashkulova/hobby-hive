@@ -1,18 +1,17 @@
 import { useEffect, useState } from 'react';
 import { Card, CardBody, CardFooter, Heading, SimpleGrid, Button, Text, Flex, Image, Spacer } from '@chakra-ui/react'
+import { Link } from "react-router-dom";
+
+
+import * as groupService from '../services/groupService';
 
 const GroupsPage = () => {
 
     const [groups, setGroups] = useState([]);
 
-    const fetchGroups = () => {
-        fetch('http://localhost:5000')
-            .then(res => res.json())
-            .then(data => setGroups(data));
-    }
-
     useEffect(() => {
-        fetchGroups();
+        groupService.getAll()
+            .then(setGroups);
     }, []);
 
 
@@ -43,12 +42,12 @@ const GroupsPage = () => {
                         </CardBody>
 
                         <CardFooter alignItems='center' gap='4' >
-                            <Button variant='solid' colorScheme='blue'>
+                            <Button as={Link} to={`groups/${group._id}`} variant='solid' colorScheme='blue'>
                                 Към групата
                             </Button>
                             <Spacer />
                             <Text as='span'>
-                                20 членове
+                                {group.members} членове
                             </Text>
                         </CardFooter>
                     </Flex>
