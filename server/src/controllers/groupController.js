@@ -10,20 +10,22 @@ const groupSevice = require('../services/groupService');
 router.post('/create', async (req, res) => {
     // console.log(req.body);
     //деструктурираме за да валидираме данните идващи от request-a
-    const { name, location, category, description, imageUrl } = req.body;
+    const { name, category, location, description, imageUrl } = req.body;
 
-    const createdGroup = await groupSevice.create(name, location, category, description, imageUrl);
+    const createdGroup = await groupSevice.create(name, category, location, description, imageUrl);
     res.status(201).send(createdGroup);
 });
 
-router.get('/:groupId/details', (req, res) => {
-    const group = groupSevice.getById(req.params.groupId);
+router.get('/:groupId/details', async (req, res) => {
 
-    if (!group) {
+    try {
+        const group = await groupSevice.getById(req.params.groupId);
+        res.send(group);
+    } catch (error) {
+        console.log(error);
         return res.redirect('/404');
     }
-    console.log(group);
-    res.send(group);
+
 })
 
 router.delete('/:id', (req, res) => {

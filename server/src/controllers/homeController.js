@@ -2,7 +2,7 @@ const router = require('express').Router();
 const groupManager = require('../services/groupService');
 
 
-
+//TODO: да го преместя може би в groupController
 //TODO : Search and filter
 //http://localhost:5000/?category=sport&location=Plovdiv
 router.get('/', async (req, res) => {

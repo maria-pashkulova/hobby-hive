@@ -22,7 +22,11 @@ const Group = require('../models/Group')
 // ];
 
 
-exports.getAll = async (name, category, location) => {
+//ако една функция просто ще взима и връща promise, няма нужда да
+//awaitваме, защото на ниво контролер ще я awaitваме пак
+
+
+exports.getAll = (name, category, location) => {
 
     //Search functionality with array storage (in-memory)
     // let result = groups.slice();
@@ -37,14 +41,15 @@ exports.getAll = async (name, category, location) => {
     //     result = result.filter(group => group.location === location);
     // }
 
-    const groups = await Group.find();
+    const groups = Group.find();
 
     return groups;
 }
 
-exports.getById = (groupId) => groups.find(group => group.id == groupId);
+//findById is a Mongoose method - we use it instead monogodb's findOne()
+exports.getById = (groupId) => Group.findById(groupId);
 
-exports.create = async (name, category, location, description, imageUrl) => {
+exports.create = (name, category, location, description, imageUrl) => {
     //createdAt, editedAt...
     const newGroupData = {
         name,
@@ -57,7 +62,7 @@ exports.create = async (name, category, location, description, imageUrl) => {
     // groups.push(newGroup);
 
 
-    const newGroup = await Group.create(newGroupData);
+    const newGroup = Group.create(newGroupData);
     console.log(newGroup);
 
     return newGroup;
