@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const groupManager = require('../services/groupService');
+const groupSevice = require('../services/groupService');
 
 //path /groups/[...]
 
@@ -12,12 +12,12 @@ router.post('/create', async (req, res) => {
     //деструктурираме за да валидираме данните идващи от request-a
     const { name, location, category, description, imageUrl } = req.body;
 
-    const createdGroup = await groupManager.create(name, location, category, description, imageUrl);
+    const createdGroup = await groupSevice.create(name, location, category, description, imageUrl);
     res.status(201).send(createdGroup);
 });
 
 router.get('/:groupId/details', (req, res) => {
-    const group = groupManager.getById(req.params.groupId);
+    const group = groupSevice.getById(req.params.groupId);
 
     if (!group) {
         return res.redirect('/404');
