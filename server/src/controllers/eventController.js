@@ -1,6 +1,6 @@
 const router = require('express').Router();
 
-router.get('/create', (req, res) => {
+router.post('/create', (req, res) => {
     res.send('Create event in current group');
 });
 
