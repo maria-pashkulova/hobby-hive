@@ -15,7 +15,7 @@ router.get('/', async (req, res) => {
 });
 
 router.get('/404', (req, res) => {
-    res.send('Page not found!');
+    res.status(404).json({ msg: 'Page not found!' });
 })
 
 
