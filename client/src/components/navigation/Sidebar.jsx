@@ -4,8 +4,7 @@ import NavItem from './NavItem';
 
 const listItems = [
     { title: 'Начало', icon: FiHome, to: '/' },
-    { title: 'Моите групи', icon: FiStar, to: '/my-groups' },
-    { title: 'Изглед в група', icon: FiCompass, to: '/in-group' }
+    { title: 'Моите групи', icon: FiStar, to: '/my-groups' }
 ];
 
 
