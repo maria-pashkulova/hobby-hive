@@ -52,6 +52,7 @@ exports.getById = (groupId) => Group.findById(groupId);
 
 exports.create = (name, category, location, description, imageUrl) => {
     //createdAt, editedAt...
+    //TODO: add validation
     const newGroupData = {
         name,
         category,

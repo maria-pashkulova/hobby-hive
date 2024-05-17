@@ -9,8 +9,8 @@ export const getAll = async () => {
     return result;
 }
 
-export const getById = async (gameId) => {
-    const response = await fetch(`${baseUrl}/groups/${gameId}/details`);
+export const getById = async (groupId) => {
+    const response = await fetch(`${baseUrl}/groups/${groupId}/details`);
     const result = await response.json();
 
     return result;
