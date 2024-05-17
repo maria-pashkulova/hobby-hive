@@ -4,11 +4,13 @@ import { useParams } from "react-router-dom"
 
 import * as groupService from '../services/groupService';
 
+import Calendar from '../components/Calendar';
 
 const SingleGroupPage = () => {
 
     const { groupId } = useParams();
     const [group, setGroup] = useState({});
+    //const [groupEvents, setGroupEvents] = useState([]);
 
     useEffect(() => {
         groupService.getById(groupId)
@@ -26,7 +28,7 @@ const SingleGroupPage = () => {
 
                 <TabPanels>
                     <TabPanel>
-                        FullCalendar
+                        <Calendar groupEvents={group.events} />
                     </TabPanel>
                     <TabPanel>
                         Group Chat

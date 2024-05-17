@@ -14,7 +14,7 @@ exports.getAllGroupEvents = (groupId) => {
 }
 
 //city, location, status
-exports.create = (title, description, city, location, status, groupId) => {
+exports.create = (title, description, city, location, status) => {
 
     //TODO: add validation here
     const newEventData = {
@@ -23,9 +23,7 @@ exports.create = (title, description, city, location, status, groupId) => {
         description,
         city,
         location,
-        status,
-        groupId
-
+        status
     }
     const newEvent = Event.create(newEventData);
 

@@ -10,7 +10,11 @@ const groupSchema = new mongoose.Schema({
     description: String,
     location: String,
     members: Number,
-    imageUrl: String
+    imageUrl: String,
+    events: [{
+        type: mongoose.Types.ObjectId,
+        ref: 'Event'
+    }]
 
 });
 

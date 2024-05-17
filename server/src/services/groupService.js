@@ -49,8 +49,9 @@ exports.getAll = async (name, category, location) => {
 
 //findById is a Mongoose method - we use it instead monogodb's findOne()
 exports.getById = (groupId) => Group.findById(groupId);
+exports.getByIdWithEvents = (groupId) => this.getById(groupId).populate('events');
 
-exports.create = (name, category, location, description, imageUrl) => {
+exports.create = (name, category, location, description, members, imageUrl) => {
     //createdAt, editedAt...
     //TODO: add validation
     const newGroupData = {
@@ -58,6 +59,7 @@ exports.create = (name, category, location, description, imageUrl) => {
         category,
         location,
         description,
+        members,
         imageUrl
     };
 
@@ -68,7 +70,8 @@ exports.create = (name, category, location, description, imageUrl) => {
     console.log(newGroup);
 
     return newGroup;
+}
 
-
-
+exports.attachEventToGroup = (groupId, eventId) => {
+    return Group.findByIdAndUpdate(groupId, { $push: { events: eventId } });
 }
