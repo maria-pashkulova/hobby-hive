@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const bcrypt = require('bcrypt');
 
 
 //Create schema
@@ -36,6 +37,17 @@ userSchema.virtual('repeatPass')
         }
     })
 
+
+//случва се след изпълнение на всички валидатори
+//hash password: 
+userSchema.pre('save', async function () {
+
+    //всеки път ще използва 10 rounds и ще генерира уникална сол
+    const hash = await bcrypt.hash(this.password, 10);
+
+    //презаписваме стойността на полето password на текущия документ
+    this.password = hash;
+});
 
 
 //Create model
