@@ -2,6 +2,7 @@
 
 const express = require('express');
 const cookieParser = require('cookie-parser');
+const { auth } = require('../middlewares/authenticationMiddleware');
 
 function expressConfig(app) {
     //обработва данни от форми с метод POST и querystrings също
@@ -27,7 +28,9 @@ function expressConfig(app) {
     })
 
     //Working with cookies
-    app.use(cookieParser())
+    app.use(cookieParser());
+
+    app.use(auth);
 
     //logger middleware
     app.use((req, res, next) => {

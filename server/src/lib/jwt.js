@@ -8,12 +8,12 @@ const sign = (payload, secret, options) => {
     //new Promise (executor function - която приема 2 параметъра - 2 функции,
     //   resolve и reject)
     const promise = new Promise((resolve, reject) => {
-        jsonwebtoken.sign(payload, secret, options = { expiresIn: '2d' }, (err, result) => {
+        jsonwebtoken.sign(payload, secret, options = { expiresIn: '2d' }, (err, token) => {
             if (err) {
                 return reject(err);
             }
 
-            resolve(result);
+            resolve(token);
         });
     });
 
@@ -22,12 +22,12 @@ const sign = (payload, secret, options) => {
 
 const verify = (token, secret) => {
     const promise = new Promise((resolve, reject) => {
-        jsonwebtoken.verify(token, secret, (err, result) => {
+        jsonwebtoken.verify(token, secret, (err, decodedToken) => {
             if (err) {
                 return reject(err);
             }
 
-            resolve(result);
+            resolve(decodedToken);
         });
     });
 

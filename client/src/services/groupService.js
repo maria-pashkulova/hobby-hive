@@ -2,7 +2,7 @@ const baseUrl = 'http://localhost:5000';
 
 
 export const getAll = async () => {
-    const response = await fetch(baseUrl)
+    const response = await fetch(baseUrl, { credentials: 'include' });
 
     const result = await response.json();
 

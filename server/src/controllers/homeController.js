@@ -6,6 +6,7 @@ const groupService = require('../services/groupService');
 //TODO : Search and filter
 //http://localhost:5000/?category=sport&location=Plovdiv
 router.get('/', async (req, res) => {
+    console.log(req.user);
     const { name, category, location } = req.query;
     // console.log(req.query);
 
