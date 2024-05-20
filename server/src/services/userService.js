@@ -1,5 +1,6 @@
-const User = require('../models/User');
 const bcrypt = require('bcrypt');
+const jwt = require('../lib/jwt');
+const User = require('../models/User');
 
 //подавам отделните пропърита
 //за по ясен интерфейс
@@ -30,5 +31,15 @@ exports.login = async (email, password) => {
         throw new Error('Inavlid email or password');
     }
 
-    return user;
+    //create token
+
+    const payload = {
+        _id: user._id,
+        name: user.fullName
+
+    }
+
+    const token = await jwt.sign(payload, process.env.SECRET);
+
+    return token;
 }

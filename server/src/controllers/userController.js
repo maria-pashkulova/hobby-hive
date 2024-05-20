@@ -5,10 +5,11 @@ const userService = require('../services/userService');
 router.post('/login', async (req, res) => {
     const { email, password } = req.body;
 
-    const user = await userService.login(email, password);
-    console.log('here');
-    res.cookie('email', user.email);
-    res.send(user);
+    const token = await userService.login(email, password);
+
+    //httpOnly: true + React ?
+    res.cookie(process.env.COOKIE_NAME, token, { httpOnly: true });
+    res.send('Successfully logged in!');
 })
 
 router.post('/register', async (req, res) => {

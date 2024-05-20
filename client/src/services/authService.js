@@ -23,7 +23,7 @@ export const register = ({ firstName, lastName, email, password, repeatPass }) =
 export const login = ({ email, password }) =>
     fetch(`${baseUrl}/login`, {
         method: 'POST',
-        credentials: 'include',
+        credentials: 'include', //Important: this ensures cookies are sent and received
         body: JSON.stringify(
             {
                 email,
