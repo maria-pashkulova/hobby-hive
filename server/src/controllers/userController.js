@@ -6,6 +6,8 @@ router.post('/login', async (req, res) => {
     const { email, password } = req.body;
 
     const user = await userService.login(email, password);
+    console.log('here');
+    res.cookie('email', user.email);
     res.send(user);
 })
 

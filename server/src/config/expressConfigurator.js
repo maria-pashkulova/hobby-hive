@@ -1,6 +1,7 @@
 //конфигурация на инстанция на експрес сървър
 
 const express = require('express');
+const cookieParser = require('cookie-parser');
 
 function expressConfig(app) {
     //обработва данни от форми с метод POST и querystrings също
@@ -15,13 +16,18 @@ function expressConfig(app) {
 
     //CORS related
     app.use((req, res, next) => {
-        res.setHeader('Access-Control-Allow-Origin', '*');
+        res.setHeader('Access-Control-Allow-Origin', 'http://localhost:5173');
         res.setHeader('Access-Control-Allow-Methods',
             '*');
         res.setHeader('Access-Control-Allow-Headers',
-            '*');
+            'Content-Type,Accept, Authorization');
+
+        res.header('Access-Control-Allow-Credentials', 'true');
         next();
     })
+
+    //Working with cookies
+    app.use(cookieParser())
 
     //logger middleware
     app.use((req, res, next) => {

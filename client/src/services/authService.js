@@ -23,6 +23,7 @@ export const register = ({ firstName, lastName, email, password, repeatPass }) =
 export const login = ({ email, password }) =>
     fetch(`${baseUrl}/login`, {
         method: 'POST',
+        credentials: 'include',
         body: JSON.stringify(
             {
                 email,
