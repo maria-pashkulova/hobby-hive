@@ -21,6 +21,9 @@ const userSchema = new mongoose.Schema({
     }
 });
 
+//TODO: validate if user exists (със същия имейл)
+
+
 //Virtual properties usage:
 //repeat pass and password matching validation
 //value param : името на virtual property и property-то на обекта който е подаден при създаване на user must match 1:1 

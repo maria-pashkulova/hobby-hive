@@ -2,10 +2,11 @@ const router = require('express').Router();
 
 const userService = require('../services/userService');
 
-router.post('/login', (req, res) => {
-    const userData = req.body;
-    console.log(userData);
-    res.send('login');
+router.post('/login', async (req, res) => {
+    const { email, password } = req.body;
+
+    const user = await userService.login(email, password);
+    res.send(user);
 })
 
 router.post('/register', async (req, res) => {
