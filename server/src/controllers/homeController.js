@@ -1,11 +1,12 @@
 const router = require('express').Router();
+const { isAuthenticated } = require('../middlewares/authenticationMiddleware');
 const groupService = require('../services/groupService');
 
 
 //TODO: да го преместя може би в groupController
 //TODO : Search and filter
 //http://localhost:5000/?category=sport&location=Plovdiv
-router.get('/', async (req, res) => {
+router.get('/', isAuthenticated, async (req, res) => {
     console.log(req.user);
     const { name, category, location } = req.query;
     // console.log(req.query);

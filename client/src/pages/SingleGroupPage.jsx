@@ -1,6 +1,6 @@
 import { TabList, TabPanels, TabPanel, Tabs, Tab, Heading } from "@chakra-ui/react"
 import { useEffect, useState } from "react"
-import { useParams } from "react-router-dom"
+import { useNavigate, useParams } from "react-router-dom"
 
 import * as groupService from '../services/groupService';
 
@@ -8,13 +8,20 @@ import Calendar from '../components/Calendar';
 
 const SingleGroupPage = () => {
 
+
+    const navigate = useNavigate();
+
+
     const { groupId } = useParams();
     const [group, setGroup] = useState({});
     //const [groupEvents, setGroupEvents] = useState([]);
 
     useEffect(() => {
         groupService.getById(groupId)
-            .then(setGroup);
+            .then(setGroup)
+            .catch(err => {
+                navigate('/notLogged');
+            });
     }, []);
 
     return (

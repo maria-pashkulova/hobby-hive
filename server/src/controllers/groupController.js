@@ -33,7 +33,12 @@ router.delete('/:id', (req, res) => {
     res.json({ msg: 'Delete a group' });
 })
 
-router.patch('/:id', (req, res) => {
+router.put('/:groupId/edit', async (req, res) => {
+
+    const { name, category, location, description, members, imageUrl } = req.body;
+
+
+    await groupService.update(req.params.groupId, name, category, location, description, members, imageUrl);
     res.json({ msg: 'Update a group' });
 })
 

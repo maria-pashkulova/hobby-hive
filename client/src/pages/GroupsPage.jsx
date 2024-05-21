@@ -1,17 +1,22 @@
 import { useEffect, useState } from 'react';
 import { Card, CardBody, CardFooter, Heading, SimpleGrid, Button, Text, Flex, Image, Spacer } from '@chakra-ui/react'
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 
 import * as groupService from '../services/groupService';
 
 const GroupsPage = () => {
 
+    const navigate = useNavigate();
+
     const [groups, setGroups] = useState([]);
 
     useEffect(() => {
         groupService.getAll()
-            .then(setGroups);
+            .then(setGroups)
+            .catch(err => {
+                navigate('/notLogged');
+            })
     }, []);
 
 
