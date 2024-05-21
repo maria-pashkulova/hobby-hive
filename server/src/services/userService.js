@@ -11,7 +11,7 @@ exports.register = (firstName, lastName, email, password, repeatPass) => {
     //ако проверката password === repeatPass е тук, може да се направи хеширането
     //на паролата тук
 
-    User.create({ firstName, lastName, email, password, repeatPass })
+    return User.create({ firstName, lastName, email, password, repeatPass })
 }
 
 exports.login = async (email, password) => {
@@ -35,11 +35,12 @@ exports.login = async (email, password) => {
 
     const payload = {
         _id: user._id,
-        name: user.fullName
-
+        fullName: user.fullName,
+        email: user.email
     }
 
     const token = await jwt.sign(payload, process.env.SECRET);
 
-    return token;
+    //return token;
+    return { ...payload, token };
 }

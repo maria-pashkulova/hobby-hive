@@ -1,6 +1,7 @@
 import { Flex, Heading, IconButton, Box, Text, HStack, Avatar, Menu, MenuButton, MenuList, MenuItem, MenuDivider } from '@chakra-ui/react';
 
 import { FiMenu, FiChevronDown, FiBell } from "react-icons/fi";
+import { Link } from 'react-router-dom';
 
 const Header = ({ onOpen }) => {
     return (
@@ -58,7 +59,7 @@ const Header = ({ onOpen }) => {
                         borderColor='gray.200'>
                         <MenuItem>Моят профил</MenuItem>
                         <MenuDivider />
-                        <MenuItem>Изход</MenuItem>
+                        <MenuItem as={Link} to={'/logout'}>Изход</MenuItem>
                     </MenuList>
                 </Menu>
             </HStack>

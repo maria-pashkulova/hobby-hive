@@ -36,3 +36,6 @@ export const login = ({ email, password }) =>
         }
 
     });
+
+
+export const logout = () => fetch(`${baseUrl}/logout`, { credentials: 'include' });

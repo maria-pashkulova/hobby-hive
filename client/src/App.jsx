@@ -8,6 +8,7 @@ import GroupsPage from './pages/GroupsPage';
 import LoggedInLayout from './layouts/LoggedInLayout';
 import MyGroupsPage from './pages/MyGroupsPage';
 import SingleGroupPage from './pages/SingleGroupPage';
+import Logout from './components/Logout';
 
 
 
@@ -23,6 +24,7 @@ function App() {
           <Route path='/groups/:groupId' element={<SingleGroupPage />} />
         </Route >
         <Route path='/notLogged' element={<StartPage />} />
+        <Route path={'/logout'} element={<Logout />} />
       </Routes >
 
     </div>
