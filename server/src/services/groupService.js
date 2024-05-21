@@ -67,11 +67,29 @@ exports.create = (name, category, location, description, members, imageUrl) => {
 
 
     const newGroup = Group.create(newGroupData);
-    console.log(newGroup);
+    // console.log(newGroup); promise pending 
 
     return newGroup;
 }
 
+exports.update = (groupId, name, category, location, description, members, imageUrl) => {
+    //TODO: add validation
+    const newGroupData = {
+        name,
+        category,
+        location,
+        description,
+        members,
+        imageUrl
+    };
+
+    const updatedGroup = Group.findByIdAndUpdate(groupId, newGroupData);
+    return updatedGroup;
+}
+
+exports.delete = (groupId) => Group.findByIdAndDelete(groupId);
+
+//postman request
 exports.attachEventToGroup = (groupId, eventId) => {
     return Group.findByIdAndUpdate(groupId, { $push: { events: eventId } });
 }
