@@ -6,10 +6,10 @@ const eventSchema = new mongoose.Schema({
     city: String,
     location: String,
     status: String,
-    groupId: {
-        type: mongoose.Types.ObjectId,
-        ref: 'Group'
-    }
+    // groupId: {
+    //     type: mongoose.Types.ObjectId,
+    //     ref: 'Group'
+    // }
 });
 
 const Event = mongoose.model('Event', eventSchema);
