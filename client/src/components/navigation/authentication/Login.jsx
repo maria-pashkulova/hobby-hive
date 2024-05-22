@@ -5,7 +5,8 @@ import {
     Input,
     InputGroup,
     InputRightElement,
-    Button
+    Button,
+    useToast
 } from '@chakra-ui/react';
 
 import { FiEye, FiEyeOff } from "react-icons/fi";
@@ -22,6 +23,7 @@ const formInitialState = {
 const Login = () => {
 
     const navigate = useNavigate();
+    const toast = useToast();
 
     //Basic controlled components:
     //TODO make it abstract
@@ -42,12 +44,35 @@ const Login = () => {
 
 
         // TODO: validate before making a request -> client side validation
+        //TODO - abstract
+
+        if (userData.email === '' || userData.password === '') {
+            toast({
+                title: "Попълнете данните си!",
+                status: "warning",
+                duration: 3000,
+                isClosable: true,
+                position: "bottom",
+            });
+            return;
+        }
+
         authService.login(userData)
-            .then(() => navigate('/'));
+            .then(() => {
+                toast({
+                    title: "Успешно вписване!",
+                    status: "success",
+                    duration: 5000,
+                    isClosable: true,
+                    position: "bottom",
+                });
+
+                navigate('/')
+            });
     }
 
     return (
-        <VStack as='form' spacing='5' onSubmit={handleFormSubmit}>
+        <VStack as='form' spacing='5' onSubmit={handleFormSubmit} noValidate>
             <FormControl id='email' isRequired>
                 <FormLabel>Имейл</FormLabel>
                 <Input
