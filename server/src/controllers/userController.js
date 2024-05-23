@@ -5,14 +5,24 @@ const userService = require('../services/userService');
 router.post('/login', async (req, res) => {
     const { email, password } = req.body;
 
-    const userData = await userService.login(email, password);
+    try {
+        const userData = await userService.login(email, password);
 
-    //httpOnly: true + React ?
-    res.cookie(process.env.COOKIE_NAME, userData.token, { httpOnly: true });
+        //httpOnly: true + React ?
+        res.cookie(process.env.COOKIE_NAME, userData.token, { httpOnly: true });
 
-    res.json(userData);
+        res.json(userData);
 
-    // res.send('Successfully logged in!');
+        // res.send('Successfully logged in!');
+
+    } catch (error) {
+        res.status(400).json({
+            message: error.message
+        })
+    }
+
+
+
 })
 
 router.post('/register', async (req, res) => {
@@ -33,7 +43,9 @@ router.post('/register', async (req, res) => {
         })
 
     } catch (error) {
-        res.status(400);
+        res.status(400).json({
+            message: "Error - register",
+        });
     }
 
 });
