@@ -33,7 +33,7 @@ exports.auth = async (req, res, next) => {
             res.clearCookie(process.env.COOKIE_NAME)
             //може би сървъра трябва да върне статус код 401 и примерно клиента да проверява
             //какъв е статус кода и самия клиент да редиректва
-            res.status(401).json({ msg: 'Unautorized, invalid token!' }); //TODO
+            res.status(401).json({ message: 'Unautorized, invalid token!' }); //TODO
         }
 
     } else {
@@ -47,7 +47,7 @@ exports.auth = async (req, res, next) => {
 //служи за проверка дали потребителят е автентикиран 
 exports.isAuthenticated = (req, res, next) => {
     if (!req.user) {
-        return res.status(401).json({ msg: 'Unautorized!' });
+        return res.status(401).json({ message: 'Unautorized!' });
     }
     next();
 }
