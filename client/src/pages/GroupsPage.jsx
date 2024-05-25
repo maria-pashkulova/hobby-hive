@@ -15,6 +15,7 @@ const GroupsPage = () => {
         groupService.getAll()
             .then(setGroups)
             .catch(err => {
+                console.log(err.message);
                 navigate('/notLogged');
             })
     }, []);

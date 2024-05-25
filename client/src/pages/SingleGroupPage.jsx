@@ -20,6 +20,7 @@ const SingleGroupPage = () => {
         groupService.getById(groupId)
             .then(setGroup)
             .catch(err => {
+                console.log(err.message);
                 navigate('/notLogged');
             });
     }, []);

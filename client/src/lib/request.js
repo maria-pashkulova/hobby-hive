@@ -12,26 +12,47 @@ const buildOptions = (data) => {
 }
 
 const request = async (method, url, data) => {
-    const response = await fetch(url, {
-        ...buildOptions(data),
-        method,
-        credentials: 'include' //this ensures cookies are sent and received
-    });
 
-    //204 - no content -> logout server response
-    if (response.status === 204) {
-        return {};
+    try {
+        // Perform the fetch operation
+        const response = await fetch(url, {
+            ...buildOptions(data),
+            method,
+            credentials: 'include' //this ensures cookies are sent and received
+        });
+
+        // Check if the response status is not ok (status code not in the range 200-299)
+        if (response.ok == false) {
+            // Parse the response body as JSON to get the error message
+            const error = await response.json();
+            // Throw an error with the message from the server
+            throw new Error(error.message);
+        }
+
+        //204 - no content -> logout server response
+        if (response.status === 204) {
+            return {};
+        }
+
+        //TODO: check other satus codes?
+
+        try {
+            // Try to parse the response body as JSON
+            const result = await response.json();
+            // Return the parsed JSON data
+            return result;
+
+        } catch (error) {
+            // If parsing as JSON fails, return the raw response
+            return response;
+        }
+
+    } catch (error) {
+        // If any error occurs during fetch or JSON parsing
+        // re-throw the error so it can be handled by the caller of this function
+        throw error;
     }
 
-    //TODO: check other satus codes
-
-    const result = await response.json();
-
-    if (!response.ok) {
-        throw result;
-    }
-
-    return result;
 
 }
 

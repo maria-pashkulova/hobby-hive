@@ -47,7 +47,7 @@ exports.auth = async (req, res, next) => {
 //служи за проверка дали потребителят е автентикиран 
 exports.isAuthenticated = (req, res, next) => {
     if (!req.user) {
-        return res.status(401).json({ message: 'Unautorized!' });
+        return res.status(401).json({ message: 'Protected route - Unautorized!' });
     }
     next();
 }
