@@ -12,7 +12,9 @@ const groupService = require('../services/groupService');
 //     res.send(events);
 // })
 
-router.post('/create', async (req, res) => {
+
+//CREATE
+router.post('/', async (req, res) => {
     const { title, description, city, location, status, groupId } = req.body;
 
     const createdEvent = await eventService.create(title, description, city, location, status, groupId);
@@ -20,7 +22,7 @@ router.post('/create', async (req, res) => {
     //attach newly created event to a single group with groupId : groupId
     await groupService.attachEventToGroup(groupId, createdEvent._id);
 
-    res.status(201).send(createdEvent);
+    res.status(201).json(createdEvent);
 });
 
 

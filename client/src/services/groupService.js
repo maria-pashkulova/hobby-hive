@@ -17,7 +17,7 @@ export const getAll = async () => {
 }
 
 export const getById = async (groupId) => {
-    const response = await fetch(`${baseUrl}/groups/${groupId}/details`, { credentials: 'include' });
+    const response = await fetch(`${baseUrl}/groups/${groupId}`, { credentials: 'include' });
 
     //Опит за заявка ако не сме се логнали
     //type:cors?? -> получавам грешки в конзолата??
