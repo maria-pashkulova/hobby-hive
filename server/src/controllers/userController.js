@@ -33,13 +33,11 @@ router.post('/register', async (req, res) => {
 
     try {
 
-        const user = await userService.register(firstName, lastName, email, password);
+        const userData = await userService.register(firstName, lastName, email, password);
+        res.cookie(process.env.COOKIE_NAME, userData.token, { httpOnly: true });
 
-        res.status(201).json({
-            _id: user._id,
-            fullName: user.fullName,
-            email: user.email,
-        });
+        console.log(userData);
+        res.json(userData);
 
     } catch (error) {
         res.status(400).json({

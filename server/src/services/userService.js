@@ -5,13 +5,16 @@ const User = require('../models/User');
 //подавам отделните пропърита
 //за по ясен интерфейс
 //евентуално за валидация на ниво сървис
-exports.register = (firstName, lastName, email, password) => {
+exports.register = async (firstName, lastName, email, password) => {
     //password === repeatPass може да се провери на ниво сървис
     //проверка за съществуващ user със същия имейл
     //ако проверката password === repeatPass е тук, може да се направи хеширането
     //на паролата тук
 
-    return User.create({ firstName, lastName, email, password })
+    const user = await User.create({ firstName, lastName, email, password });
+    const result = getAuthResult(user);
+
+    return result;
 }
 
 exports.login = async (email, password) => {
@@ -31,6 +34,15 @@ exports.login = async (email, password) => {
         throw new Error('Inavlid email or password');
     }
 
+    //create token + return user data as js object
+
+    const result = getAuthResult(user);
+
+    return result;
+
+}
+
+async function getAuthResult(user) {
     //create token
 
     const payload = {
@@ -41,6 +53,10 @@ exports.login = async (email, password) => {
 
     const token = await jwt.sign(payload, process.env.SECRET);
 
-    //return token;
-    return { ...payload, token };
+    const result = {
+        ...payload,
+        token
+    }
+
+    return result;
 }

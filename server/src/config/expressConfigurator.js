@@ -21,7 +21,7 @@ function expressConfig(app) {
         res.setHeader('Access-Control-Allow-Methods',
             '*');
         res.setHeader('Access-Control-Allow-Headers',
-            'Content-Type,Accept, Authorization');
+            'Content-Type,Authorization');
 
         res.header('Access-Control-Allow-Credentials', 'true');
         next();
