@@ -12,12 +12,13 @@ import {
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import * as authService from '../../../services/authService';
 
+import * as authService from '../../services/authService';
+import useForm from "../../hooks/useForm";
 
-const formInitialState = {
-    email: '',
-    password: ''
+const LoginFormKeys = {
+    Email: 'email',
+    Password: 'password'
 }
 
 const Login = () => {
@@ -25,15 +26,11 @@ const Login = () => {
     const navigate = useNavigate();
     const toast = useToast();
 
-    //Basic controlled components:
-    //TODO make it abstract
-    const [userData, setUserData] = useState(formInitialState);
-    const handleInputChange = (e) => {
-        setUserData(prevState => ({
-            ...prevState,
-            [e.target.name]: e.target.value
-        }));
-    }
+    //Make Login form controlled
+    const { formValues: userData, onChange } = useForm({
+        [LoginFormKeys.Email]: '',
+        [LoginFormKeys.Password]: ''
+    });
 
     const [showPassword, setShowPassword] = useState(false);
     const handleClick = () => setShowPassword((showPassword) => !showPassword);
@@ -46,7 +43,7 @@ const Login = () => {
         // TODO: validate before making a request -> client side validation
         //TODO - abstract
 
-        if (userData.email === '' || userData.password === '') {
+        if (userData[LoginFormKeys.Email] === '' || userData[LoginFormKeys.Password] === '') {
             toast({
                 title: "Попълнете данните си!",
                 status: "warning",
@@ -78,7 +75,8 @@ const Login = () => {
                 <Input
                     type='email'
                     name='email'
-                    onChange={handleInputChange}
+                    value={userData[LoginFormKeys.Email]}
+                    onChange={onChange}
                 />
             </FormControl>
             <FormControl id='password' isRequired>
@@ -87,7 +85,8 @@ const Login = () => {
                     <Input
                         type={showPassword ? 'text' : 'password'}
                         name='password'
-                        onChange={handleInputChange}
+                        value={userData[LoginFormKeys.Password]}
+                        onChange={onChange}
                     />
                     <InputRightElement h={'full'}>
                         <Button
@@ -99,10 +98,6 @@ const Login = () => {
                     </InputRightElement>
                 </InputGroup>
             </FormControl>
-            {/* <FormControl id='date' isRequired>
-                <FormLabel>дата</FormLabel>
-                <Input type='date' />
-            </FormControl> */}
             <Button
                 type='submit'
                 bg={'blue.400'}

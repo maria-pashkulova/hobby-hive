@@ -5,23 +5,27 @@ const bcrypt = require('bcrypt');
 //Create schema
 const userSchema = new mongoose.Schema({
 
-    firstName: String,
-    lastName: String,
+    firstName: {
+        type: String,
+        required: true
+    },
+    lastName: {
+        type: String,
+        required: true
+    },
     email: {
         type: String,
         required: true,
         unique: true
     },
-    password: String,
+    password: {
+        type: String,
+        required: true
+    },
     pic: {
         type: String,
         required: true,
         default: 'https://images.nightcafe.studio/users/ZcDYVAlvjNbsAHbwNhUFxdU0rXs2/uploads/m7XuV1i6egth4ISiD240.jpeg?tr=w-1600,c-at_max'
-    },
-    isAdmin: {
-        type: Boolean,
-        required: true,
-        default: false,
     }
 });
 

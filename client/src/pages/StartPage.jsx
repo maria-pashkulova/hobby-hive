@@ -11,8 +11,8 @@ import {
     TabPanel
 } from '@chakra-ui/react';
 
-import Login from '../components/navigation/authentication/Login';
-import Register from '../components/navigation/authentication/Register';
+import Login from '../components/authentication/Login';
+import Register from '../components/authentication/Register';
 
 
 const StartPage = () => {

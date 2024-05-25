@@ -7,36 +7,35 @@ import {
     InputRightElement,
     Button
 } from '@chakra-ui/react';
-
 import { FiEye, FiEyeOff } from "react-icons/fi";
-import { useState } from 'react';
-import * as authService from '../../../services/authService';
 
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import * as authService from '../../services/authService';
+import useForm from "../../hooks/useForm";
 
-const formInitialState = {
-    firstName: '',
-    lastName: '',
-    email: '',
-    password: '',
-    repeatPass: ''
-}
 
+const RegisterFormKeys = {
+    FirstName: 'firstName',
+    LastName: 'lastName',
+    Email: 'email',
+    Password: 'password',
+    RepeatPass: 'repeatPass'
+};
 
 const Register = () => {
 
     const navigate = useNavigate();
 
-    //Basic controlled components:
-    //TODO make it abstract
-    const [userData, setUserData] = useState(formInitialState);
-    const handleInputChange = (e) => {
-        setUserData(prevState => ({
-            ...prevState,
-            [e.target.name]: e.target.value
-        }));
-    }
+    const { formValues: userData, onChange } = useForm({
+        [RegisterFormKeys.FirstName]: '',
+        [RegisterFormKeys.LastName]: '',
+        [RegisterFormKeys.Email]: '',
+        [RegisterFormKeys.Password]: '',
+        [RegisterFormKeys.RepeatPass]: '',
+
+    })
 
     const [showPassword, setShowPassword] = useState(false);
     const handleClick = () => setShowPassword((showPassword) => !showPassword);
@@ -51,13 +50,14 @@ const Register = () => {
     }
 
     return (
-        <VStack as='form' spacing='5' onSubmit={handleFormSubmit} >
+        <VStack as='form' spacing='5' onSubmit={handleFormSubmit} noValidate >
             <FormControl id='fname' isRequired>
                 <FormLabel>Име</FormLabel>
                 <Input
                     type='text'
                     name='firstName'
-                    onChange={handleInputChange}
+                    value={userData[RegisterFormKeys.FirstName]}
+                    onChange={onChange}
                 />
             </FormControl>
             <FormControl id='lname' isRequired>
@@ -65,7 +65,8 @@ const Register = () => {
                 <Input
                     type='text'
                     name='lastName'
-                    onChange={handleInputChange}
+                    value={userData[RegisterFormKeys.LastName]}
+                    onChange={onChange}
                 />
             </FormControl>
             <FormControl id='email' isRequired>
@@ -73,7 +74,8 @@ const Register = () => {
                 <Input
                     type='email'
                     name='email'
-                    onChange={handleInputChange}
+                    value={userData[RegisterFormKeys.Email]}
+                    onChange={onChange}
                 />
             </FormControl>
             <FormControl id='password' isRequired>
@@ -82,7 +84,8 @@ const Register = () => {
                     <Input
                         type={showPassword ? 'text' : 'password'}
                         name='password'
-                        onChange={handleInputChange}
+                        value={userData[RegisterFormKeys.Password]}
+                        onChange={onChange}
                     />
                     <InputRightElement h={'full'}>
                         <Button
@@ -100,7 +103,8 @@ const Register = () => {
                     <Input
                         type={showPassword ? 'text' : 'password'}
                         name='repeatPass'
-                        onChange={handleInputChange}
+                        value={userData[RegisterFormKeys.RepeatPass]}
+                        onChange={onChange}
                     />
                     <InputRightElement h={'full'}>
                         <Button
