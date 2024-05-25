@@ -32,23 +32,6 @@ const userSchema = new mongoose.Schema({
 //TODO: validate if user exists (със същия имейл)
 
 
-//Virtual properties usage:
-//repeat pass and password matching validation
-//value param : името на virtual property и property-то на обекта който е подаден при създаване на user must match 1:1 
-
-//защото това което се случва е : User.create(userData object); и userData -> {firstName: ...,lastName: ..., email: ...,  password: ... , repeatPass: ...}
-//взима стойността на поле repeatPass и я подава като параметър (value) на анонимната ф-ция, параметър на set 
-//Това се случва преди записа да е въведен в БД !
-
-//maybe validate it on service layer
-userSchema.virtual('repeatPass')
-    .set(function (value) {
-        if (value !== this.password) {
-            throw new mongoose.MongooseError('Паролите не съвпадат');
-        }
-    })
-
-
 //случва се след изпълнение на всички валидатори
 //hash password: 
 userSchema.pre('save', async function () {
@@ -59,6 +42,7 @@ userSchema.pre('save', async function () {
     //презаписваме стойността на полето password на текущия документ
     this.password = hash;
 });
+
 
 
 userSchema.virtual('fullName').get(function () {

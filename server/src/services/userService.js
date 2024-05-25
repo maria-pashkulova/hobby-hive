@@ -5,13 +5,13 @@ const User = require('../models/User');
 //подавам отделните пропърита
 //за по ясен интерфейс
 //евентуално за валидация на ниво сървис
-exports.register = (firstName, lastName, email, password, repeatPass) => {
+exports.register = (firstName, lastName, email, password) => {
     //password === repeatPass може да се провери на ниво сървис
     //проверка за съществуващ user със същия имейл
     //ако проверката password === repeatPass е тук, може да се направи хеширането
     //на паролата тук
 
-    return User.create({ firstName, lastName, email, password, repeatPass })
+    return User.create({ firstName, lastName, email, password })
 }
 
 exports.login = async (email, password) => {

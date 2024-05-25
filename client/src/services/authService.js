@@ -1,7 +1,7 @@
 const baseUrl = 'http://localhost:5000/users';
 
 
-export const register = ({ firstName, lastName, email, password, repeatPass }) =>
+export const register = ({ firstName, lastName, email, password }) =>
     fetch(`${baseUrl}/register`, {
         method: 'POST',
         body: JSON.stringify(
@@ -9,8 +9,7 @@ export const register = ({ firstName, lastName, email, password, repeatPass }) =
                 firstName,
                 lastName,
                 email,
-                password,
-                repeatPass
+                password
             }
         ),
         headers: {

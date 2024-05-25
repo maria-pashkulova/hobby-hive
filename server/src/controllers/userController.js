@@ -26,15 +26,14 @@ router.post('/login', async (req, res) => {
 })
 
 router.post('/register', async (req, res) => {
-    const { firstName, lastName, email, password, repeatPass } = req.body;
+    const { firstName, lastName, email, password } = req.body;
 
     //TODO: validate email format
-    //TODO: password === repeatPass ?
     // console.log(req.body);
 
     try {
 
-        const user = await userService.register(firstName, lastName, email, password, repeatPass);
+        const user = await userService.register(firstName, lastName, email, password);
 
         res.status(201).json({
             _id: user._id,

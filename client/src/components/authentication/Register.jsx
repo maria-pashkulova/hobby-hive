@@ -44,6 +44,7 @@ const Register = () => {
         e.preventDefault();
 
         // TODO: validate before making a request -> client side validation
+        //check if password and repeat password match
 
         authService.register(userData)
             .then(() => navigate('/'));
