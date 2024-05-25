@@ -1,40 +1,24 @@
+import * as request from '../lib/request';
+
 const baseUrl = 'http://localhost:5000/users';
 
+//return promise
+export const register = ({ firstName, lastName, email, password }) => (
+    request.post(`${baseUrl}/register`, {
+        firstName,
+        lastName,
+        email,
+        password
+    })
+);
 
-export const register = ({ firstName, lastName, email, password }) =>
-    fetch(`${baseUrl}/register`, {
-        method: 'POST',
-        body: JSON.stringify(
-            {
-                firstName,
-                lastName,
-                email,
-                password
-            }
-        ),
-        headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-        }
+//return promise
+export const login = ({ email, password }) => (
+    request.post(`${baseUrl}/login`, {
+        email,
+        password
+    })
+)
 
-    });
-
-export const login = ({ email, password }) =>
-    fetch(`${baseUrl}/login`, {
-        method: 'POST',
-        credentials: 'include', //Important: this ensures cookies are sent and received
-        body: JSON.stringify(
-            {
-                email,
-                password
-            }
-        ),
-        headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-        }
-
-    });
-
-
-export const logout = () => fetch(`${baseUrl}/logout`, { credentials: 'include' });
+//return promise
+export const logout = () => request.get(`${baseUrl}/logout`);

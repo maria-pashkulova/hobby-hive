@@ -52,7 +52,7 @@ router.post('/register', async (req, res) => {
 router.get('/logout', (req, res) => {
     //TO DO - invalidate token - да се измисли механизъм за инвалидиране на токена
     res.clearCookie(process.env.COOKIE_NAME);
-    res.end();
+    res.status(204).end();
 });
 
 module.exports = router;
