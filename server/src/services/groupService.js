@@ -33,7 +33,7 @@ exports.getAll = async (name, category, location) => {
 
     let groups = await Group.find();
 
-    //TODO: use mongoose to filter in the db
+    //TODO: use mongoose to filter in the db -> $or mongodb operator
     if (name) {
         groups = groups.filter(group => group.name.toLowerCase().includes(name.toLowerCase()));
     }

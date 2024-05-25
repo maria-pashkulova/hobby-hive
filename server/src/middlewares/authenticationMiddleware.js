@@ -1,6 +1,6 @@
 const jwt = require('../lib/jwt');
 
-//в момента не работи, защото не сетвам бисквитка при логин! (засега при register не генерирам token)
+//(засега при register не генерирам token)
 
 
 //служи за да автентикира потребителя
@@ -9,6 +9,9 @@ exports.auth = async (req, res, next) => {
     //сървъра да не го търси в кукитата, а в req.headers('име на хедъра:пр: X-Authorization')
     //бисквитка или хедърс?
     const token = req.cookies[process.env.COOKIE_NAME];
+
+    //headers
+    //const token = req.header('X-Authorization');
 
     if (token) {
 
@@ -30,18 +33,18 @@ exports.auth = async (req, res, next) => {
             res.clearCookie(process.env.COOKIE_NAME)
             //може би сървъра трябва да върне статус код 401 и примерно клиента да проверява
             //какъв е статус кода и самия клиент да редиректва
-            res.status(401).json({ msg: 'Unautorized!' }); //TODO
+            res.status(401).json({ msg: 'Unautorized, invalid token!' }); //TODO
         }
 
     } else {
+        //единствените публични  routes са login и register
         next();
-
     }
 
 }
 
-//route guards
-//служи за проверка дали потребителят е автентикиран
+//route guards - за всички пътища освен login и register
+//служи за проверка дали потребителят е автентикиран 
 exports.isAuthenticated = (req, res, next) => {
     if (!req.user) {
         return res.status(401).json({ msg: 'Unautorized!' });

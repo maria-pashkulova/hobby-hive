@@ -40,17 +40,18 @@ router.post('/register', async (req, res) => {
             _id: user._id,
             fullName: user.fullName,
             email: user.email,
-        })
+        });
 
     } catch (error) {
         res.status(400).json({
-            message: "Error - register",
+            message: error.message,
         });
     }
 
 });
 
 router.get('/logout', (req, res) => {
+    //TO DO - invalidate token - да се измисли механизъм за инвалидиране на токена
     res.clearCookie(process.env.COOKIE_NAME);
     res.end();
 });
