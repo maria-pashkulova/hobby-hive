@@ -11,17 +11,17 @@ router.post('/login', async (req, res) => {
         //httpOnly: true + React ?
         res.cookie(process.env.COOKIE_NAME, userData.token, { httpOnly: true });
 
-        res.json(userData);
-
-        // res.send('Successfully logged in!');
+        res.json({
+            _id: userData._id,
+            fullName: userData.fullName,
+            email: userData.email
+        });
 
     } catch (error) {
         res.status(400).json({
             message: error.message
         })
     }
-
-
 
 })
 
@@ -36,8 +36,11 @@ router.post('/register', async (req, res) => {
         const userData = await userService.register(firstName, lastName, email, password);
         res.cookie(process.env.COOKIE_NAME, userData.token, { httpOnly: true });
 
-        console.log(userData);
-        res.json(userData);
+        res.json({
+            _id: userData._id,
+            fullName: userData.fullName,
+            email: userData.email
+        });
 
     } catch (error) {
         res.status(400).json({
