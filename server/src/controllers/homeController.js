@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const { isAuthenticated } = require('../middlewares/authenticationMiddleware');
+const { auth } = require('../middlewares/authenticationMiddleware');
 const groupService = require('../services/groupService');
 
 
@@ -8,7 +8,7 @@ const groupService = require('../services/groupService');
 //http://localhost:5000/?category=sport&location=Plovdiv
 
 //READ
-router.get('/', isAuthenticated, async (req, res) => {
+router.get('/', auth, async (req, res) => {
     console.log(req.user);
     const { name, category, location } = req.query;
     // console.log(req.query);
