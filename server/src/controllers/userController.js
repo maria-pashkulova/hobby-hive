@@ -5,6 +5,10 @@ const userService = require('../services/userService');
 router.post('/login', async (req, res) => {
     const { email, password } = req.body;
 
+    if (!email || !password) {
+        return res.status(400).json({ message: 'Username and password are required!' })
+    }
+
     try {
         const userData = await userService.login(email, password);
 
@@ -18,7 +22,7 @@ router.post('/login', async (req, res) => {
         });
 
     } catch (error) {
-        res.status(400).json({
+        res.status(401).json({
             message: error.message
         })
     }
@@ -27,6 +31,10 @@ router.post('/login', async (req, res) => {
 
 router.post('/register', async (req, res) => {
     const { firstName, lastName, email, password } = req.body;
+
+    if (!firstName || !lastName || !email || !password) {
+        return res.status(400).json({ message: 'First name, Last name, email, password are required!' })
+    }
 
     //TODO: validate email format
     // console.log(req.body);
@@ -43,7 +51,9 @@ router.post('/register', async (req, res) => {
         });
 
     } catch (error) {
-        res.status(400).json({
+
+        //status 409 - conflict - user with the same email already exists
+        res.status(409).json({
             message: error.message,
         });
     }

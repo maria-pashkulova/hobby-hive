@@ -47,7 +47,10 @@ const Register = () => {
         //check if password and repeat password match
 
         authService.register(userData)
-            .then(() => navigate('/'));
+            .then(() => navigate('/'))
+            .catch((error) => {
+                console.log(error.message);
+            });
     }
 
     return (

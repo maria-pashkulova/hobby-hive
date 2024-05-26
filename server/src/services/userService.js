@@ -10,6 +10,14 @@ exports.register = async (firstName, lastName, email, password) => {
     //проверка за съществуващ user със същия имейл
     //ако проверката password === repeatPass е тук, може да се направи хеширането
     //на паролата тук
+    //за момента няма да пращам на сървъра repeat pass
+
+    //validate if user exists (със същия имейл)
+    //findOne() връща null, ако не намери търсен запис в колекцията
+    const duplicate = await User.findOne({ email });
+    if (duplicate) {
+        throw new Error('User with the same email already exists!');
+    }
 
     const user = await User.create({ firstName, lastName, email, password });
     const result = getAuthResult(user);
@@ -20,6 +28,7 @@ exports.register = async (firstName, lastName, email, password) => {
 exports.login = async (email, password) => {
 
     //find user (проверка дали изобщо съществува)
+    //findOne() връща null, ако не намери търсен запис в колекцията
     const user = await User.findOne({ email });
 
     if (!user) {
