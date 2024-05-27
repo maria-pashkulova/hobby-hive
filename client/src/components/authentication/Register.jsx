@@ -9,11 +9,13 @@ import {
 } from '@chakra-ui/react';
 import { FiEye, FiEyeOff } from "react-icons/fi";
 
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import * as authService from '../../services/authService';
 import useForm from "../../hooks/useForm";
+
+import AuthContext from '../../contexts/authContext';
 
 
 const RegisterFormKeys = {
@@ -27,6 +29,7 @@ const RegisterFormKeys = {
 const Register = () => {
 
     const navigate = useNavigate();
+    const { registerSubmitHandler } = useContext(AuthContext);
 
     const { formValues: userData, onChange } = useForm({
         [RegisterFormKeys.FirstName]: '',
@@ -45,12 +48,7 @@ const Register = () => {
 
         // TODO: validate before making a request -> client side validation
         //check if password and repeat password match
-
-        authService.register(userData)
-            .then(() => navigate('/'))
-            .catch((error) => {
-                console.log(error.message);
-            });
+        registerSubmitHandler(userData);
     }
 
     return (

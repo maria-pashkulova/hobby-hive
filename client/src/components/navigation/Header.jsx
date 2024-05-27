@@ -2,8 +2,13 @@ import { Flex, Heading, IconButton, Box, Text, HStack, Avatar, Menu, MenuButton,
 
 import { FiMenu, FiChevronDown, FiBell } from "react-icons/fi";
 import { Link } from 'react-router-dom';
+import { useContext } from 'react';
+import AuthContext from '../../contexts/authContext';
+
 
 const Header = ({ onOpen }) => {
+
+    const { fullName } = useContext(AuthContext);
     return (
         <Flex
             as='header'
@@ -48,7 +53,7 @@ const Header = ({ onOpen }) => {
                                     'https://images.unsplash.com/photo-1619946794135-5bc917a27793?ixlib=rb-0.3.5&q=80&fm=jpg&crop=faces&fit=crop&h=200&w=200&s=b616b2c5b373a80ffc9636ba24f7a4a9'
                                 }
                             />
-                            <Text display={{ base: 'none', md: 'flex' }} fontSize="sm">Мария Пашкулова</Text>
+                            <Text display={{ base: 'none', md: 'flex' }} fontSize="sm">{fullName}</Text>
                             <Box display={{ base: 'none', md: 'flex' }}>
                                 <FiChevronDown />
                             </Box>

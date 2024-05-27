@@ -10,11 +10,12 @@ import {
 } from '@chakra-ui/react';
 
 import { FiEye, FiEyeOff } from "react-icons/fi";
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import * as authService from '../../services/authService';
+// import * as authService from '../../services/authService';
 import useForm from "../../hooks/useForm";
+import AuthContext from '../../contexts/authContext';
 
 const LoginFormKeys = {
     Email: 'email',
@@ -24,6 +25,7 @@ const LoginFormKeys = {
 const Login = () => {
 
     const navigate = useNavigate();
+    const { loginSubmitHandler } = useContext(AuthContext);
     const toast = useToast();
 
     //Make Login form controlled
@@ -54,21 +56,7 @@ const Login = () => {
             return;
         }
 
-        authService.login(userData)
-            .then(() => {
-                toast({
-                    title: "Успешно вписване!",
-                    status: "success",
-                    duration: 5000,
-                    isClosable: true,
-                    position: "bottom",
-                });
-
-                navigate('/')
-            })
-            .catch((error) => {
-                console.log(error.message);
-            })
+        loginSubmitHandler(userData);
     }
 
     return (
