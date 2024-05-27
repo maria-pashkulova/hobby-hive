@@ -12,10 +12,10 @@ import { FiEye, FiEyeOff } from "react-icons/fi";
 import { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import * as authService from '../../services/authService';
-import useForm from "../../hooks/useForm";
+import * as authService from '../services/authService';
+import useForm from "../hooks/useForm";
 
-import AuthContext from '../../contexts/authContext';
+import AuthContext from '../contexts/authContext';
 
 
 const RegisterFormKeys = {
@@ -28,7 +28,7 @@ const RegisterFormKeys = {
 
 const Register = () => {
 
-    const navigate = useNavigate();
+    // const navigate = useNavigate();
     const { registerSubmitHandler } = useContext(AuthContext);
 
     const { formValues: userData, onChange } = useForm({

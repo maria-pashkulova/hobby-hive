@@ -21,7 +21,7 @@ const SingleGroupPage = () => {
             .then(setGroup)
             .catch(err => {
                 console.log(err.message);
-                navigate('/notLogged');
+                navigate('/login');
             });
     }, []);
 

@@ -60,6 +60,7 @@ export const AuthProvider = ({ children }) => {
 
     //Изход
     const logoutHandler = () => {
+        console.log('logout handler');
         setAuth({});
     }
 
@@ -67,9 +68,10 @@ export const AuthProvider = ({ children }) => {
         loginSubmitHandler,
         registerSubmitHandler,
         logoutHandler,
-        userId: auth.userId,
+        userId: auth._id,
         fullName: auth.fullName,
-        email: auth.email
+        email: auth.email,
+        isAuthenticated: !!auth._id
     };
 
     return (

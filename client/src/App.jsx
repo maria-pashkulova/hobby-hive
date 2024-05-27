@@ -3,11 +3,13 @@ import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import { Routes, Route } from 'react-router-dom';
 import './App.css'
-import StartPage from './pages/StartPage';
+import GuestLayout from './layouts/GuestLayout.jsx';
 import GroupsPage from './pages/GroupsPage';
-import LoggedInLayout from './layouts/LoggedInLayout';
+import AuthLayout from './layouts/AuthLayout.jsx';
 import MyGroupsPage from './pages/MyGroupsPage';
 import SingleGroupPage from './pages/SingleGroupPage';
+import Login from './components/Login.jsx';
+import Register from './components/Register.jsx';
 import Logout from './components/Logout';
 
 import { AuthProvider } from './contexts/authContext.jsx';
@@ -22,12 +24,16 @@ function App() {
     <AuthProvider>
       <div className='App'>
         <Routes>
-          <Route path='/' element={<LoggedInLayout />}>
+          {/* път / води към AuthLayout */}
+          <Route element={<AuthLayout />}>
             <Route path='/' element={<GroupsPage />} />
             <Route path='/my-groups' element={<MyGroupsPage />} />
             <Route path='/groups/:groupId' element={<SingleGroupPage />} />
           </Route >
-          <Route path='/notLogged' element={<StartPage />} />
+          <Route element={<GuestLayout />}>
+            <Route path='/login' element={<Login />} />
+            <Route path='/register' element={<Register />} />
+          </Route>
           <Route path={'/logout'} element={<Logout />} />
         </Routes >
 

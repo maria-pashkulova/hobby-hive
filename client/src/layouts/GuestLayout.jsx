@@ -1,4 +1,4 @@
-import React from 'react'
+import { useContext } from 'react'
 import {
     Stack,
     Heading,
@@ -11,12 +11,16 @@ import {
     TabPanel
 } from '@chakra-ui/react';
 
-import Login from '../components/authentication/Login';
-import Register from '../components/authentication/Register';
 
+import { Link, Navigate, Outlet } from 'react-router-dom';
+import AuthContext from "../contexts/authContext";
 
-const StartPage = () => {
-    return (
+const GuestLayout = () => {
+    console.log('guest layout')
+    const { isAuthenticated } = useContext(AuthContext);
+
+    console.log(isAuthenticated);
+    return !isAuthenticated ? (
         <Stack direction='column' spacing='8' mx='auto' maxW='lg' py='12' px='6'>
             <Stack direction='column' alignItems='center'>
                 <Heading fontSize={{ base: '2xl', md: '4xl' }}>Хоби Кошер</Heading>
@@ -32,15 +36,15 @@ const StartPage = () => {
 
                 <Tabs variant='soft-rounded' colorScheme='yellow' isLazy={true}>
                     <TabList mb='1em'>
-                        <Tab w='50%'>Вход</Tab>
-                        <Tab w='50%'>Регистрация</Tab>
+                        <Tab w='50%' as={Link} to={'/login'}>Вход</Tab>
+                        <Tab w='50%' as={Link} to={'/register'}>Регистрация</Tab>
                     </TabList>
                     <TabPanels>
-                        <TabPanel>
-                            <Login />
+                        <TabPanel >
+                            <Outlet />
                         </TabPanel>
-                        <TabPanel>
-                            <Register />
+                        <TabPanel >
+                            <Outlet />
                         </TabPanel>
                     </TabPanels>
                 </Tabs>
@@ -48,8 +52,8 @@ const StartPage = () => {
             </Box>
         </Stack>
 
-    )
+    ) : <Navigate to='/' />
 }
 
-export default StartPage;
+export default GuestLayout;
 

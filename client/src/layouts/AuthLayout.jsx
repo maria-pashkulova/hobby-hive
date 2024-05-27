@@ -1,12 +1,17 @@
-import { Outlet } from 'react-router-dom';
+import { Outlet, Navigate } from 'react-router-dom';
 import { Box, Drawer, DrawerContent, useDisclosure } from '@chakra-ui/react';
 import Sidebar from '../components/navigation/Sidebar';
 import Header from '../components/navigation/Header';
+import { useContext } from 'react';
+import AuthContext from "../contexts/authContext";
 
-const LoggedInLayout = () => {
+const AuthLayout = () => {
 
+    console.log('Auth layout');
+    const { isAuthenticated } = useContext(AuthContext);
     const { isOpen, onOpen, onClose } = useDisclosure();
-    return (
+
+    return isAuthenticated ? (
         <>
             <Sidebar
                 display={{ base: 'none', md: 'block' }}
@@ -27,9 +32,7 @@ const LoggedInLayout = () => {
                 <Outlet />
             </Box>
         </>
-
-
-    )
+    ) : <Navigate to='/login' />
 }
 
-export default LoggedInLayout
+export default AuthLayout;

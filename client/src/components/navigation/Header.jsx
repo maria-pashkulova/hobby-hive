@@ -8,7 +8,7 @@ import AuthContext from '../../contexts/authContext';
 
 const Header = ({ onOpen }) => {
 
-    const { fullName } = useContext(AuthContext);
+    const { fullName, userId } = useContext(AuthContext);
     return (
         <Flex
             as='header'

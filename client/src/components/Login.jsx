@@ -14,8 +14,8 @@ import { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 // import * as authService from '../../services/authService';
-import useForm from "../../hooks/useForm";
-import AuthContext from '../../contexts/authContext';
+import useForm from "../hooks/useForm";
+import AuthContext from '../contexts/authContext';
 
 const LoginFormKeys = {
     Email: 'email',
@@ -24,7 +24,7 @@ const LoginFormKeys = {
 
 const Login = () => {
 
-    const navigate = useNavigate();
+    // const navigate = useNavigate();
     const { loginSubmitHandler } = useContext(AuthContext);
     const toast = useToast();
 

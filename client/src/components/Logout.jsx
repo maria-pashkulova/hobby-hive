@@ -14,10 +14,10 @@ const Logout = () => {
 
         authService.logout()
             .then(() => {
-                logoutHandler;
-                navigate('/notLogged')
+                logoutHandler();
+                navigate('/login')
             })
-            .catch(() => navigate('/notLogged'))
+            .catch(() => navigate('/'))
 
     }, []);
 
