@@ -1,13 +1,15 @@
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { Card, CardBody, CardFooter, Heading, SimpleGrid, Button, Text, Flex, Image, Spacer } from '@chakra-ui/react'
 import { Link, useNavigate } from "react-router-dom";
 
+import AuthContext from '../contexts/authContext';
 
 import * as groupService from '../services/groupService';
 
 const GroupsPage = () => {
 
     const navigate = useNavigate();
+    const { invalidOrMissingTokenHandler } = useContext(AuthContext);
 
     const [groups, setGroups] = useState([]);
 
@@ -16,6 +18,7 @@ const GroupsPage = () => {
             .then(setGroups)
             .catch(err => {
                 console.log(err.message);
+                invalidOrMissingTokenHandler();
                 navigate('/login');
             })
     }, []);

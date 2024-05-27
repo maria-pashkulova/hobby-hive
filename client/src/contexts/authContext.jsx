@@ -1,8 +1,9 @@
-import { createContext, useState, useEffect } from "react";
+import { createContext } from "react";
 import { useToast } from '@chakra-ui/react';
 import { useNavigate } from "react-router-dom";
 
 import * as authService from '../services/authService';
+import usePersistedState from "../hooks/usePersistedState";
 
 
 
@@ -15,8 +16,10 @@ export const AuthProvider = ({ children }) => {
     const navigate = useNavigate();
     const toast = useToast();
 
+
+
     //auth - данните върнати от сървъра след успешен логин
-    const [auth, setAuth] = useState({});
+    const [auth, setAuth] = usePersistedState('user', {});
 
     //Вариант да не пазя токена в localStorage, а само в бисквитка
     // => не ми се налага да изнасям токена в localStorage, за да го пратя с request-a
@@ -37,6 +40,8 @@ export const AuthProvider = ({ children }) => {
                 position: "bottom",
             });
 
+            //разчитаме че сървъра връща обект с _id, fullName, email
+            //можем да деструктурираме обекта за по-сигурно
             setAuth(result);
             navigate('/')
 
@@ -51,6 +56,9 @@ export const AuthProvider = ({ children }) => {
 
         try {
             const result = await authService.register(userData);
+
+            //разчитаме че сървъра връща обект с _id, fullName, email
+            //можем да деструктурираме обекта за по-сигурно
             setAuth(result);
             navigate('/');
         } catch (error) {
@@ -61,13 +69,18 @@ export const AuthProvider = ({ children }) => {
     //Изход
     const logoutHandler = () => {
         console.log('logout handler');
-        setAuth({});
+        setAuth(null);
+    }
+
+    const invalidOrMissingTokenHandler = () => {
+        setAuth(null);
     }
 
     const values = {
         loginSubmitHandler,
         registerSubmitHandler,
         logoutHandler,
+        invalidOrMissingTokenHandler,
         userId: auth._id,
         fullName: auth.fullName,
         email: auth.email,

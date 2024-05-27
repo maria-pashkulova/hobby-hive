@@ -1,16 +1,19 @@
 import { TabList, TabPanels, TabPanel, Tabs, Tab, Heading } from "@chakra-ui/react"
-import { useEffect, useState } from "react"
+import { useContext, useEffect, useState } from "react"
 import { useNavigate, useParams } from "react-router-dom"
 
 import * as groupService from '../services/groupService';
 
 import Calendar from '../components/Calendar';
 
+
+import AuthContext from '../contexts/authContext';
+
 const SingleGroupPage = () => {
 
 
     const navigate = useNavigate();
-
+    const { invalidOrMissingTokenHandler } = useContext(AuthContext);
 
     const { groupId } = useParams();
     const [group, setGroup] = useState({});
@@ -21,6 +24,7 @@ const SingleGroupPage = () => {
             .then(setGroup)
             .catch(err => {
                 console.log(err.message);
+                invalidOrMissingTokenHandler();
                 navigate('/login');
             });
     }, []);
