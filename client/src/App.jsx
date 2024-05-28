@@ -13,6 +13,7 @@ import Register from './components/Register.jsx';
 import Logout from './components/Logout';
 
 import { AuthProvider } from './contexts/authContext.jsx';
+import NotFoundPage from './components/NotFoundPage.jsx';
 
 
 
@@ -29,12 +30,13 @@ function App() {
             <Route path='/' element={<GroupsPage />} />
             <Route path='/my-groups' element={<MyGroupsPage />} />
             <Route path='/groups/:groupId' element={<SingleGroupPage />} />
+            <Route path={'/logout'} element={<Logout />} />
           </Route >
           <Route element={<GuestLayout />}>
             <Route path='/login' element={<Login />} />
             <Route path='/register' element={<Register />} />
           </Route>
-          <Route path={'/logout'} element={<Logout />} />
+          <Route path='*' element={<NotFoundPage />} />
         </Routes >
 
       </div>

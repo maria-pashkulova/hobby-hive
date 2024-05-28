@@ -9,15 +9,19 @@ const Logout = () => {
     const { logoutHandler } = useContext(AuthContext);
     useEffect(() => {
 
-        //logout от сървъра
-        //logout от клиента ? - зависи дали ще работя с бисквитки или хедърс
+        //logout от сървъра - оторизирана заявка (изисква бисквитка с валиден токен)
+        //logout от клиента 
 
         authService.logout()
             .then(() => {
                 logoutHandler();
                 navigate('/login')
             })
-            .catch(() => navigate('/'))
+            .catch(() => {
+                logoutHandler(); //invalid or missing token - пр логнал си се, седял си опр време, изтича ти токена - сървъра връща unauthorized - изчистваш стейта
+                //и localStorage за да станеш неаутентикиран и за клиента и тогава редиректваш
+                navigate('/login')
+            });
 
     }, []);
 
