@@ -13,7 +13,7 @@ const SingleGroupPage = () => {
 
 
     const navigate = useNavigate();
-    const { invalidOrMissingTokenHandler } = useContext(AuthContext);
+    const { logoutHandler } = useContext(AuthContext);
 
     const { groupId } = useParams();
     const [group, setGroup] = useState({});
@@ -24,7 +24,8 @@ const SingleGroupPage = () => {
             .then(setGroup)
             .catch(err => {
                 console.log(err.message);
-                invalidOrMissingTokenHandler();
+                logoutHandler(); //invalid or missing token - пр логнал си се, седял си опр време, изтича ти токена - сървъра връща unauthorized - изчистваш стейта
+                //и localStorage за да станеш неаутентикиран и за клиента и тогава редиректваш
                 navigate('/login');
             });
     }, []);

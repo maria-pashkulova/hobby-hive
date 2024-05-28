@@ -66,21 +66,17 @@ export const AuthProvider = ({ children }) => {
         }
     }
 
-    //Изход
+    //logout + invalid or missing token handling (при изтичане на токена (бисквитката също в моя случай))
     const logoutHandler = () => {
         console.log('logout handler');
         setAuth(null);
     }
 
-    const invalidOrMissingTokenHandler = () => {
-        setAuth(null);
-    }
 
     const values = {
         loginSubmitHandler,
         registerSubmitHandler,
         logoutHandler,
-        invalidOrMissingTokenHandler,
         userId: auth._id,
         fullName: auth.fullName,
         email: auth.email,

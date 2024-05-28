@@ -9,7 +9,7 @@ import * as groupService from '../services/groupService';
 const GroupsPage = () => {
 
     const navigate = useNavigate();
-    const { invalidOrMissingTokenHandler } = useContext(AuthContext);
+    const { logoutHandler } = useContext(AuthContext);
 
     const [groups, setGroups] = useState([]);
 
@@ -18,7 +18,8 @@ const GroupsPage = () => {
             .then(setGroups)
             .catch(err => {
                 console.log(err.message);
-                invalidOrMissingTokenHandler();
+                logoutHandler(); //invalid or missing token - пр логнал си се, седял си опр време, изтича ти токена - сървъра връща unauthorized - изчистваш стейта
+                //и localStorage за да станеш неаутентикиран и за клиента и тогава редиректваш
                 navigate('/login');
             })
     }, []);
