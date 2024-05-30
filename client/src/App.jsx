@@ -14,6 +14,8 @@ import Logout from './components/Logout';
 
 import { AuthProvider } from './contexts/authContext.jsx';
 import NotFoundPage from './components/NotFoundPage.jsx';
+import GroupEvents from './components/GroupEvents.jsx';
+import GroupPosts from './components/GroupPosts.jsx';
 
 
 
@@ -29,7 +31,10 @@ function App() {
           <Route element={<AuthLayout />}>
             <Route path='/' element={<GroupsPage />} />
             <Route path='/my-groups' element={<MyGroupsPage />} />
-            <Route path='/groups/:groupId' element={<SingleGroupPage />} />
+            <Route path='/groups/:groupId' element={<SingleGroupPage />} >
+              <Route index element={<GroupPosts />} />
+              <Route path='events' element={<GroupEvents />} />
+            </Route>
             <Route path={'/logout'} element={<Logout />} />
           </Route >
           <Route element={<GuestLayout />}>

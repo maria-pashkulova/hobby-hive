@@ -57,7 +57,7 @@ const GroupsPage = () => {
                             </Button>
                             <Spacer />
                             <Text as='span'>
-                                {group.members} членове
+                                Членове: {group.membersCount}
                             </Text>
                         </CardFooter>
                     </Flex>
