@@ -31,7 +31,28 @@ exports.getAll = async (name, category, location) => {
     //Search functionality with array storage (in-memory)
     // let result = groups.slice();
 
-    let groups = await Group.find();
+    // let groups = await Group.find().lean();
+
+    //_id се включва автоматично; get members count but not the actual members' ids in the home page
+    let groups = await Group.aggregate([{
+
+        //the key $project refers to the stage type, and the value { } describes its parameters
+        /*When the projection document contains keys with 1 as their values, it describes the list of fields that will be included in the result. 
+        If, on the other hand, projection keys are set to 0, 
+        the projection document describes the list of fields that will be excluded from the result. */
+
+        $project: {
+            name: 1,
+            description: 1,
+            category: 1,
+            location: 1,
+            imageUrl: 1,
+            groupAdmin: 1,
+            membersCount: { $size: "$members" }
+        }
+    }]);
+
+    // console.log(groups);
 
     //TODO: use mongoose to filter in the db -> $or mongodb operator
     if (name) {
@@ -48,10 +69,10 @@ exports.getAll = async (name, category, location) => {
 }
 
 //findById is a Mongoose method - we use it instead monogodb's findOne()
-exports.getById = (groupId) => Group.findById(groupId);
-exports.getByIdWithEvents = (groupId) => this.getById(groupId).populate('events');
+exports.getById = (groupId) => Group.findById(groupId).lean();
+// exports.getByIdWithEvents = (groupId) => this.getById(groupId).populate('events'); (child referencing approach)
 
-exports.create = (name, category, location, description, members, imageUrl) => {
+exports.create = (name, category, location, description, imageUrl, groupAdmin) => {
     //createdAt, editedAt...
     //TODO: add validation
     const newGroupData = {
@@ -59,12 +80,14 @@ exports.create = (name, category, location, description, members, imageUrl) => {
         category,
         location,
         description,
-        members,
-        imageUrl
+        imageUrl,
+        groupAdmin,
+        members: [groupAdmin]
     };
 
     // groups.push(newGroup);
 
+    console.log(newGroupData);
 
     const newGroup = Group.create(newGroupData);
     // console.log(newGroup); promise pending 
@@ -89,7 +112,7 @@ exports.update = (groupId, name, category, location, description, members, image
 
 exports.delete = (groupId) => Group.findByIdAndDelete(groupId);
 
-//postman request
-exports.attachEventToGroup = (groupId, eventId) => {
-    return Group.findByIdAndUpdate(groupId, { $push: { events: eventId } });
-}
+//postman request - (child referencing approach)
+// exports.attachEventToGroup = (groupId, eventId) => {
+//     return Group.findByIdAndUpdate(groupId, { $push: { events: eventId } });
+// }

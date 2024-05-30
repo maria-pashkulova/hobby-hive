@@ -1,5 +1,6 @@
 const router = require('express').Router();
 const groupService = require('../services/groupService');
+const eventService = require('../services/eventService');
 
 //path /groups/[...]
 
@@ -7,12 +8,16 @@ const groupService = require('../services/groupService');
 router.get('/:groupId', async (req, res) => {
 
     try {
-        const group = await groupService.getByIdWithEvents(req.params.groupId);
+
+        //ако въведа несъществуващо id се хврърля Mongoose грешка
+        //и приложението (server) спира да работи?
+        const group = await groupService.getById(req.params.groupId);
+
+        console.log(group);
         res.json(group);
 
     } catch (error) {
-        console.log(error);
-        return res.redirect('/404');
+        res.status(404).json({ message: 'Group not found!' });
     }
 
 });
@@ -21,9 +26,10 @@ router.get('/:groupId', async (req, res) => {
 router.post('/', async (req, res) => {
     // console.log(req.body);
     //деструктурираме за да валидираме данните идващи от request-a
-    const { name, category, location, description, members, imageUrl } = req.body;
+    const { name, category, location, description, imageUrl } = req.body;
+    const groupAdmin = req.user._id;
 
-    const createdGroup = await groupService.create(name, category, location, description, members, imageUrl);
+    const createdGroup = await groupService.create(name, category, location, description, imageUrl, groupAdmin);
     res.status(201).json(createdGroup);
 });
 
@@ -46,5 +52,12 @@ router.delete('/:groupId', async (req, res) => {
     res.status(204).end();
 })
 
+
+//GROUP EVENTS
+router.get('/:groupId/events', async (req, res) => {
+    const events = await eventService.getAllGroupEvents(req.params.groupId);
+
+    res.json(events);
+})
 
 module.exports = router;

@@ -8,13 +8,13 @@ exports.getAllGroupEvents = (groupId) => {
     //     end: { $lte: end.toDate() }
     // })
 
-    const events = Event.find({ groupId });
+    const events = Event.find({ groupId }).lean();
 
     return events;
 }
 
 //city, location, status
-exports.create = (title, description, city, location, status) => {
+exports.create = (title, description, city, location, groupId, _ownerId) => {
 
     //TODO: add validation here
     const newEventData = {
@@ -23,7 +23,8 @@ exports.create = (title, description, city, location, status) => {
         description,
         city,
         location,
-        status
+        groupId,
+        _ownerId
     }
     const newEvent = Event.create(newEventData);
 

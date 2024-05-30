@@ -9,13 +9,15 @@ const groupSchema = new mongoose.Schema({
     category: String,
     description: String,
     location: String,
-    members: Number,
     imageUrl: String,
-    events: [{
-        // mongoose.Schema.Types.ObjectId - 2н.
+    members: [{
         type: mongoose.Types.ObjectId,
-        ref: 'Event'
-    }]
+        ref: 'User'
+    }],
+    groupAdmin: {
+        type: mongoose.Types.ObjectId,
+        ref: 'User'
+    }
 
 });
 

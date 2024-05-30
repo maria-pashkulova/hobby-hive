@@ -5,11 +5,14 @@ const eventSchema = new mongoose.Schema({
     description: String,
     city: String,
     location: String,
-    status: String,
-    // groupId: {
-    //     type: mongoose.Types.ObjectId,
-    //     ref: 'Group'
-    // }
+    groupId: {
+        type: mongoose.Types.ObjectId,
+        ref: 'Group'
+    },
+    _ownerId: {
+        type: mongoose.Types.ObjectId,
+        ref: 'User'
+    }
 });
 
 const Event = mongoose.model('Event', eventSchema);
