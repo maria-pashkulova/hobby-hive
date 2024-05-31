@@ -1,11 +1,12 @@
 const express = require('express');
 const path = require('path');
-require('dotenv').config(); //прави process.env обекта глобално достъпен
-
-
+const dotenv = require('dotenv');
 const expressConfigurator = require('./config/expressConfigurator');
 const connectToDb = require('./config/dbConfig');
 const routes = require('./routes');
+
+
+dotenv.config(); //прави process.env обекта глобално достъпен
 
 //#Init - инстанция на експрес сървър
 const app = express();
