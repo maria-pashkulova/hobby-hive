@@ -4,6 +4,21 @@ const eventService = require('../services/eventService');
 
 //path /groups/[...]
 
+//TODO : Search and filter
+//http://localhost:5000/groups?category=sport&location=Plovdiv
+
+//READ
+router.get('/', async (req, res) => {
+    console.log(req.user);
+    const { name, category, location } = req.query;
+    // console.log(req.query);
+
+    const allGroups = await groupService.getAll(name, category, location);
+
+    res.json(allGroups);
+});
+
+
 
 router.get('/:groupId', async (req, res) => {
 
@@ -13,7 +28,6 @@ router.get('/:groupId', async (req, res) => {
         //и приложението (server) спира да работи?
         const group = await groupService.getById(req.params.groupId);
 
-        console.log(group);
         res.json(group);
 
     } catch (error) {
