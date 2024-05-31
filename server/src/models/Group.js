@@ -11,12 +11,13 @@ const groupSchema = new mongoose.Schema({
     location: String,
     imageUrl: String,
     members: [{
-        type: mongoose.Types.ObjectId,
+        type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
     }],
     groupAdmin: {
-        type: mongoose.Types.ObjectId,
-        ref: 'User'
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
     }
 
 });

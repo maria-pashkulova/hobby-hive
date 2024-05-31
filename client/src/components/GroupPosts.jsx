@@ -1,7 +1,11 @@
+import Post from "./Post"
+
 const GroupPosts = () => {
     return (
         <div>
-            Group Posts here
+            <Post />
+            <Post />
+
         </div>
     )
 }

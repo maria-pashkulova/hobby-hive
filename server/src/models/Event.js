@@ -6,12 +6,14 @@ const eventSchema = new mongoose.Schema({
     city: String,
     location: String,
     groupId: {
-        type: mongoose.Types.ObjectId,
-        ref: 'Group'
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Group',
+        required: true
     },
     _ownerId: {
-        type: mongoose.Types.ObjectId,
-        ref: 'User'
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
     }
 });
 

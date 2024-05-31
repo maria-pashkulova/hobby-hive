@@ -1,4 +1,4 @@
-import { Heading, Button } from "@chakra-ui/react"
+import { Heading, Button, Container, Flex } from "@chakra-ui/react"
 import { useContext, useEffect, useState } from "react"
 import { Link, Outlet, useNavigate, useParams } from "react-router-dom"
 
@@ -32,19 +32,31 @@ const SingleGroupPage = () => {
 
     return (
         <>
-            <Heading mb='6'>{group.name}</Heading>
 
-            <p>Hobby category: {group.category}</p>
-            <p>Description: {group.description}</p>
-            <p>Location: {group.location}</p>
-            <p>members: {group.members}</p>
+            <Flex justifyContent='space-between'>
 
-            <nav>
-                <Button bgColor={"greenyellow"} as={Link} to={`/groups/${groupId}`}>Публикации</Button>
-                <Button bgColor={"greenyellow"} as={Link} to={`/groups/${groupId}/events`}>Събития</Button>
-            </nav>
+                <Flex flexDirection='column' gap={2} mb={6}>
+                    <Heading mb='6'>{group.name}</Heading>
+                    <p>{group.description}</p>
+                </Flex>
+                <div>
+                    <p>Hobby category: {group.category}</p>
+                    <p>Location: {group.location}</p>
+                    <p>members: {group.members}</p>
 
-            <Outlet />
+                </div>
+
+            </Flex>
+            <Flex gap={2}>
+                <Button bgColor={"yellow.400"} as={Link} to={`/groups/${groupId}`}>Публикации</Button>
+                <Button bgColor={"yellow.400"} as={Link} to={`/groups/${groupId}/events`}>Събития</Button>
+
+            </Flex>
+
+            <Container>
+                <Outlet />
+            </Container>
+
 
 
         </>
