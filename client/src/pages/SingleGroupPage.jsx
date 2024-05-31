@@ -20,11 +20,20 @@ const SingleGroupPage = () => {
     useEffect(() => {
         groupService.getById(groupId)
             .then(setGroup)
-            .catch(err => {
-                console.log(err.message);
-                logoutHandler(); //invalid or missing token - пр логнал си се, седял си опр време, изтича ти токена - сървъра връща unauthorized - изчистваш стейта
-                //и localStorage за да станеш неаутентикиран и за клиента и тогава редиректваш
-                navigate('/login');
+            .catch(error => {
+                console.log(error.message);
+
+                if (error.status === 401) {
+                    logoutHandler(); //invalid or missing token - пр логнал си се, седял си опр време, изтича ти токена - сървъра връща unauthorized - изчистваш стейта
+                    //и localStorage за да станеш неаутентикиран и за клиента и тогава редиректваш
+                    navigate('/login');
+                } else if (error.status === 404) {
+                    navigate('/not-found');
+                } else {
+                    //handle other errors
+                    console.log(error.message);
+                }
+
             });
 
     }, []);

@@ -69,7 +69,15 @@ exports.getAll = async (name, category, location) => {
 }
 
 //findById is a Mongoose method - we use it instead monogodb's findOne()
-exports.getById = (groupId) => Group.findById(groupId).lean();
+exports.getById = async (groupId) => {
+    const group = await Group.findById(groupId).lean();
+
+    //валиден стринг objectId, но несъществуващ
+    if (!group) {
+        throw new Error('Group not found');
+    };
+
+}
 // exports.getByIdWithEvents = (groupId) => this.getById(groupId).populate('events'); (child referencing approach)
 
 exports.create = (name, category, location, description, imageUrl, groupAdmin) => {

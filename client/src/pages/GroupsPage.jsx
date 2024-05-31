@@ -16,8 +16,10 @@ const GroupsPage = () => {
     useEffect(() => {
         groupService.getAll()
             .then(setGroups)
-            .catch(err => {
-                console.log(err.message);
+            .catch(error => {
+                //мисля че тук няма нужда да проверявам статус кодовете
+                //защото сървъра връща единствено 401 - ако е изтекла бисквитката
+                console.log(error.message);
                 logoutHandler(); //invalid or missing token - пр логнал си се, седял си опр време, изтича ти токена - сървъра връща unauthorized - изчистваш стейта
                 //и localStorage за да станеш неаутентикиран и за клиента и тогава редиректваш
                 navigate('/login');

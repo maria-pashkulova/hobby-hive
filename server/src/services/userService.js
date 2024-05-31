@@ -65,14 +65,14 @@ exports.updateUser = async (currUserId, userIdToUpdate, firstName, lastName, ema
 
     let user = await User.findById(userIdToUpdate);
 
-    //проверка дали изобщо съществува такъв потребител
+    //проверка дали изобщо съществува такъв потребител - съществува ли id-то
     if (!user) {
         const error = new Error('User not found');
         error.statusCode = 404;
         throw error;
     };
 
-    //автентикиран потребител за нашето приложение (с валиден токен)
+    //case:автентикиран потребител за нашето приложение (с валиден токен)
     //се опитва да промени данните на друг потребител
     if (userIdToUpdate !== currUserId) {
         const error = new Error('You cannot update other user\'s profile');
@@ -97,7 +97,6 @@ exports.updateUser = async (currUserId, userIdToUpdate, firstName, lastName, ema
 
     user = await user.save();
 
-    console.log('Updated user: ' + user);
     return {
         _id: user._id,
         fullName: user.fullName,

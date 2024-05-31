@@ -26,7 +26,12 @@ const request = async (method, url, data) => {
             // Parse the response body as JSON to get the error message
             const error = await response.json();
             // Throw an error with the message from the server
-            throw new Error(error.message);
+            // throw new Error(error.message);
+
+            // Throw an error with the message from the server and status
+            const errorWithStatus = new Error(error.message)
+            errorWithStatus.status = response.status;
+            throw errorWithStatus;
         }
 
         //204 - no content -> logout server response

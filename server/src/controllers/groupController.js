@@ -31,7 +31,10 @@ router.get('/:groupId', async (req, res) => {
         res.json(group);
 
     } catch (error) {
-        res.status(404).json({ message: 'Group not found!' });
+
+        //грешка ако върне null - аз я хвърлям
+        //Mongoose грешка - ако е подаден невалиден стринг който да се кастне към objectID
+        res.status(404).json({ message: error.message });
     }
 
 });
