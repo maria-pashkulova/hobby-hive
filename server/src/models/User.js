@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const bcrypt = require('bcrypt');
+
 
 
 //Create schema
@@ -22,27 +22,19 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    pic: {
+    profilePic: {
         type: String,
         required: true,
         default: 'https://images.nightcafe.studio/users/ZcDYVAlvjNbsAHbwNhUFxdU0rXs2/uploads/m7XuV1i6egth4ISiD240.jpeg?tr=w-1600,c-at_max'
+    },
+    bio: {
+        type: String,
+        default: ''
     }
-});
+}, { timestamps: true });
 
-//TODO: validate if user exists (със същия имейл)
-
-
-//случва се след изпълнение на всички валидатори
-//hash password: 
-userSchema.pre('save', async function () {
-
-    //всеки път ще използва 10 rounds и ще генерира уникална сол
-    const hash = await bcrypt.hash(this.password, 10);
-
-    //презаписваме стойността на полето password на текущия документ
-    this.password = hash;
-});
-
+//TODO: validate if user exists (със същия имейл)- направих го на ниво service
+//тук сложих unique, което пак би хвърлило грешка
 
 
 userSchema.virtual('fullName').get(function () {
