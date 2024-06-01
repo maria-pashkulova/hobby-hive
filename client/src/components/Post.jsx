@@ -2,7 +2,7 @@ import { Avatar, Box, Flex, Text, Image } from '@chakra-ui/react'
 import { BsThreeDots } from "react-icons/bs";
 import React from 'react'
 
-const Post = () => {
+const Post = ({ text }) => {
     return (
         <Flex gap={3} mb={4} py={5}>
             <Flex flexDirection='column' alignItems='center'>
@@ -26,7 +26,7 @@ const Post = () => {
 
                 </Flex>
 
-                <Text fontSize='sm'>Описание на публикацията</Text>
+                <Text fontSize='sm'>{text}</Text>
                 <Box
                     borderRadius={6}
                     overflow='hidden'

@@ -1,5 +1,5 @@
 const Event = require('../models/Event');
-
+const Group = require('../models/Group');
 
 
 exports.getAllGroupEvents = (groupId) => {
@@ -14,7 +14,18 @@ exports.getAllGroupEvents = (groupId) => {
 }
 
 //city, location, status
-exports.create = (title, description, city, location, groupId, _ownerId) => {
+exports.create = async (title, description, city, location, groupId, _ownerId) => {
+
+    const group = await Group.findById(groupId);
+
+    if (!group) {
+        const error = new Error('Несъществуваща група за създаване на публикация!');
+        error.statusCode = 404;
+        throw error;
+    }
+
+    //TODO: проверка дали този който се опитва да създаде поста е член на групата
+
 
     //TODO: add validation here
     const newEventData = {

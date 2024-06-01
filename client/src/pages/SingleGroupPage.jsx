@@ -17,6 +17,7 @@ const SingleGroupPage = () => {
     const [group, setGroup] = useState({});
 
 
+    //TODO: след като групата е успешно намерена - да направя заявка за нейните публикации
     useEffect(() => {
         groupService.getById(groupId)
             .then(setGroup)

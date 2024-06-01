@@ -74,7 +74,7 @@ router.get('/logout', auth, (req, res) => {
     res.status(204).end();
 });
 
-
+//да преглеждаш други users мисля
 router.get('/:userId', auth, async (req, res) => {
     const { userId } = req.params;
     try {
