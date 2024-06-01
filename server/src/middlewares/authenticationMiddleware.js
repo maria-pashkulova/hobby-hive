@@ -3,7 +3,7 @@ const jwt = require('../lib/jwt');
 
 //използвам го за protected routes, а не е глобален midlleware, тъй като само login и  register са публични
 //служи за да автентикира потребителя
-exports.auth = async (req, res, next) => {
+const auth = async (req, res, next) => {
     //TODO - клиентът да закача в хедърс с определено име токена (custom header name)
     //сървъра да не го търси в кукитата, а в req.headers('име на хедъра:пр: X-Authorization')
     //бисквитка или хедърс?
@@ -40,6 +40,8 @@ exports.auth = async (req, res, next) => {
 
 }
 
+
+module.exports = auth;
 //route guards - за всички пътища освен login и register
 //служи за проверка дали потребителят е автентикиран
 // exports.isAuthenticated = (req, res, next) => {

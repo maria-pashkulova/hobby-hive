@@ -1,7 +1,7 @@
 const router = require('express').Router();
 
 const userService = require('../services/userService');
-const { auth } = require('../middlewares/authenticationMiddleware');
+const auth = require('../middlewares/authenticationMiddleware');
 
 router.post('/login', async (req, res) => {
     const { email, password } = req.body;
@@ -74,6 +74,19 @@ router.get('/logout', auth, (req, res) => {
     res.status(204).end();
 });
 
+
+router.get('/:userId', auth, async (req, res) => {
+    const { userId } = req.params;
+    try {
+
+        const user = await userService.getUser(userId);
+        res.status(200).json(user);
+
+    } catch (error) {
+        res.status(error.statusCode || 500).json({ message: error.message });
+        console.log('Error in get user profile:', error.message);
+    }
+})
 
 router.put('/:userId', auth, async (req, res) => {
 
