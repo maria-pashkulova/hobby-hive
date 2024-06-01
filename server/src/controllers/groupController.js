@@ -1,6 +1,13 @@
 const router = require('express').Router();
+
+//други routers:
+const eventController = require('./eventController');
+const postController = require('./postController');
+
+//middlewares
+const getGroup = require('../middlewares/groupMiddleware');
+
 const groupService = require('../services/groupService');
-const eventService = require('../services/eventService');
 
 //path /groups/[...]
 
@@ -17,7 +24,6 @@ router.get('/', async (req, res) => {
 
     res.json(allGroups);
 });
-
 
 
 router.get('/:groupId', async (req, res) => {
@@ -70,11 +76,15 @@ router.delete('/:groupId', async (req, res) => {
 })
 
 
-//GROUP EVENTS
-router.get('/:groupId/events', async (req, res) => {
-    const events = await eventService.getAllGroupEvents(req.params.groupId);
+//GROUP POSTS
 
-    res.json(events);
-})
+router.use('/:groupId/posts', getGroup, postController);
+
+
+
+//GROUP EVENTS
+router.use('/:groupId/events', getGroup, eventController);
+
+
 
 module.exports = router;

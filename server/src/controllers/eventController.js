@@ -11,11 +11,20 @@ const eventService = require('../services/eventService');
 //     res.json(events);
 // })
 
+//GET ALL
+
+router.get('/', async (req, res) => {
+    const events = await eventService.getAllGroupEvents(req.groupId);
+
+    res.json(events);
+})
+
 
 //CREATE
 router.post('/', async (req, res) => {
-    const { title, description, city, location, groupId } = req.body;
+    const { title, description, city, location } = req.body;
     const _ownerId = req.user._id;
+    const groupId = req.groupId;
 
     const createdEvent = await eventService.create(title, description, city, location, groupId, _ownerId);
 

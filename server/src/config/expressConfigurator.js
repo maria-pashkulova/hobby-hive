@@ -13,7 +13,7 @@ function expressConfig(app) {
     app.use(express.urlencoded({ extended: false }));
     //Обработва данни от форма идващи в json формат - клиентът
     //трябва да ги оформи под формата на json (Реакт ще се грижи за това)
-    app.use(express.json());
+    app.use(express.json()); // To parse JSON data in the req.body
 
     //CORS related
     app.use((req, res, next) => {

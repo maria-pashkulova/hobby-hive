@@ -77,6 +77,8 @@ exports.getById = async (groupId) => {
         throw new Error('Group not found');
     };
 
+    return group;
+
 }
 // exports.getByIdWithEvents = (groupId) => this.getById(groupId).populate('events'); (child referencing approach)
 
