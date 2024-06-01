@@ -61,6 +61,17 @@ exports.login = async (email, password) => {
 
 }
 
+exports.getUser = async (userId) => {
+    const user = await User.findById(userId).select('_id fullName profilePic bio createdAt');
+
+    if (!user) {
+        const error = new Error('User not found');
+        error.statusCode = 404;
+        throw error;
+    };
+    return user;
+}
+
 exports.updateUser = async (currUserId, userIdToUpdate, firstName, lastName, email, password, profilePic, bio) => {
 
     let user = await User.findById(userIdToUpdate);
@@ -103,6 +114,7 @@ exports.updateUser = async (currUserId, userIdToUpdate, firstName, lastName, ema
         email: user.email
     }
 }
+
 
 async function getAuthResult(user) {
     //create token
