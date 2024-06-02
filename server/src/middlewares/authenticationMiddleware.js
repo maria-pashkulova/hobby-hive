@@ -28,6 +28,8 @@ const auth = async (req, res, next) => {
         //имат достъп до контекста на заявката
         req.user = decodedToken;
 
+        console.log(req.user);
+
         next();
 
     } catch (err) {

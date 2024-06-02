@@ -21,7 +21,8 @@ router.post('/login', async (req, res) => {
         res.json({
             _id: userData._id,
             fullName: userData.fullName,
-            email: userData.email
+            email: userData.email,
+            profilePic: userData.profilePic
         });
 
     } catch (error) {
@@ -53,7 +54,8 @@ router.post('/register', async (req, res) => {
         res.json({
             _id: userData._id,
             fullName: userData.fullName,
-            email: userData.email
+            email: userData.email,
+            profilePic: userData.profilePic
         });
 
     } catch (error) {

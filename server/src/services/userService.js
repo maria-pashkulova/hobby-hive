@@ -129,6 +129,7 @@ async function getAuthResult(user) {
         _id: user._id,
         fullName: user.fullName,
         email: user.email,
+        profilePic: user.profilePic,
         accessToken
     }
 

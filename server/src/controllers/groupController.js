@@ -16,7 +16,6 @@ const groupService = require('../services/groupService');
 
 //READ
 router.get('/', async (req, res) => {
-    console.log(req.user);
     const { name, category, location } = req.query;
     // console.log(req.query);
 
