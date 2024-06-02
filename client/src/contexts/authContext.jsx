@@ -80,6 +80,7 @@ export const AuthProvider = ({ children }) => {
         userId: auth._id,
         fullName: auth.fullName,
         email: auth.email,
+        profilePic: auth.profilePic,
         isAuthenticated: !!auth._id
     };
 
