@@ -1,4 +1,5 @@
-const Group = require('../models/Group')
+const Group = require('../models/Group');
+const User = require('../models/User');
 
 
 //In-memory storage
@@ -82,7 +83,7 @@ exports.getById = async (groupId) => {
 }
 // exports.getByIdWithEvents = (groupId) => this.getById(groupId).populate('events'); (child referencing approach)
 
-exports.create = (name, category, location, description, imageUrl, groupAdmin) => {
+exports.create = async (name, category, location, description, imageUrl, currUserId) => {
     //createdAt, editedAt...
     //TODO: add validation
     const newGroupData = {
@@ -91,16 +92,16 @@ exports.create = (name, category, location, description, imageUrl, groupAdmin) =
         location,
         description,
         imageUrl,
-        groupAdmin,
-        members: [groupAdmin]
+        groupAdmin: currUserId,
+        members: [currUserId]
     };
 
-    // groups.push(newGroup);
+    const newGroup = await Group.create(newGroupData);
 
-    console.log(newGroupData);
+    const currUser = await User.findById(currUserId);
 
-    const newGroup = Group.create(newGroupData);
-    // console.log(newGroup); promise pending 
+    currUser.groups.push(newGroup._id);
+    await currUser.save();
 
     return newGroup;
 }
@@ -121,6 +122,41 @@ exports.update = (groupId, name, category, location, description, members, image
 }
 
 exports.delete = (groupId) => Group.findByIdAndDelete(groupId);
+
+exports.joinGroup = async (groupId, currUserId) => {
+
+    //find user who wants to join a group in the db
+    const currUser = await User.findById(currUserId);
+
+    //find group in the db
+    const group = await Group.findById(groupId);
+
+    //check if group still exists
+    if (!group) {
+        const error = new Error('Group not found');
+        error.statusCode = 404;
+        throw error;
+    }
+
+    // check if the user is already a member of the group
+    const memberExist = group.members.find(memberId => memberId.toString() === currUserId);
+
+    if (memberExist) {
+        const error = new Error('You are already a member of this group');
+        error.statusCode = 400;
+        throw error;
+    }
+
+    //if the current user is not a member of a group:
+    //add member to the group
+    group.members.push(currUserId)
+
+    //add group to the user group array
+    currUser.groups.push(groupId);
+
+    await group.save();
+    await currUser.save();
+}
 
 //postman request - (child referencing approach)
 // exports.attachEventToGroup = (groupId, eventId) => {

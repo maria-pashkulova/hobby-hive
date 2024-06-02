@@ -5,7 +5,8 @@ const Group = require('../models/Group');
 exports.getAllGroupPosts = (groupId) => {
 
     //ако се подаде несъществуващо groupId, което е валидно ObjectId, ще върне празен масив
-    const posts = Post.find({ groupId }).lean();
+    //sort in descending order
+    const posts = Post.find({ groupId }).sort({ createdAt: -1 }).lean();
     return posts;
 }
 

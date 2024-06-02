@@ -49,9 +49,9 @@ router.post('/', async (req, res) => {
     // console.log(req.body);
     //деструктурираме за да валидираме данните идващи от request-a
     const { name, category, location, description, imageUrl } = req.body;
-    const groupAdmin = req.user._id;
+    const currUserId = req.user._id;
 
-    const createdGroup = await groupService.create(name, category, location, description, imageUrl, groupAdmin);
+    const createdGroup = await groupService.create(name, category, location, description, imageUrl, currUserId);
     res.status(201).json(createdGroup);
 });
 
@@ -72,7 +72,26 @@ router.delete('/:groupId', async (req, res) => {
 
     await groupService.delete(req.params.groupId);
     res.status(204).end();
-})
+});
+
+
+//JOIN A GROUP
+router.post('/:groupId/join', async (req, res) => {
+    const groupId = req.params.groupId;
+    const currUserId = req.user._id;
+    try {
+
+        await groupService.joinGroup(groupId, currUserId);
+        res.status(200).json({
+            message: 'Successfully joined a group'
+        })
+
+    } catch (error) {
+        res.status(error.statusCode || 500).json({
+            message: error.message,
+        });
+    }
+});
 
 
 //GROUP POSTS

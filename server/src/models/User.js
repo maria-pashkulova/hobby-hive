@@ -30,7 +30,12 @@ const userSchema = new mongoose.Schema({
     bio: {
         type: String,
         default: ''
-    }
+    },
+    groups: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Group'
+    }]
+
 }, { timestamps: true });
 
 //TODO: validate if user exists (със същия имейл)- направих го на ниво service
