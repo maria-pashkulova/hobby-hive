@@ -6,12 +6,15 @@ import {
     InputGroup,
     InputRightElement,
     Button,
-    useToast
+    useToast,
+    Box,
+    Text,
+    Link
 } from '@chakra-ui/react';
 
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import { useContext, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link as ReactRouterLink } from 'react-router-dom';
 
 // import * as authService from '../../services/authService';
 import useForm from "../hooks/useForm";
@@ -99,6 +102,11 @@ const Login = () => {
                 }}>
                 Вход
             </Button>
+            <Box pt={6}>
+                <Text align={'center'}>
+                    Все още нямате акаунт? <Link as={ReactRouterLink} to='/register' color={'blue.400'}>Регистрация</Link>
+                </Text>
+            </Box>
 
         </VStack >
     )

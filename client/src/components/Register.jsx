@@ -5,14 +5,17 @@ import {
     Input,
     InputGroup,
     InputRightElement,
-    Button
+    Button,
+    Box,
+    Link,
+    Text
 } from '@chakra-ui/react';
 import { FiEye, FiEyeOff } from "react-icons/fi";
 
 import { useState, useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link as ReactRouterLink } from 'react-router-dom';
 
-import * as authService from '../services/authService';
+// import * as authService from '../services/authService';
 import useForm from "../hooks/useForm";
 
 import AuthContext from '../contexts/authContext';
@@ -129,6 +132,12 @@ const Register = () => {
             >
                 Регистрация
             </Button>
+
+            <Box pt={6}>
+                <Text align={'center'}>
+                    Вече имате акаунт? <Link as={ReactRouterLink} to='/login' color={'blue.400'}>Вход</Link>
+                </Text>
+            </Box>
         </VStack >
     )
 }

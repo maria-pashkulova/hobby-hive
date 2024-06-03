@@ -3,16 +3,11 @@ import {
     Stack,
     Heading,
     Text,
-    Box,
-    Tabs,
-    TabList,
-    Tab,
-    TabPanels,
-    TabPanel
+    Box
 } from '@chakra-ui/react';
 
 
-import { Link, Navigate, Outlet } from 'react-router-dom';
+import { Navigate, Outlet } from 'react-router-dom';
 import AuthContext from "../contexts/authContext";
 
 const GuestLayout = () => {
@@ -34,20 +29,7 @@ const GuestLayout = () => {
                 boxShadow={'lg'}
                 p={8}>
 
-                <Tabs variant='soft-rounded' colorScheme='yellow' isLazy={true}>
-                    <TabList mb='1em'>
-                        <Tab w='50%' as={Link} to={'/login'}>Вход</Tab>
-                        <Tab w='50%' as={Link} to={'/register'}>Регистрация</Tab>
-                    </TabList>
-                    <TabPanels>
-                        <TabPanel >
-                            <Outlet />
-                        </TabPanel>
-                        <TabPanel >
-                            <Outlet />
-                        </TabPanel>
-                    </TabPanels>
-                </Tabs>
+                <Outlet />
 
             </Box>
         </Stack>
