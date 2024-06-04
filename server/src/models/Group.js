@@ -20,7 +20,7 @@ const groupSchema = new mongoose.Schema({
         required: true
     }
 
-});
+}, { timestamps: true });
 
 //Create model
 

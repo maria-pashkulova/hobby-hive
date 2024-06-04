@@ -62,6 +62,7 @@ exports.login = async (email, password) => {
 }
 
 exports.getUser = async (userId) => {
+    //TODO - virtual property fullName is not returned! 
     const user = await User.findById(userId).select('_id fullName profilePic bio createdAt');
 
     if (!user) {
@@ -113,6 +114,12 @@ exports.updateUser = async (currUserId, userIdToUpdate, firstName, lastName, ema
         fullName: user.fullName,
         email: user.email
     }
+}
+
+exports.getGroupsWithMembership = (userId) => {
+    const user = User.findById(userId).select('groups -_id').populate('groups');
+
+    return user;
 }
 
 

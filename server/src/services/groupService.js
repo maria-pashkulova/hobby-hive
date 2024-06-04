@@ -48,7 +48,6 @@ exports.getAll = async (name, category, location) => {
             category: 1,
             location: 1,
             imageUrl: 1,
-            groupAdmin: 1,
             membersCount: { $size: "$members" }
         }
     }]);
@@ -127,6 +126,8 @@ exports.joinGroup = async (groupId, currUserId) => {
 
     //find user who wants to join a group in the db
     const currUser = await User.findById(currUserId);
+
+    //??check if user exists
 
     //find group in the db
     const group = await Group.findById(groupId);

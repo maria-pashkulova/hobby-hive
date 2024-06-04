@@ -22,3 +22,5 @@ export const login = ({ email, password }) => (
 
 //return promise
 export const logout = () => request.get(`${baseUrl}/logout`);
+
+export const getMyGroups = () => request.get(`${baseUrl}/my-groups`);

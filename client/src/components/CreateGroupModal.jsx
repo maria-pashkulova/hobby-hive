@@ -39,7 +39,7 @@ const locationOptions = [
 ];
 
 
-const CreateGroupModal = ({ isOpen, onClose }) => {
+const CreateGroupModal = ({ isOpen, onClose, addNewCreatedGroup }) => {
 
     const navigate = useNavigate();
     const { logoutHandler } = useContext(AuthContext);
@@ -60,6 +60,7 @@ const CreateGroupModal = ({ isOpen, onClose }) => {
         try {
 
             const newGroup = await groupService.createGroup(formValues);
+            addNewCreatedGroup(newGroup);
             onClose();
 
         } catch (error) {

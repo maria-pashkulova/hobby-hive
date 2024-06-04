@@ -46,7 +46,7 @@ const SingleGroupPage = () => {
             <Flex justifyContent='space-between'>
 
                 <Flex flexDirection='column' gap={2} mb={6}>
-                    <Heading mb='6'>{group.name}</Heading>
+                    <Heading mb='6' size='lg'>{group.name}</Heading>
                     <p>{group.description}</p>
                 </Flex>
                 <div>

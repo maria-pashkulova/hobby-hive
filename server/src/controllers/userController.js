@@ -14,6 +14,7 @@ router.post('/login', async (req, res) => {
     try {
         const userData = await userService.login(email, password);
 
+
         //httpOnly: true + React ?
         //15*60*1000 = 900 000 ms = 15 min - cookie expiration
         res.cookie(process.env.COOKIE_NAME, userData.accessToken, { httpOnly: true, maxAge: 15 * 60 * 1000 });
@@ -76,6 +77,32 @@ router.get('/logout', auth, (req, res) => {
     res.status(204).end();
 });
 
+
+//задължително преди долния път
+//a parametric path inserted just before a literal one takes the precedence over the literal one.
+router.get('/my-groups', auth, async (req, res) => {
+    try {
+        const user = await userService.getGroupsWithMembership(req.user._id).lean();
+
+        const groupsWithMembersCount = user.groups.map(group => ({
+            _id: group._id,
+            name: group.name,
+            category: group.category,
+            description: group.description,
+            location: group.location,
+            imageUrl: group.imageUrl,
+            membersCount: group.members.length
+        }));
+
+
+        res.json(groupsWithMembersCount);
+
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+        console.log('Error in get user groups:', error.message);
+    }
+});
+
 //да преглеждаш други users мисля
 router.get('/:userId', auth, async (req, res) => {
     const { userId } = req.params;
@@ -106,5 +133,6 @@ router.put('/:userId', auth, async (req, res) => {
         console.log('Error in update user:', error.message);
     }
 });
+
 
 module.exports = router;
