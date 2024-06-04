@@ -19,12 +19,18 @@ function expressConfig(app) {
     app.use((req, res, next) => {
         res.setHeader('Access-Control-Allow-Origin', 'http://localhost:5173');
         res.setHeader('Access-Control-Allow-Methods',
-            '*');
+            'GET, OPTIONS, POST, PUT, DELETE');
         res.setHeader('Access-Control-Allow-Headers',
             'Content-Type,Authorization');
 
         res.header('Access-Control-Allow-Credentials', 'true');
-        next();
+
+        // Handle preflight requests
+        if (req.method === 'OPTIONS') {
+            res.sendStatus(200); // Preflight requests should return 200 status
+        } else {
+            next();
+        }
     })
 
     //Working with cookies
