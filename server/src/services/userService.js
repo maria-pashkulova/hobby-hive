@@ -39,7 +39,7 @@ exports.login = async (email, password) => {
 
     //find user (проверка дали изобщо съществува)
     //findOne() връща null, ако не намери търсен запис в колекцията
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email }).select('_id firstName lastName email password profilePic');
 
     if (!user) {
         throw new Error('Invalid email or password!');
@@ -62,8 +62,10 @@ exports.login = async (email, password) => {
 }
 
 exports.getUser = async (userId) => {
-    //TODO - virtual property fullName is not returned! 
-    const user = await User.findById(userId).select('_id fullName profilePic bio createdAt');
+    //TODO - virtual property fullName is not returned  - fullName is not part of the schema (DB)
+    //so it cant be used in select() as a field to be selected. The fields that it consist of 
+    //MUST be selected
+    const user = await User.findById(userId).select('_id firstName lastName profilePic bio createdAt');
 
     if (!user) {
         const error = new Error('User not found');
@@ -126,7 +128,6 @@ exports.getGroupsWithMembership = (userId) => {
 
 async function getAuthResult(user) {
     //create token
-
 
     //900 sec = 15 min
     const accessToken = await jwt.sign({ _id: user._id }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: 900 });
