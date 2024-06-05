@@ -117,7 +117,8 @@ exports.updateUser = async (currUserId, userIdToUpdate, firstName, lastName, ema
 }
 
 exports.getGroupsWithMembership = (userId) => {
-    const user = User.findById(userId).select('groups -_id').populate('groups');
+    //sort results 
+    const user = User.findById(userId).select('groups -_id').populate({ path: 'groups', options: { sort: { 'createdAt': -1 } } });
 
     return user;
 }

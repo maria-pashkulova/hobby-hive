@@ -35,22 +35,26 @@ exports.getAll = async (name, category, location) => {
     // let groups = await Group.find().lean();
 
     //_id се включва автоматично; get members count but not the actual members' ids in the home page
-    let groups = await Group.aggregate([{
+    let groups = await Group.aggregate([
 
         //the key $project refers to the stage type, and the value { } describes its parameters
         /*When the projection document contains keys with 1 as their values, it describes the list of fields that will be included in the result. 
         If, on the other hand, projection keys are set to 0, 
         the projection document describes the list of fields that will be excluded from the result. */
 
-        $project: {
-            name: 1,
-            description: 1,
-            category: 1,
-            location: 1,
-            imageUrl: 1,
-            membersCount: { $size: "$members" }
-        }
-    }]);
+        {
+            $project: {
+                name: 1,
+                description: 1,
+                category: 1,
+                location: 1,
+                imageUrl: 1,
+                createdAt: 1,
+                membersCount: { $size: "$members" }
+            }
+        },
+        { $sort: { "createdAt": -1 } }
+    ]);
 
     // console.log(groups);
 
