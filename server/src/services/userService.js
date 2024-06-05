@@ -61,6 +61,25 @@ exports.login = async (email, password) => {
 
 }
 
+exports.getAll = async (search, currUserId) => {
+
+    const keyword = search
+        ? {
+            $or: [
+                { firstName: { $regex: search, $options: 'i' } },
+                { email: { $regex: search, $options: 'i' } }
+            ]
+        }
+        : {};
+
+    //всички потребители, които match-ват условията - съдържат в името си или имейла си търсения стринг
+    //и са различни от текущо логнатия потребител
+    const users = User.find(keyword).find({ _id: { $ne: currUserId } }).select('_id firstName lastName email profilePic');
+
+    return users;
+}
+
+
 exports.getUser = async (userId) => {
     //TODO - virtual property fullName is not returned  - fullName is not part of the schema (DB)
     //so it cant be used in select() as a field to be selected. The fields that it consist of 

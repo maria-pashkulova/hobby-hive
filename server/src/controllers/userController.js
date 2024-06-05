@@ -78,6 +78,18 @@ router.get('/logout', auth, (req, res) => {
 });
 
 
+//users?search=Мария
+router.get('/', auth, async (req, res) => {
+    const { search } = req.query;
+    const currUserId = req.user._id;
+
+    const users = await userService.getAll(search, currUserId);
+
+    res.json(users);
+
+});
+
+
 //задължително преди долния път
 //a parametric path inserted just before a literal one takes the precedence over the literal one.
 router.get('/my-groups', auth, async (req, res) => {
