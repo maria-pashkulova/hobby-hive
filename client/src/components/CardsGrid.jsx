@@ -6,9 +6,9 @@ const CardsGrid = ({ groups, partialLinkToGroup }) => {
     return (
         <SimpleGrid spacing={4} templateColumns={{ base: '1fr', xl: 'repeat(2,1fr)' }}>
 
-            {groups.map((group, i) => (
+            {groups.map((group) => (
                 <Card
-                    key={i}
+                    key={group._id}
                     direction={{ base: 'column', md: 'row' }}
                     overflow='hidden'
                     variant='outline'

@@ -51,20 +51,29 @@ router.post('/', async (req, res) => {
     const { name, category, location, description, imageUrl } = req.body;
     const currUserId = req.user._id;
 
-    const createdGroup = await groupService.create(name, category, location, description, imageUrl, currUserId);
+    try {
+        const createdGroup = await groupService.create(name, category, location, description, imageUrl, currUserId);
 
-    const newGroupResult = {
-        _id: createdGroup._id,
-        name: createdGroup.name,
-        category: createdGroup.category,
-        description: createdGroup.description,
-        location: createdGroup.location,
-        imageUrl: createdGroup.imageUrl,
-        membersCount: createdGroup.members.length
+        const newGroupResult = {
+            _id: createdGroup._id,
+            name: createdGroup.name,
+            category: createdGroup.category,
+            description: createdGroup.description,
+            location: createdGroup.location,
+            imageUrl: createdGroup.imageUrl,
+            membersCount: createdGroup.members.length
+        }
+
+
+        res.status(201).json(newGroupResult);
+
+    } catch (error) {
+        res.status(500).json({
+            message: error.message,
+        });
     }
 
 
-    res.status(201).json(newGroupResult);
 });
 
 //UPDATE

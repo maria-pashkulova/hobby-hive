@@ -31,7 +31,7 @@ const MyGroupsPage = () => {
     }, []);
 
     const addNewCreatedGroup = (newGroup) => {
-        setGroups((groups) => ([...groups, newGroup]));
+        setGroups((groups) => ([newGroup, ...groups]));
     }
 
     const { isOpen, onOpen, onClose } = useDisclosure();
