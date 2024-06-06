@@ -49,6 +49,7 @@ const Header = ({ onOpen }) => {
                         <HStack >
                             <Avatar
                                 size={'sm'}
+                                name={fullName}
                                 src={profilePic}
                             />
                             <Text display={{ base: 'none', md: 'flex' }} fontSize="sm">{fullName}</Text>

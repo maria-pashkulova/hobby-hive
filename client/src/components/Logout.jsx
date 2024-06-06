@@ -1,5 +1,5 @@
 import { useEffect, useContext } from 'react';
-import * as authService from '../services/authService';
+import * as userService from '../services/userService';
 import { useNavigate } from 'react-router-dom';
 import AuthContext from "../contexts/authContext";
 
@@ -12,7 +12,7 @@ const Logout = () => {
         //logout от сървъра - оторизирана заявка (изисква бисквитка с валиден токен)
         //logout от клиента 
 
-        authService.logout()
+        userService.logout()
             .then(() => {
                 logoutHandler();
                 navigate('/login')

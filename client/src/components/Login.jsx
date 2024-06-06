@@ -16,7 +16,7 @@ import { FiEye, FiEyeOff } from "react-icons/fi";
 import { useContext, useState } from 'react';
 import { Link as ReactRouterLink } from 'react-router-dom';
 
-// import * as authService from '../../services/authService';
+// import * as userService from '../../services/userService';
 import useForm from "../hooks/useForm";
 import AuthContext from '../contexts/authContext';
 

@@ -2,7 +2,7 @@ import { createContext } from "react";
 import { useToast } from '@chakra-ui/react';
 import { useNavigate } from "react-router-dom";
 
-import * as authService from '../services/authService';
+import * as userService from '../services/userService';
 import usePersistedState from "../hooks/usePersistedState";
 
 
@@ -30,7 +30,7 @@ export const AuthProvider = ({ children }) => {
     const loginSubmitHandler = async (userData) => {
 
         try {
-            const result = await authService.login(userData);
+            const result = await userService.login(userData);
 
             toast({
                 title: "Успешно вписване!",
@@ -55,7 +55,7 @@ export const AuthProvider = ({ children }) => {
     const registerSubmitHandler = async (userData) => {
 
         try {
-            const result = await authService.register(userData);
+            const result = await userService.register(userData);
 
             //разчитаме че сървъра връща обект с _id, fullName, email
             //можем да деструктурираме обекта за по-сигурно

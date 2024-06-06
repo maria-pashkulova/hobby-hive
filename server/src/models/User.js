@@ -24,8 +24,7 @@ const userSchema = new mongoose.Schema({
     },
     profilePic: {
         type: String,
-        required: true,
-        default: 'https://images.nightcafe.studio/users/ZcDYVAlvjNbsAHbwNhUFxdU0rXs2/uploads/m7XuV1i6egth4ISiD240.jpeg?tr=w-1600,c-at_max'
+        default: ''
     },
     bio: {
         type: String,
@@ -45,6 +44,17 @@ const userSchema = new mongoose.Schema({
 userSchema.virtual('fullName').get(function () {
     return this.firstName + ' ' + this.lastName
 });
+
+userSchema.set("toJSON", {
+    virtuals: true,
+    versionKey: false,
+    transform: function (doc, dataInMongoDb) {
+        delete dataInMongoDb.firstName;
+        delete dataInMongoDb.lastName;
+        delete dataInMongoDb.id;
+    }
+});
+
 
 //Create model
 
