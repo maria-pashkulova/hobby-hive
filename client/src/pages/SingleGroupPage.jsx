@@ -1,26 +1,35 @@
-import { Heading, Button, Container, Flex } from "@chakra-ui/react"
+import { Heading, Button, Container, Flex, useDisclosure, IconButton, Tooltip } from "@chakra-ui/react"
 import { useContext, useEffect, useState } from "react"
 import { Link, Outlet, useNavigate, useParams } from "react-router-dom"
+import { FiEdit } from "react-icons/fi";
 
 import * as groupService from '../services/groupService';
 
 import AuthContext from '../contexts/authContext';
+import UpdateGroupModal from "../components/UpdateGroupModal";
 
 
 const SingleGroupPage = () => {
 
 
     const navigate = useNavigate();
-    const { logoutHandler } = useContext(AuthContext);
+    const { logoutHandler, userId } = useContext(AuthContext);
+
 
     const { groupId } = useParams();
     const [group, setGroup] = useState({});
+    const [isMember, setIsMember] = useState(false);
+
+    const { isOpen, onOpen, onClose } = useDisclosure();
 
 
     //TODO: след като групата е успешно намерена - да направя заявка за нейните публикации
     useEffect(() => {
         groupService.getById(groupId)
-            .then(setGroup)
+            .then((currGroup) => {
+                setGroup(currGroup);
+                setIsMember(currGroup.members.includes(userId));
+            })
             .catch(error => {
                 console.log(error.message);
 
@@ -46,7 +55,16 @@ const SingleGroupPage = () => {
             <Flex justifyContent='space-between'>
 
                 <Flex flexDirection='column' gap={2} mb={6}>
-                    <Heading mb='6' size='lg'>{group.name}</Heading>
+                    <Flex gap={2}>
+                        <Heading mb='6' size='lg'>{group.name}</Heading>
+
+                        {isMember && (<IconButton
+                            icon={<FiEdit />}
+                            onClick={onOpen}
+                        />
+                        )}
+
+                    </Flex>
                     <p>{group.description}</p>
                 </Flex>
                 <div>
@@ -57,11 +75,33 @@ const SingleGroupPage = () => {
                 </div>
 
             </Flex>
-            <Flex gap={2}>
-                <Button bgColor={"yellow.400"} as={Link} to={`/groups/${groupId}`}>Публикации</Button>
-                <Button bgColor={"yellow.400"} as={Link} to={`/groups/${groupId}/events`}>Събития</Button>
 
+            {/* update group modal */}
+            {isOpen && <UpdateGroupModal
+                isOpen={isOpen}
+                onClose={onClose}
+            />}
+
+            <Flex justifyContent='space-between'>
+                <Flex gap={2}>
+                    <Button bgColor={"yellow.400"} as={Link} to={`/groups/${groupId}`}>Публикации</Button>
+
+                    {
+                        isMember
+                            ? (<Button bgColor={"yellow.400"} as={Link} to={`/groups/${groupId}/events`}>Събития</Button>)
+                            : (
+                                <Tooltip label='Присъединете се, за да имате достъп до събитията на групата' placement="bottom-end">
+                                    <Button bgColor={"yellow.400"} >Присъединяване</Button>
+                                </Tooltip>
+                            )
+                    }
+
+                </Flex>
+                {isMember && (
+                    <Button bgColor={"red.400"} >Напускане</Button>
+                )}
             </Flex>
+
 
             <Container>
                 <Outlet />
