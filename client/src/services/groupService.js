@@ -8,4 +8,4 @@ export const getAll = () => request.get(baseUrl);
 
 export const getById = (groupId) => request.get(`${baseUrl}/${groupId}`);
 
-export const createGroup = ({ name, category, location, description, imageUrl }) => request.post(baseUrl, { name, category, location, description, imageUrl });
+export const createGroup = ({ name, category, location, description, imageUrl, members }) => request.post(baseUrl, { name, category, location, description, imageUrl, members });

@@ -1,11 +1,11 @@
 import { Button, Card, CardBody, CardFooter, Flex, Heading, Image, SimpleGrid, Spacer, Text, useDisclosure } from "@chakra-ui/react"
-import CreateGroupModal from "../components/CreateGroupModal"
+import CreateGroupModal from "../components/create-group/CreateGroupModal"
 import { FiPlus } from "react-icons/fi";
 
 import { useContext, useEffect, useState } from 'react';
 import { Link, useNavigate } from "react-router-dom";
 
-import * as authService from '../services/authService';
+import * as userService from '../services/userService';
 import AuthContext from "../contexts/authContext";
 import CardsGrid from "../components/CardsGrid";
 
@@ -17,7 +17,7 @@ const MyGroupsPage = () => {
     const [groups, setGroups] = useState([]);
 
     useEffect(() => {
-        authService.getMyGroups()
+        userService.getMyGroups()
             .then(setGroups)
             .catch(error => {
                 if (error.status === 401) {

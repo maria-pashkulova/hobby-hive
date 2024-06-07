@@ -1,9 +1,9 @@
 import { Avatar, Box, Text } from "@chakra-ui/react"
 
-const UserListItem = ({ fullName, profilePic, email }) => {
+const UserListItem = ({ user, handleSelectUser }) => {
     return (
         <Box
-            // onClick={handleFunction}
+            onClick={handleSelectUser}
             cursor="pointer"
             bg="#E8E8E8"
             _hover={{
@@ -21,14 +21,14 @@ const UserListItem = ({ fullName, profilePic, email }) => {
             <Avatar
                 mr={2}
                 size="sm"
-                name={fullName}
-                src={profilePic}
+                name={user.fullName}
+                src={user.profilePic}
             />
             <Box>
-                <Text>{fullName}</Text>
+                <Text>{user.fullName}</Text>
                 <Text fontSize="xs">
-                    <b>Email : </b>
-                    {email}
+                    <b>Имейл: </b>
+                    {user.email}
                 </Text>
             </Box>
         </Box>

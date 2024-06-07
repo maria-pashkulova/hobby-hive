@@ -86,7 +86,11 @@ exports.getById = async (groupId) => {
 }
 // exports.getByIdWithEvents = (groupId) => this.getById(groupId).populate('events'); (child referencing approach)
 
-exports.create = async (name, category, location, description, imageUrl, currUserId) => {
+exports.create = async (name, category, location, description, imageUrl, members, currUserId) => {
+
+    //add owner of the group to members
+    members.push(currUserId);
+
     //createdAt, editedAt...
     //TODO: add validation
     const newGroupData = {
@@ -96,15 +100,18 @@ exports.create = async (name, category, location, description, imageUrl, currUse
         description,
         imageUrl,
         groupAdmin: currUserId,
-        members: [currUserId]
+        members
     };
 
     const newGroup = await Group.create(newGroupData);
 
-    const currUser = await User.findById(currUserId);
+    //Update users who are members to the newly created group - add it to their group field
+    //if no users are added upon creation only user who is group admin will be updated
+    await User.updateMany(
+        { _id: { $in: members } },
+        { $push: { groups: newGroup._id } }
+    );
 
-    currUser.groups.push(newGroup._id);
-    await currUser.save();
 
     return newGroup;
 }

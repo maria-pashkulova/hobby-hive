@@ -2,6 +2,7 @@ import { useContext, useEffect, useState } from 'react';
 import { useNavigate } from "react-router-dom";
 
 import AuthContext from '../contexts/authContext';
+import Loading from '../components/Loading';
 
 import * as groupService from '../services/groupService';
 import CardsGrid from '../components/CardsGrid';
@@ -12,10 +13,18 @@ const GroupsPage = () => {
     const { logoutHandler } = useContext(AuthContext);
 
     const [groups, setGroups] = useState([]);
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
+
+        setLoading(true);
+
         groupService.getAll()
-            .then(setGroups)
+            .then((groups) => {
+                setLoading(false);
+
+                setGroups(groups);
+            })
             .catch(error => {
                 //мисля че тук няма нужда да проверявам статус кодовете
                 //защото сървъра връща единствено 401 - ако е изтекла бисквитката
@@ -27,9 +36,12 @@ const GroupsPage = () => {
     }, []);
 
 
-    return (
-        <CardsGrid groups={groups} partialLinkToGroup='groups' />
-    )
+    return loading ?
+        (<Loading />) :
+        (<CardsGrid groups={groups} partialLinkToGroup='groups' />);
+
+
+
 }
 
 export default GroupsPage
