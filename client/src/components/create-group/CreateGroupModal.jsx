@@ -197,6 +197,25 @@ const CreateGroupModal = ({ isOpen, onClose, addNewCreatedGroup }) => {
                             </FormControl>
 
                             <FormControl mt={4}>
+                                <FormLabel>Описание</FormLabel>
+                                <Input
+                                    placeholder='Описание'
+                                    name={[FormKeys.Description]}
+                                    value={formValues[FormKeys.Description]}
+                                    onChange={onChange} />
+                            </FormControl>
+
+                            {/* TODO: upload picture functionality */}
+                            <FormControl mt={4}>
+                                <FormLabel>Снимка на групата</FormLabel>
+                                <Input
+                                    placeholder='Прикачи снимка на групата'
+                                    name={[FormKeys.ImageUrl]}
+                                    value={formValues[FormKeys.ImageUrl]}
+                                    onChange={onChange} />
+                            </FormControl>
+
+                            <FormControl mt={4}>
                                 <FormLabel>Добавяне на членове</FormLabel>
                                 <Input
                                     placeholder='Потърсете потребители...'
@@ -229,20 +248,13 @@ const CreateGroupModal = ({ isOpen, onClose, addNewCreatedGroup }) => {
                                 ))
                             )}
 
-                            <FormControl mt={7}>
-                                <FormLabel>Описание</FormLabel>
-                                <Input
-                                    placeholder='Описание'
-                                    name={[FormKeys.Description]}
-                                    value={formValues[FormKeys.Description]}
-                                    onChange={onChange} />
-                            </FormControl>
+
 
                         </ModalBody>
 
                         <ModalFooter>
-                            <Button type='submit' colorScheme='blue'>Създай</Button>
-                            <Button variant='ghost' mr={3} onClick={onClose}>
+                            <Button type='submit' mr={3} colorScheme='blue'>Създай</Button>
+                            <Button variant='ghost' onClick={onClose}>
                                 Отмяна
                             </Button>
                         </ModalFooter>

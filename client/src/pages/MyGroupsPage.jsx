@@ -1,4 +1,4 @@
-import { Button, Card, CardBody, CardFooter, Flex, Heading, Image, SimpleGrid, Spacer, Text, useDisclosure } from "@chakra-ui/react"
+import { Button, Flex, Heading, useDisclosure } from "@chakra-ui/react"
 import CreateGroupModal from "../components/create-group/CreateGroupModal"
 import { FiPlus } from "react-icons/fi";
 

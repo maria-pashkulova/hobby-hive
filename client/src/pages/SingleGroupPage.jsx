@@ -1,4 +1,4 @@
-import { Heading, Button, Container, Flex, useDisclosure, IconButton, Tooltip } from "@chakra-ui/react"
+import { Heading, Button, Container, Flex, useDisclosure, IconButton, Tooltip, AvatarGroup, Avatar } from "@chakra-ui/react"
 import { useContext, useEffect, useState } from "react"
 import { Link, Outlet, useNavigate, useParams } from "react-router-dom"
 import { FiEdit } from "react-icons/fi";
@@ -68,9 +68,13 @@ const SingleGroupPage = () => {
                     <p>{group.description}</p>
                 </Flex>
                 <div>
-                    <p>Hobby category: {group.category}</p>
-                    <p>Location: {group.location}</p>
-                    <p>members: {group.members}</p>
+                    <p>Категория хоби : {group.category}</p>
+                    <p>Локация: {group.location}</p>
+                    <AvatarGroup>
+                        {group.members?.map((member) => (
+                            <Avatar />
+                        ))}
+                    </AvatarGroup>
 
                 </div>
 
