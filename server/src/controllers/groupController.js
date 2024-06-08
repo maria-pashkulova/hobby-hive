@@ -99,14 +99,14 @@ router.delete('/:groupId', async (req, res) => {
 
 
 //JOIN A GROUP
-router.post('/:groupId/join', async (req, res) => {
+router.put('/:groupId/join', async (req, res) => {
     const groupId = req.params.groupId;
     const currUserId = req.user._id;
     try {
 
         await groupService.joinGroup(groupId, currUserId);
         res.status(200).json({
-            message: 'Successfully joined a group'
+            message: 'Успешно се присъединихте към групата!'
         })
 
     } catch (error) {
@@ -115,6 +115,64 @@ router.post('/:groupId/join', async (req, res) => {
         });
     }
 });
+
+//LEAVE A GROUP
+
+router.put('/:groupId/leave', async (req, res) => {
+    const groupId = req.params.groupId;
+    const currUserId = req.user._id;
+
+    try {
+        await groupService.leaveGroup(groupId, currUserId);
+        res.status(200).json({
+            message: 'Успешно напуснахте групата!'
+        })
+
+    } catch (error) {
+        res.status(error.statusCode || 500).json({
+            message: error.message,
+        });
+    }
+})
+
+//ADD MEMBER TO A GROUP
+
+router.put('/:groupId/addMember', async (req, res) => {
+    const groupId = req.params.groupId;
+    //_id - id на потребителят, който желаем да добавим
+    const { _id } = req.body;
+
+    try {
+        await groupService.addMember(groupId, _id);
+        res.status(200).json({
+            message: 'Успешно добавихте нов член към групата.'
+        })
+    } catch (error) {
+        res.status(error.statusCode || 500).json({
+            message: error.message,
+        });
+    }
+});
+
+//REMOVE MEMBER FROM A GROUP - само администратора на групата може да премахва потребители от групата
+router.put('/:groupId/removeMember', async (req, res) => {
+    const groupId = req.params.groupId;
+    const currUserId = req.user._id;
+    //_id - id на потребителят, който желаем да премахнем
+    const { _id } = req.body;
+
+    try {
+        await groupService.removeMember(groupId, _id, currUserId);
+        res.status(200).json({
+            message: 'Успешно премахнахте член от групата.'
+        })
+    } catch (error) {
+        res.status(error.statusCode || 500).json({
+            message: error.message,
+        });
+    }
+
+})
 
 
 //GROUP POSTS

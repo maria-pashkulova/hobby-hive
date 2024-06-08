@@ -148,25 +148,26 @@ exports.delete = (groupId) => Group.findByIdAndDelete(groupId);
 exports.joinGroup = async (groupId, currUserId) => {
 
     //find user who wants to join a group in the db
-    const currUser = await User.findById(currUserId).select('firstName lastName email profilePic');
+    const currUser = await User.findById(currUserId).select('firstName lastName email profilePic groups');
 
     //??check if user exists
 
     //find group in the db
     const group = await Group.findById(groupId);
 
-    //check if group still exists
+    //check if group exists
     if (!group) {
-        const error = new Error('Group not found');
+        const error = new Error('Не съществува такава група!');
         error.statusCode = 404;
         throw error;
     }
 
     // check if the user is already a member of the group
-    const memberExist = group.members.find(memberId => memberId.toString() === currUserId);
+    //toString() is needed, because group is a Mongoose document, not js object so _id is of type ObjectId and not string
+    const memberExist = group.members.find(member => member._id.toString() === currUserId);
 
     if (memberExist) {
-        const error = new Error('You are already a member of this group');
+        const error = new Error('Вече сте член на тази група!');
         error.statusCode = 400;
         throw error;
     }
@@ -186,6 +187,161 @@ exports.joinGroup = async (groupId, currUserId) => {
 
     await group.save();
     await currUser.save();
+}
+
+exports.leaveGroup = async (groupId, currUserId) => {
+    //find user who wants to leave a group in the db
+    const currUser = await User.findById(currUserId).select('firstName lastName email profilePic groups');
+
+    //??check if user exists
+
+    //find group in the db
+    const group = await Group.findById(groupId);
+
+    //check if group exists
+    if (!group) {
+        const error = new Error('Не съществува такава група!');
+        error.statusCode = 404;
+        throw error;
+    }
+
+    // check if the user is already a member of the group
+    //toString() is needed, because group is a Mongoose document, not js object so _id is of type ObjectId and not string
+    const memberExist = group.members.find(member => member._id.toString() === currUserId);
+
+    if (!memberExist) {
+        const error = new Error('Не можете да напуснете група, в която не членувате!');
+        error.statusCode = 400;
+        throw error;
+    }
+
+
+    // if user is a member, remove group id from the groups array
+    const newGroups = currUser.groups.filter(currGroupId => currGroupId.toString() !== groupId);
+    currUser.groups = newGroups;
+
+
+    // remove user from member array on the group
+    const newMembers = group.members.filter((member) => member._id.toString() !== currUserId);
+    group.members = newMembers;
+
+    await group.save();
+    await currUser.save();
+
+}
+
+exports.addMember = async (groupId, userIdToAdd) => {
+
+    // find this user in the database
+    const userToAdd = await User.findById(userIdToAdd).select('firstName lastName email profilePic groups');
+
+    if (!userToAdd) {
+        const error = new Error('Не съществува такъв потребител!');
+        error.statusCode = 404;
+        throw error;
+    }
+
+    // if member exist, check if member is already in the group
+    //find group in the db
+    const group = await Group.findById(groupId);
+
+    //check if group exists
+    if (!group) {
+        const error = new Error('Не съществува такава група!');
+        error.statusCode = 404;
+        throw error;
+    }
+
+
+    //TODO: в такъв случай трябва ли да проверявам дали текущо логнатия потребител иска да добави себе си
+    //щом имам долната проверка
+
+    //if group exists check if the member is in the group already
+    // check if the user is already a member of the group
+    //toString() is needed, because group is a Mongoose document, not js object so _id is of type ObjectId and not string
+    const memberExist = group.members.find(member => member._id.toString() === userIdToAdd);
+
+    if (memberExist) {
+        const error = new Error('Потребителят вече е член на тази група!');
+        error.statusCode = 400;
+        throw error;
+    }
+
+
+    //if the useToAdd is not a member of a group:
+    //add member to the group with additional data
+
+    group.members.push({
+        _id: userIdToAdd,
+        fullName: userToAdd.fullName,
+        email: userToAdd.email,
+        profilePic: userToAdd.profilePic
+    });
+
+    //add group to the user group array
+    userToAdd.groups.push(groupId);
+
+    await group.save();
+    await userToAdd.save();
+
+}
+
+exports.removeMember = async (groupId, userIdToRemove, currUserId) => {
+
+
+    // find this user in the database
+    const userToRemove = await User.findById(userIdToRemove).select('firstName lastName email profilePic groups');
+
+    if (!userToRemove) {
+        const error = new Error('Не съществува такъв потребител!');
+        error.statusCode = 404;
+        throw error;
+    }
+
+    // if member exist, check if member is a member of the group - required for him to leave!
+    //find group in the db
+    const group = await Group.findById(groupId);
+
+    //check if group exists
+    if (!group) {
+        const error = new Error('Не съществува такава група!');
+        error.statusCode = 404;
+        throw error;
+    }
+
+    //is current user admin of the group - само той може да премахва потребители
+    if (group.groupAdmin.toString() !== currUserId) {
+        const error = new Error('Само администраторът на групата може да премахва нейни членове!');
+        error.statusCode = 403;
+        throw error;
+    }
+
+    //TODO: трябва ли да проверявам дали текущо логнатия потребител иска да премахне себе си
+
+    //if group exists check if the member is in the group
+    // check if the user is a member of the group
+    //toString() is needed, because group is a Mongoose document, not js object so _id is of type ObjectId and not string
+    const memberExist = group.members.find(member => member._id.toString() === userIdToRemove);
+
+    if (!memberExist) {
+        const error = new Error('Потребителят не е член на тази група, за да бъде премахнат!');
+        error.statusCode = 400;
+        throw error;
+    }
+
+
+    // if user is a member, remove group id from the groups array
+    const newGroups = userToRemove.groups.filter(currGroupId => currGroupId.toString() !== groupId);
+    userToRemove.groups = newGroups;
+
+
+    // remove user from member array on the group
+    const newMembers = group.members.filter((member) => member._id.toString() !== userIdToRemove);
+    group.members = newMembers;
+
+    await group.save();
+    await userToRemove.save();
+
 }
 
 //postman request - (child referencing approach)
