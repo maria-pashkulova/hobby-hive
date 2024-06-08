@@ -94,10 +94,13 @@ const SingleGroupPage = () => {
                 onClose={editGroupDetailsModal.onClose}
             />}
 
-            {/* see and add members modal */}
+            {/* see current and add members modal */}
             {groupMembersModal.isOpen && <GroupMembersModal
                 isOpen={groupMembersModal.isOpen}
                 onClose={groupMembersModal.onClose}
+                groupMembers={group.members}
+                groupAdmin={group.groupAdmin}
+                isMember={isMember}
             />}
 
             <Flex justifyContent='space-between'>

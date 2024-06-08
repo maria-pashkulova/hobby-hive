@@ -242,7 +242,7 @@ const CreateGroupModal = ({ isOpen, onClose, addNewCreatedGroup }) => {
                                     <UserListItem
                                         key={user._id}
                                         user={user}
-                                        handleSelectUser={() => handleSelectUser(user)}
+                                        handleFunction={() => handleSelectUser(user)}
                                     />
 
                                 ))
