@@ -132,7 +132,7 @@ const CreateGroupModal = ({ isOpen, onClose, addNewCreatedGroup }) => {
 
             const newGroup = await groupService.createGroup({
                 ...formValues,
-                members: selectedUsers.map((user) => user._id)
+                members: selectedUsers
             });
             addNewCreatedGroup(newGroup);
             onClose();

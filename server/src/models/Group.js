@@ -10,10 +10,27 @@ const groupSchema = new mongoose.Schema({
     description: String,
     location: String,
     imageUrl: String,
-    members: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User'
-    }],
+    members: [
+        {
+            _id: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'User',
+                required: true
+            },
+            fullName: {
+                type: String,
+                required: true
+            },
+            email: {
+                type: String,
+                required: true
+            },
+            profilePic: {
+                type: String
+            }
+
+        }
+    ],
     groupAdmin: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
@@ -21,6 +38,11 @@ const groupSchema = new mongoose.Schema({
     }
 
 }, { timestamps: true });
+
+
+// groupSchema.virtual('membersCount').get(function () {
+//     return this.members.length
+// });
 
 //Create model
 

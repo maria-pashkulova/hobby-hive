@@ -7,6 +7,7 @@ import * as groupService from '../services/groupService';
 
 import AuthContext from '../contexts/authContext';
 import UpdateGroupModal from "../components/UpdateGroupModal";
+import GroupMembersModal from "../components/GroupMembersModal";
 
 
 const SingleGroupPage = () => {
@@ -20,7 +21,8 @@ const SingleGroupPage = () => {
     const [group, setGroup] = useState({});
     const [isMember, setIsMember] = useState(false);
 
-    const { isOpen, onOpen, onClose } = useDisclosure();
+    const editGroupDetailsModal = useDisclosure();
+    const groupMembersModal = useDisclosure();
 
 
     //TODO: след като групата е успешно намерена - да направя заявка за нейните публикации
@@ -28,7 +30,9 @@ const SingleGroupPage = () => {
         groupService.getById(groupId)
             .then((currGroup) => {
                 setGroup(currGroup);
-                setIsMember(currGroup.members.includes(userId));
+
+                const currGroupMemberIds = currGroup.members.map(member => member._id);
+                setIsMember(currGroupMemberIds.includes(userId));
             })
             .catch(error => {
                 console.log(error.message);
@@ -60,7 +64,7 @@ const SingleGroupPage = () => {
 
                         {isMember && (<IconButton
                             icon={<FiEdit />}
-                            onClick={onOpen}
+                            onClick={editGroupDetailsModal.onOpen}
                         />
                         )}
 
@@ -70,9 +74,13 @@ const SingleGroupPage = () => {
                 <div>
                     <p>Категория хоби : {group.category}</p>
                     <p>Локация: {group.location}</p>
-                    <AvatarGroup>
+                    <AvatarGroup size='md' max={2} cursor='pointer' onClick={groupMembersModal.onOpen}>
                         {group.members?.map((member) => (
-                            <Avatar />
+                            <Avatar
+                                key={member._id}
+                                name={member.fullName}
+                                src={member.profilePic}
+                            />
                         ))}
                     </AvatarGroup>
 
@@ -81,9 +89,15 @@ const SingleGroupPage = () => {
             </Flex>
 
             {/* update group modal */}
-            {isOpen && <UpdateGroupModal
-                isOpen={isOpen}
-                onClose={onClose}
+            {editGroupDetailsModal.isOpen && <UpdateGroupModal
+                isOpen={editGroupDetailsModal.isOpen}
+                onClose={editGroupDetailsModal.onClose}
+            />}
+
+            {/* see and add members modal */}
+            {groupMembersModal.isOpen && <GroupMembersModal
+                isOpen={groupMembersModal.isOpen}
+                onClose={groupMembersModal.onClose}
             />}
 
             <Flex justifyContent='space-between'>

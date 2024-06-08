@@ -88,8 +88,20 @@ exports.getById = async (groupId) => {
 
 exports.create = async (name, category, location, description, imageUrl, members, currUserId) => {
 
-    //add owner of the group to members
-    members.push(currUserId);
+    //find user data for group admin
+    //cant use lean because of virtual field fullName
+    const currUser = await User.findById(currUserId).select('firstName lastName email profilePic');
+
+    //add owner of the group to members with additional data
+    members.push({
+        _id: currUserId,
+        fullName: currUser.fullName,
+        email: currUser.email,
+        profilePic: currUser.profilePic
+    });
+
+    console.log(members);
+    //check for duplicate users - case:postman request with duplicate users (skips client side validation)
 
     //createdAt, editedAt...
     //TODO: add validation
@@ -108,7 +120,7 @@ exports.create = async (name, category, location, description, imageUrl, members
     //Update users who are members to the newly created group - add it to their group field
     //if no users are added upon creation only user who is group admin will be updated
     await User.updateMany(
-        { _id: { $in: members } },
+        { _id: { $in: members.map(member => member._id) } },
         { $push: { groups: newGroup._id } }
     );
 
@@ -136,7 +148,7 @@ exports.delete = (groupId) => Group.findByIdAndDelete(groupId);
 exports.joinGroup = async (groupId, currUserId) => {
 
     //find user who wants to join a group in the db
-    const currUser = await User.findById(currUserId);
+    const currUser = await User.findById(currUserId).select('firstName lastName email profilePic');
 
     //??check if user exists
 
@@ -160,8 +172,14 @@ exports.joinGroup = async (groupId, currUserId) => {
     }
 
     //if the current user is not a member of a group:
-    //add member to the group
-    group.members.push(currUserId)
+    //add member to the group with additional data
+
+    group.members.push({
+        _id: currUserId,
+        fullName: currUser.fullName,
+        email: currUser.email,
+        profilePic: currUser.profilePic
+    });
 
     //add group to the user group array
     currUser.groups.push(groupId);
