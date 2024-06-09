@@ -1,4 +1,4 @@
-import { Heading, Button, Container, Flex, useDisclosure, IconButton, Tooltip, AvatarGroup, Avatar } from "@chakra-ui/react"
+import { Heading, Button, Container, Flex, useDisclosure, IconButton, Tooltip, AvatarGroup, Avatar, useToast } from "@chakra-ui/react"
 import { useContext, useEffect, useState } from "react"
 import { Link, Outlet, useNavigate, useParams } from "react-router-dom"
 import { FiEdit } from "react-icons/fi";
@@ -20,6 +20,7 @@ const SingleGroupPage = () => {
     const { groupId } = useParams();
     const [group, setGroup] = useState({});
     const [isMember, setIsMember] = useState(false);
+    const toast = useToast();
 
     const editGroupDetailsModal = useDisclosure();
     const groupMembersModal = useDisclosure();
@@ -32,6 +33,15 @@ const SingleGroupPage = () => {
             members: [...group.members, newMember]
         }));
     }
+
+    //change members in the state when admin removes other users successfully
+    const handleRemoveMember = (memberToRemove) => {
+        setGroup((group) => ({
+            ...group,
+            members: group.members.filter(currMember => currMember._id !== memberToRemove._id)
+        }))
+    }
+
 
     //join group functionality
     const handleJoinGroup = async () => {
@@ -47,6 +57,49 @@ const SingleGroupPage = () => {
             });
 
             setIsMember(true);
+
+        } catch (error) {
+
+            if (error.status === 401) {
+                logoutHandler(); //invalid or missing token - пр логнал си се, седял си опр време, изтича ти токена - сървъра връща unauthorized - изчистваш стейта
+                //и localStorage за да станеш неаутентикиран и за клиента и тогава редиректваш
+                navigate('/login');
+            } else {
+                toast({
+                    title: error.message,
+                    status: "error",
+                    duration: 5000,
+                    isClosable: true,
+                    position: "bottom",
+                });
+            }
+        }
+    }
+
+    //leave group functionality
+    const handleLeaveGroup = async () => {
+
+        //client-side validation 
+        //ако текущо вписания потребител е администратор на групата и иска да напусне
+        //да се провери админа единствен член на групата ли е (members.length === 1) - в такъв случай не може да напусне;
+        //за да не се стига изобщо до заявка към сървъра
+
+        if (group.groupAdmin === userId && group.members.length === 1) {
+            toast({
+                title: "Поради липсата на други членове, не може да се назначи нов администратор на групата и не можете да напуснете!",
+                status: "error",
+                duration: 5000,
+                isClosable: true,
+                position: "bottom",
+            });
+            return;
+        }
+
+
+        try {
+            await groupService.removeMember(groupId, userId);
+
+            navigate('/my-groups');
 
         } catch (error) {
 
@@ -145,6 +198,7 @@ const SingleGroupPage = () => {
                 isMember={isMember}
                 groupId={groupId}
                 handleAddMember={handleAddMember}
+                handleRemoveMember={handleRemoveMember}
             />}
 
             <Flex justifyContent='space-between'>
@@ -163,7 +217,7 @@ const SingleGroupPage = () => {
 
                 </Flex>
                 {isMember && (
-                    <Button bgColor={"red.400"} >Напускане</Button>
+                    <Button bgColor={"red.400"} onClick={handleLeaveGroup} >Напускане</Button>
                 )}
             </Flex>
 

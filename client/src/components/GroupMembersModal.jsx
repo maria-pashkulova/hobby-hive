@@ -8,7 +8,7 @@ import * as groupService from '../services/groupService';
 import { useNavigate } from "react-router-dom";
 import AuthContext from "../contexts/authContext";
 
-const GroupMembersModal = ({ isOpen, onClose, groupMembers, groupAdmin, isMember, groupId, handleAddMember }) => {
+const GroupMembersModal = ({ isOpen, onClose, groupMembers, groupAdmin, isMember, groupId, handleAddMember, handleRemoveMember }) => {
 
 
     const navigate = useNavigate();
@@ -97,8 +97,9 @@ const GroupMembersModal = ({ isOpen, onClose, groupMembers, groupAdmin, isMember
         }
     }
 
+    //remove another user from the group functionality
     //само админа на групата може да премахва потребители
-    const handleRemoveUser = async (member) => {
+    const handleRemoveUser = async (memberToRemove) => {
 
         if (groupAdmin !== userId) {
             toast({
@@ -108,8 +109,34 @@ const GroupMembersModal = ({ isOpen, onClose, groupMembers, groupAdmin, isMember
                 isClosable: true,
                 position: "bottom",
             });
+            return;
         }
-        //handle remove -> toast for permission on status code 403
+
+        try {
+            await groupService.removeMember(groupId, memberToRemove._id);
+
+            //update group state accordingly - function comes from parent component SingleGroupPage
+            handleRemoveMember(memberToRemove);
+
+        } catch (error) {
+
+            if (error.status === 401) {
+                logoutHandler(); //invalid or missing token - пр логнал си се, седял си опр време, изтича ти токена - сървъра връща unauthorized - изчистваш стейта
+                //и localStorage за да станеш неаутентикиран и за клиента и тогава редиректваш
+                navigate('/login');
+            } else {
+                toast({
+                    title: error.message,
+                    status: "error",
+                    duration: 5000,
+                    isClosable: true,
+                    position: "bottom",
+                });
+            }
+        }
+        //handle remove -> toast for permission on status code 403 - имам защита на сървъра - само админа да може да премахва друг освен себе си; 
+        //но на клиента може би не трябва да хендълвам по специалиен начин когато статуса е 403 : 
+        //1) toast е достатъчен (else); 2) имам клиентска валидация която не позволява да се стигне до заявка ако не си админ
 
     }
 
@@ -135,7 +162,7 @@ const GroupMembersModal = ({ isOpen, onClose, groupMembers, groupAdmin, isMember
                             <UserListItem
                                 key={member._id}
                                 user={member}
-                                isRemovable={member._id !== groupAdmin}
+                                isRemovable={isMember && member._id !== groupAdmin && member._id !== userId}
                                 isAdmin={member._id === groupAdmin}
                                 handleFunction={() => handleGoToProfile()}
                                 handleRemove={() => handleRemoveUser(member)}
