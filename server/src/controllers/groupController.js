@@ -119,29 +119,10 @@ router.put('/:groupId/addMember', async (req, res) => {
     }
 });
 
-
-//LEAVE A GROUP
-
-router.put('/:groupId/leave', async (req, res) => {
-    const groupId = req.params.groupId;
-    const currUserId = req.user._id;
-
-    try {
-        await groupService.leaveGroup(groupId, currUserId);
-        res.status(200).json({
-            message: 'Успешно напуснахте групата!'
-        })
-
-    } catch (error) {
-        res.status(error.statusCode || 500).json({
-            message: error.message,
-        });
-    }
-})
-
 //REMOVE MEMBER FROM A GROUP - само администратора на групата може да премахва потребители от групата
 router.put('/:groupId/removeMember', async (req, res) => {
     const groupId = req.params.groupId;
+    //текущо вписания потребител
     const currUserId = req.user._id;
     //_id - id на потребителят, който желаем да премахнем
     const { _id } = req.body;
