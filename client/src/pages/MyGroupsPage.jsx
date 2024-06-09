@@ -30,7 +30,7 @@ const MyGroupsPage = () => {
             })
     }, []);
 
-    const addNewCreatedGroup = (newGroup) => {
+    const handleAddNewCreatedGroup = (newGroup) => {
         setGroups((groups) => ([newGroup, ...groups]));
     }
 
@@ -52,7 +52,7 @@ const MyGroupsPage = () => {
                 {isOpen && <CreateGroupModal
                     isOpen={isOpen}
                     onClose={onClose}
-                    addNewCreatedGroup={addNewCreatedGroup}
+                    handleAddNewCreatedGroup={handleAddNewCreatedGroup}
                 />}
 
             </Flex>

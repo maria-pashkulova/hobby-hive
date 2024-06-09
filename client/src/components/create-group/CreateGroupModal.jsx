@@ -43,7 +43,7 @@ const locationOptions = [
 ];
 
 
-const CreateGroupModal = ({ isOpen, onClose, addNewCreatedGroup }) => {
+const CreateGroupModal = ({ isOpen, onClose, handleAddNewCreatedGroup }) => {
 
     const navigate = useNavigate();
     const { logoutHandler } = useContext(AuthContext);
@@ -134,7 +134,7 @@ const CreateGroupModal = ({ isOpen, onClose, addNewCreatedGroup }) => {
                 ...formValues,
                 members: selectedUsers
             });
-            addNewCreatedGroup(newGroup);
+            handleAddNewCreatedGroup(newGroup);
             onClose();
             toast({
                 title: "Успешно създадохте група!",

@@ -14,7 +14,7 @@ const SingleGroupPage = () => {
 
 
     const navigate = useNavigate();
-    const { logoutHandler, userId } = useContext(AuthContext);
+    const { logoutHandler, userId, fullName, email, profilePic } = useContext(AuthContext);
 
 
     const { groupId } = useParams();
@@ -23,6 +23,49 @@ const SingleGroupPage = () => {
 
     const editGroupDetailsModal = useDisclosure();
     const groupMembersModal = useDisclosure();
+
+
+    //change members in the state when user joins or adds other users successfully
+    const handleAddMember = (newMember) => {
+        setGroup((group) => ({
+            ...group,
+            members: [...group.members, newMember]
+        }));
+    }
+
+    //join group functionality
+    const handleJoinGroup = async () => {
+        try {
+            await groupService.addMember(groupId, userId);
+
+            //update group state accordingly
+            handleAddMember({
+                _id: userId,
+                fullName,
+                email,
+                profilePic
+            });
+
+            setIsMember(true);
+
+        } catch (error) {
+
+            if (error.status === 401) {
+                logoutHandler(); //invalid or missing token - пр логнал си се, седял си опр време, изтича ти токена - сървъра връща unauthorized - изчистваш стейта
+                //и localStorage за да станеш неаутентикиран и за клиента и тогава редиректваш
+                navigate('/login');
+            } else {
+                toast({
+                    title: error.message,
+                    status: "error",
+                    duration: 5000,
+                    isClosable: true,
+                    position: "bottom",
+                });
+            }
+        }
+    }
+
 
 
     //TODO: след като групата е успешно намерена - да направя заявка за нейните публикации
@@ -51,7 +94,6 @@ const SingleGroupPage = () => {
             });
 
     }, []);
-
 
     return (
         <>
@@ -101,6 +143,8 @@ const SingleGroupPage = () => {
                 groupMembers={group.members}
                 groupAdmin={group.groupAdmin}
                 isMember={isMember}
+                groupId={groupId}
+                handleAddMember={handleAddMember}
             />}
 
             <Flex justifyContent='space-between'>
@@ -112,7 +156,7 @@ const SingleGroupPage = () => {
                             ? (<Button bgColor={"yellow.400"} as={Link} to={`/groups/${groupId}/events`}>Събития</Button>)
                             : (
                                 <Tooltip label='Присъединете се, за да имате достъп до събитията на групата' placement="bottom-end">
-                                    <Button bgColor={"yellow.400"} >Присъединяване</Button>
+                                    <Button bgColor={"yellow.400"} onClick={handleJoinGroup} >Присъединяване</Button>
                                 </Tooltip>
                             )
                     }
