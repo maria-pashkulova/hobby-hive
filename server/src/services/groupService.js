@@ -92,15 +92,34 @@ exports.create = async (name, category, location, description, imageUrl, members
     //cant use lean because of virtual field fullName
     const currUser = await User.findById(currUserId).select('firstName lastName email profilePic');
 
-    //add owner of the group to members with additional data
-    members.push({
-        _id: currUserId,
-        fullName: currUser.fullName,
-        email: currUser.email,
-        profilePic: currUser.profilePic
-    });
+    //add owner of the group to members with additional data 
+    //if members.push() is used admin is added to the end of the array
+    //искаме винаги админа да се запазва на 0-ва позиция в масива, с members за да се извежда
+    //на първо място при листването на всички членове на дадена група
 
-    console.log(members);
+
+    //case 1: потребителят който създава групата е добавил други членове при нейното създаване и трябва да го добавим отпред - unshift() (mutator function)
+    //модифицира се директно members - не се създава нова референция
+
+    //case 2: потребителят който създава групата не е добавил други членове при нейното създаване
+    if (members.length > 0) {
+        members.unshift({
+            _id: currUserId,
+            fullName: currUser.fullName,
+            email: currUser.email,
+            profilePic: currUser.profilePic
+        });
+
+    } else {
+        members.push({
+            _id: currUserId,
+            fullName: currUser.fullName,
+            email: currUser.email,
+            profilePic: currUser.profilePic
+        });
+    }
+
+    // console.log(members);
     //check for duplicate users - case:postman request with duplicate users (skips client side validation)
 
     //createdAt, editedAt...
@@ -145,49 +164,6 @@ exports.update = (groupId, name, category, location, description, members, image
 
 exports.delete = (groupId) => Group.findByIdAndDelete(groupId);
 
-exports.joinGroup = async (groupId, currUserId) => {
-
-    //find user who wants to join a group in the db
-    const currUser = await User.findById(currUserId).select('firstName lastName email profilePic groups');
-
-    //??check if user exists
-
-    //find group in the db
-    const group = await Group.findById(groupId);
-
-    //check if group exists
-    if (!group) {
-        const error = new Error('Не съществува такава група!');
-        error.statusCode = 404;
-        throw error;
-    }
-
-    // check if the user is already a member of the group
-    //toString() is needed, because group is a Mongoose document, not js object so _id is of type ObjectId and not string
-    const memberExist = group.members.find(member => member._id.toString() === currUserId);
-
-    if (memberExist) {
-        const error = new Error('Вече сте член на тази група!');
-        error.statusCode = 400;
-        throw error;
-    }
-
-    //if the current user is not a member of a group:
-    //add member to the group with additional data
-
-    group.members.push({
-        _id: currUserId,
-        fullName: currUser.fullName,
-        email: currUser.email,
-        profilePic: currUser.profilePic
-    });
-
-    //add group to the user group array
-    currUser.groups.push(groupId);
-
-    await group.save();
-    await currUser.save();
-}
 
 exports.leaveGroup = async (groupId, currUserId) => {
     //find user who wants to leave a group in the db
@@ -230,7 +206,9 @@ exports.leaveGroup = async (groupId, currUserId) => {
 
 }
 
-exports.addMember = async (groupId, userIdToAdd) => {
+
+//JOIN GROUP / ADD ANOTHER MEMBER TO A GROUP
+exports.addMember = async (groupId, userIdToAdd, currUserId) => {
 
     // find this user in the database
     const userToAdd = await User.findById(userIdToAdd).select('firstName lastName email profilePic groups');
@@ -252,9 +230,17 @@ exports.addMember = async (groupId, userIdToAdd) => {
         throw error;
     }
 
+    //опит за добавяне на друг потребител - изисква се текущия потребител да бъде член на групата
+    if (userIdToAdd !== currUserId) {
+        const currUserIsMember = group.members.find(member => member._id.toString() === currUserId);
 
-    //TODO: в такъв случай трябва ли да проверявам дали текущо логнатия потребител иска да добави себе си
-    //щом имам долната проверка
+        if (!currUserIsMember) {
+            const error = new Error('За да добавите друг потребител първо трябва да те член на групата!');
+            error.statusCode = 403;
+            throw error;
+        }
+
+    }
 
     //if group exists check if the member is in the group already
     // check if the user is already a member of the group

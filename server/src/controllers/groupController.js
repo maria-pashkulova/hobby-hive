@@ -98,23 +98,27 @@ router.delete('/:groupId', async (req, res) => {
 });
 
 
-//JOIN A GROUP
-router.put('/:groupId/join', async (req, res) => {
+//JOIN GROUP / ADD ANOTHER MEMBER TO A GROUP
+
+router.put('/:groupId/addMember', async (req, res) => {
     const groupId = req.params.groupId;
+    //текущо вписания потребител
     const currUserId = req.user._id;
+    //_id - id на потребителят, който желаем да добавим
+    const { _id } = req.body;
+
     try {
-
-        await groupService.joinGroup(groupId, currUserId);
+        await groupService.addMember(groupId, _id, currUserId);
         res.status(200).json({
-            message: 'Успешно се присъединихте към групата!'
+            message: 'Успешно добавихте нов член към групата.'
         })
-
     } catch (error) {
         res.status(error.statusCode || 500).json({
             message: error.message,
         });
     }
 });
+
 
 //LEAVE A GROUP
 
@@ -134,25 +138,6 @@ router.put('/:groupId/leave', async (req, res) => {
         });
     }
 })
-
-//ADD MEMBER TO A GROUP
-
-router.put('/:groupId/addMember', async (req, res) => {
-    const groupId = req.params.groupId;
-    //_id - id на потребителят, който желаем да добавим
-    const { _id } = req.body;
-
-    try {
-        await groupService.addMember(groupId, _id);
-        res.status(200).json({
-            message: 'Успешно добавихте нов член към групата.'
-        })
-    } catch (error) {
-        res.status(error.statusCode || 500).json({
-            message: error.message,
-        });
-    }
-});
 
 //REMOVE MEMBER FROM A GROUP - само администратора на групата може да премахва потребители от групата
 router.put('/:groupId/removeMember', async (req, res) => {
