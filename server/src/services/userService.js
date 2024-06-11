@@ -79,28 +79,28 @@ exports.getAll = async (search, currUserId) => {
     return users;
 }
 
+//maybe return only bio ; other info comes from member fields in the group ?
+// exports.getUser = async (userId) => {
+//     //TODO - virtual property fullName is not returned  - fullName is not part of the schema (DB)
+//     //so it cant be used in select() as a field to be selected. The fields that it consist of 
+//     //MUST be selected
+//     const user = await User.findById(userId).select('_id firstName lastName profilePic createdAt');
 
-exports.getUser = async (userId) => {
-    //TODO - virtual property fullName is not returned  - fullName is not part of the schema (DB)
-    //so it cant be used in select() as a field to be selected. The fields that it consist of 
-    //MUST be selected
-    const user = await User.findById(userId).select('_id firstName lastName profilePic bio createdAt');
+//     if (!user) {
+//         const error = new Error('User not found');
+//         error.statusCode = 404;
+//         throw error;
+//     };
+//     return user;
+// }
 
-    if (!user) {
-        const error = new Error('User not found');
-        error.statusCode = 404;
-        throw error;
-    };
-    return user;
-}
-
-exports.updateUser = async (currUserId, userIdToUpdate, firstName, lastName, email, password, profilePic, bio) => {
+exports.updateUser = async (currUserId, userIdToUpdate, firstName, lastName, email, password, profilePic) => {
 
     let user = await User.findById(userIdToUpdate);
 
-    //проверка дали изобщо съществува такъв потребител - съществува ли id-то
+    //проверка дали изобщо съществува такъв потребител ( с такова id)
     if (!user) {
-        const error = new Error('User not found');
+        const error = new Error('Не съществува такъв потребител');
         error.statusCode = 404;
         throw error;
     };
@@ -108,12 +108,12 @@ exports.updateUser = async (currUserId, userIdToUpdate, firstName, lastName, ema
     //case:автентикиран потребител за нашето приложение (с валиден токен)
     //се опитва да промени данните на друг потребител
     if (userIdToUpdate !== currUserId) {
-        const error = new Error('You cannot update other user\'s profile');
+        const error = new Error('Не можете да редактирате профил на друг потребител');
         error.statusCode = 401;
         throw error;
     }
 
-    //ако потребителят е променил паролата си
+    //само ако потребителят е променил паролата си, се хешира отново
     if (password) {
         //hash password
         //всеки път ще използва 10 rounds и ще генерира уникална сол
@@ -121,19 +121,22 @@ exports.updateUser = async (currUserId, userIdToUpdate, firstName, lastName, ema
         user.password = hashedPassword;
     }
 
-    //за новите данни презаписва стойностите, а старите ги оставя с предходните
+    //за новите данни презаписва стойностите, а ако не е дошла стойност записва с предходните данни
     user.firstName = firstName || user.firstName;
     user.lastName = lastName || user.lastName;
+
+    //TODO : проверка дали има потребител със същия имейл - както при регистрация ако ще може да си сменя имейла
+    //или да бъде на ниво model with Mongoose errors -> виж workshop
     user.email = email || user.email;
     user.profilePic = profilePic || user.profilePic;
-    user.bio = bio || user.bio;
 
     user = await user.save();
 
     return {
         _id: user._id,
         fullName: user.fullName,
-        email: user.email
+        email: user.email,
+        profilePic: user.profilePic
     }
 }
 

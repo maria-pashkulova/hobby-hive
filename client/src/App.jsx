@@ -16,6 +16,7 @@ import { AuthProvider } from './contexts/authContext.jsx';
 import NotFoundPage from './components/NotFoundPage.jsx';
 import GroupEvents from './components/GroupEvents.jsx';
 import GroupPosts from './components/GroupPosts.jsx';
+import UpdateProfilePage from './pages/UpdateProfilePage.jsx';
 
 
 
@@ -31,6 +32,7 @@ function App() {
           <Route element={<AuthLayout />}>
             <Route path='/' element={<GroupsPage />} />
             <Route path='/my-groups' element={<MyGroupsPage />} />
+            <Route path='/update-profile' element={<UpdateProfilePage />} />
             <Route path='/groups/:groupId' element={<SingleGroupPage />} >
               <Route index element={<GroupPosts />} />
               <Route path='events' element={<GroupEvents />} />

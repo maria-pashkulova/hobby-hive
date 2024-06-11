@@ -28,6 +28,7 @@ const auth = async (req, res, next) => {
         //имат достъп до контекста на заявката
         req.user = decodedToken;
 
+        //дали да взимам само _id от decoded token - без iat и exp ?
         console.log(req.user);
 
         next();

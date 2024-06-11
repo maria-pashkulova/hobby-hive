@@ -15,7 +15,6 @@ import { FiEye, FiEyeOff } from "react-icons/fi";
 import { useState, useContext } from 'react';
 import { Link as ReactRouterLink } from 'react-router-dom';
 
-// import * as userService from '../services/userService';
 import useForm from "../hooks/useForm";
 
 import AuthContext from '../contexts/authContext';
@@ -56,7 +55,7 @@ const Register = () => {
 
     return (
         <VStack as='form' spacing='5' onSubmit={handleFormSubmit} noValidate >
-            <FormControl id='fname' isRequired>
+            <FormControl id='firstName' isRequired>
                 <FormLabel>Име</FormLabel>
                 <Input
                     type='text'
@@ -65,7 +64,7 @@ const Register = () => {
                     onChange={onChange}
                 />
             </FormControl>
-            <FormControl id='lname' isRequired>
+            <FormControl id='lastName' isRequired>
                 <FormLabel>Фамилия</FormLabel>
                 <Input
                     type='text'

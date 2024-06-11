@@ -61,7 +61,7 @@ const Header = ({ onOpen }) => {
                     <MenuList
                         bg='white'
                         borderColor='gray.200'>
-                        <MenuItem>Моят профил</MenuItem>
+                        <MenuItem as={Link} to={'/update-profile'}>Редактиране на профила</MenuItem>
                         <MenuDivider />
                         <MenuItem as={Link} to={'/logout'}>Изход</MenuItem>
                     </MenuList>

@@ -115,28 +115,34 @@ router.get('/my-groups', auth, async (req, res) => {
     }
 });
 
+
+//няма да го имам като функционалност сега
 //да преглеждаш други users мисля
-router.get('/:userId', auth, async (req, res) => {
-    const { userId } = req.params;
-    try {
+// router.get('/:userId', auth, async (req, res) => {
+//     const { userId } = req.params;
+//     try {
 
-        const user = await userService.getUser(userId);
-        res.status(200).json(user);
+//         const user = await userService.getUser(userId);
+//         res.status(200).json(user);
 
-    } catch (error) {
-        res.status(error.statusCode || 500).json({ message: error.message });
-        console.log('Error in get user profile:', error.message);
-    }
-})
+//     } catch (error) {
+//         res.status(error.statusCode || 500).json({ message: error.message });
+//         console.log('Error in get user profile:', error.message);
+//     }
+// })
+
+
+//оставям :userId да се взима от параметрите за да се запази
+//Uniform interface (REST)
 
 router.put('/:userId', auth, async (req, res) => {
 
-    const { firstName, lastName, email, password, profilePic, bio } = req.body;
+    const { firstName, lastName, email, password, profilePic } = req.body;
     const currUserId = req.user._id; //този който прави заявката
     const userIdToUpdate = req.params.userId; //този който ще бъде редактриан
 
     try {
-        const userData = await userService.updateUser(currUserId, userIdToUpdate, firstName, lastName, email, password, profilePic, bio);
+        const userData = await userService.updateUser(currUserId, userIdToUpdate, firstName, lastName, email, password, profilePic);
 
         res.json(userData);
 
