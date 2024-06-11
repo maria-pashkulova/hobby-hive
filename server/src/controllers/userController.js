@@ -96,6 +96,7 @@ router.get('/my-groups', auth, async (req, res) => {
     try {
         const user = await userService.getGroupsWithMembership(req.user._id).lean();
 
+
         const groupsWithMembersCount = user.groups.map(group => ({
             _id: group._id,
             name: group.name,

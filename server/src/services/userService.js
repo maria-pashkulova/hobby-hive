@@ -1,6 +1,7 @@
 const bcrypt = require('bcrypt');
 const jwt = require('../lib/jwt');
 const User = require('../models/User');
+const Group = require('../models/Group');
 
 //TODO: validate form inputs with express validator
 
@@ -132,6 +133,24 @@ exports.updateUser = async (currUserId, userIdToUpdate, firstName, lastName, ema
 
     user = await user.save();
 
+    //update user in all the groups he is a member to
+
+    await Group.updateMany(
+        { _id: { $in: user.groups } },
+        {
+            $set: {
+                "members.$[member].fullName": user.fullName,
+                "members.$[member].email": user.email,
+                "members.$[member].profilePic": user.profilePic
+            }
+        },
+        {
+            arrayFilters: [{ "member._id": user._id }]
+        }
+
+    )
+
+
     return {
         _id: user._id,
         fullName: user.fullName,
@@ -141,6 +160,9 @@ exports.updateUser = async (currUserId, userIdToUpdate, firstName, lastName, ema
 }
 
 exports.getGroupsWithMembership = (userId) => {
+
+    //check if user exists?
+
     //sort results 
     const user = User.findById(userId).select('groups -_id').populate({ path: 'groups', options: { sort: { 'createdAt': -1 } } });
 
