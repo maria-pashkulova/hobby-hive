@@ -101,17 +101,6 @@ const GroupMembersModal = ({ isOpen, onClose, groupMembers, groupAdmin, isMember
     //само админа на групата може да премахва потребители
     const handleRemoveUser = async (memberToRemove) => {
 
-        if (groupAdmin !== userId) {
-            toast({
-                title: `Само администраторът на групата може да премахва нейни членове`,
-                status: "error",
-                duration: 5000,
-                isClosable: true,
-                position: "bottom",
-            });
-            return;
-        }
-
         try {
             await groupService.removeMember(groupId, memberToRemove._id);
 
@@ -141,12 +130,6 @@ const GroupMembersModal = ({ isOpen, onClose, groupMembers, groupAdmin, isMember
     }
 
 
-    // TODO
-    const handleGoToProfile = async () => {
-        console.log('go to profile');
-    }
-
-
     return (
         <>
             <Modal isOpen={isOpen} onClose={onClose}>
@@ -162,9 +145,8 @@ const GroupMembersModal = ({ isOpen, onClose, groupMembers, groupAdmin, isMember
                             <UserListItem
                                 key={member._id}
                                 user={member}
-                                isRemovable={isMember && member._id !== groupAdmin && member._id !== userId}
+                                isRemovable={userId === groupAdmin && member._id !== groupAdmin}
                                 isAdmin={member._id === groupAdmin}
-                                handleFunction={() => handleGoToProfile()}
                                 handleRemove={() => handleRemoveUser(member)}
                             />
                         ))}
