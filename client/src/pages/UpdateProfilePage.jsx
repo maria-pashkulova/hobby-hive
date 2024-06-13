@@ -10,6 +10,7 @@ import {
     Center,
     InputGroup,
     InputRightElement,
+    useToast,
 } from "@chakra-ui/react";
 
 import useForm from "../hooks/useForm";
@@ -30,7 +31,7 @@ const UpdateProfileFormKeys = {
 
 const UpdateProfilePage = () => {
 
-    const { userId, fullName, email, updateProfileSubmitHandler } = useContext(AuthContext);
+    const { userId, fullName, email, updateProfileSubmitHandler, logoutHandler } = useContext(AuthContext);
     let { profilePic } = useContext(AuthContext);
 
     //split firstName and lastName
@@ -47,16 +48,50 @@ const UpdateProfilePage = () => {
     const [showPassword, setShowPassword] = useState(false);
     const handleClick = () => setShowPassword((showPassword) => !showPassword);
 
+    const [loading, setLoading] = useState(false);
+    const toast = useToast();
+
     const fileRef = useRef(null);
 
     const { handleImageChange, imageUrl } = usePreviewImage();
 
-    const handleFormSubmit = (e) => {
+    const handleFormSubmit = async (e) => {
         e.preventDefault();
+        setLoading(true);
 
         // TODO: validate before making a request -> client side validation
         //check if password and repeat password match
-        updateProfileSubmitHandler(userId, userData, profilePic = imageUrl);
+        try {
+            await updateProfileSubmitHandler(userId, userData, profilePic = imageUrl);
+
+            toast({
+                title: "Успешна редакция на профила!",
+                status: "success",
+                duration: 5000,
+                isClosable: true,
+                position: "bottom",
+            });
+
+        } catch (error) {
+
+            if (error.status === 401) {
+                logoutHandler(); //invalid or missing token - пр логнал си се, седял си опр време, изтича ти токена - сървъра връща unauthorized - изчистваш стейта
+                //и localStorage за да станеш неаутентикиран и за клиента и тогава редиректваш
+                navigate('/login');
+            } else {
+                toast({
+                    title: "Възникна грешка!",
+                    description: "Не успяхме да обновим данните Ви!",
+                    status: "error",
+                    duration: 5000,
+                    isClosable: true,
+                    position: "bottom",
+                });
+            }
+
+        } finally {
+            setLoading(false);
+        }
     }
 
 
@@ -172,6 +207,8 @@ const UpdateProfilePage = () => {
                             _hover={{
                                 bg: "blue.500",
                             }}
+                            isLoading={loading}
+                            loadingText='Запис'
                             type='submit'
                         >
                             Запис

@@ -75,16 +75,12 @@ export const AuthProvider = ({ children }) => {
 
     //update profile
     const updateProfileSubmitHandler = async (userId, userData, profilePic) => {
-        try {
-            const result = await userService.updateUser(userId, { ...userData, profilePic });
+        const result = await userService.updateUser(userId, { ...userData, profilePic });
 
-            //разчитаме че сървъра връща обект с _id, fullName, email, profilePic
-            //можем да деструктурираме обекта за по-сигурно
-            setAuth(result);
-            navigate('/');
-        } catch (error) {
-            console.log(error.message);
-        }
+        //разчитаме че сървъра връща обект с _id, fullName, email, profilePic
+        //можем да деструктурираме обекта за по-сигурно
+        setAuth(result);
+
     }
 
     const values = {
