@@ -3,8 +3,10 @@ const jwt = require('../lib/jwt');
 const User = require('../models/User');
 const Group = require('../models/Group');
 
-// const cloudinary = require('../config/cloudinaryConfig');
-const cloudinary = require('cloudinary').v2;
+const cloudinary = require('../config/cloudinaryConfig');
+const PROFILE_PICS_FOLDER = 'user-profile-pics';
+
+
 
 //TODO: validate form inputs with express validator
 
@@ -127,10 +129,16 @@ exports.updateUser = async (currUserId, userIdToUpdate, firstName, lastName, ema
 
     if (profilePic) {
         if (user.profilePic) {
-            await cloudinary.uploader.destroy(user.profilePic.split('/').pop().split('.')[0]);
+            //extract public_id from secure_url
+            //concatenate with folder name
+            const public_id = `${PROFILE_PICS_FOLDER}/${user.profilePic.split('/').pop().split('.')[0]}`;
+
+            await cloudinary.uploader.destroy(public_id);
         }
         //if user uploaded a pic we upload it to cloudinary
-        const uploadedResponse = await cloudinary.uploader.upload(profilePic);
+        const uploadedResponse = await cloudinary.uploader.upload(profilePic, {
+            folder: PROFILE_PICS_FOLDER
+        });
         profilePic = uploadedResponse.secure_url;
     }
 

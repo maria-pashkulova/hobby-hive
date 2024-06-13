@@ -1,14 +1,11 @@
 const express = require('express');
-const path = require('path');
-const dotenv = require('dotenv');
+
+require('dotenv').config() //прави process.env обекта глобално достъпен, преди да се require-нат други файлове, които евентуално на top-level
+//може да изискват достъп до environment variables (например clodinary config)
 const expressConfigurator = require('./config/expressConfigurator');
 const connectToDb = require('./config/dbConfig');
 const routes = require('./routes');
-const cloudinary = require('cloudinary').v2;
 
-
-
-dotenv.config(); //прави process.env обекта глобално достъпен
 
 //#Init - инстанция на експрес сървър
 const app = express();
@@ -21,13 +18,6 @@ expressConfigurator(app);
 connectToDb()
     .then(() => console.log('Successfully connected to database'))
     .catch((error) => console.log(`Error while connecting to the DB: ${error}`));
-
-//#cloudinary
-cloudinary.config({
-    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-    api_key: process.env.CLOUDINARY_API_KEY,
-    api_secret: process.env.CLOUDINARY_API_SECRET
-});
 
 
 //The path.resolve() method resolves a sequence of paths or path segments into an absolute path.
