@@ -28,9 +28,7 @@ const GroupMembersModal = ({ isOpen, onClose, groupMembers, groupAdmin, isMember
             try {
                 setLoading(true);
 
-                //TODO - perform request when minimum 3 symbols are there! -> foodLookup
                 const users = await userService.searchUser(query);
-                setLoading(false);
                 setSearchResult(users);
 
             } catch (error) {
@@ -50,6 +48,8 @@ const GroupMembersModal = ({ isOpen, onClose, groupMembers, groupAdmin, isMember
                     });
                 }
 
+            } finally {
+                setLoading(false);
             }
         } else if (query.trim() === '') {
             setSearchResult([]);

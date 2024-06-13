@@ -6,6 +6,7 @@ import Loading from '../components/Loading';
 
 import * as groupService from '../services/groupService';
 import CardsGrid from '../components/CardsGrid';
+import { useToast } from '@chakra-ui/react';
 
 const GroupsPage = () => {
 
@@ -14,6 +15,7 @@ const GroupsPage = () => {
 
     const [groups, setGroups] = useState([]);
     const [loading, setLoading] = useState(false);
+    const toast = useToast();
 
     useEffect(() => {
 
@@ -21,18 +23,32 @@ const GroupsPage = () => {
 
         groupService.getAll()
             .then((groups) => {
-                setLoading(false);
-
                 setGroups(groups);
             })
             .catch(error => {
-                //мисля че тук няма нужда да проверявам статус кодовете
-                //защото сървъра връща единствено 401 - ако е изтекла бисквитката
-                console.log(error.message);
-                logoutHandler(); //invalid or missing token - пр логнал си се, седял си опр време, изтича ти токена - сървъра връща unauthorized - изчистваш стейта
-                //и localStorage за да станеш неаутентикиран и за клиента и тогава редиректваш
-                navigate('/login');
+                //мисля че тук има нужда да проверявам статус кодовете
+                //сървъра връща 401 - ако е изтекла бисквитката
+                // ако го спра и не отговаря обаче не трябва да редиректва към login
+                if (error.status === 401) {
+                    logoutHandler(); //invalid or missing token - пр логнал си се, седял си опр време, изтича ти токена - сървъра връща unauthorized - изчистваш стейта
+                    //и localStorage за да станеш неаутентикиран и за клиента и тогава редиректваш
+                    navigate('/login');
+                } else {
+                    //TODO: add some image or text so that the page wont be left empty (white screen)
+                    toast({
+                        title: "Възникна грешка!",
+                        description: "Опитайте по-късно",
+                        status: "error",
+                        duration: 5000,
+                        isClosable: true,
+                        position: "bottom",
+                    });
+                }
             })
+            .finally(() => {
+                setLoading(false);
+            });
+
     }, []);
 
 
