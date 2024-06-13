@@ -15,8 +15,9 @@ import {
 import useForm from "../hooks/useForm";
 import AuthContext from "../contexts/authContext";
 import { FiEye, FiEyeOff } from "react-icons/fi";
-import { useContext, useState } from "react";
+import { useContext, useRef, useState } from "react";
 import { Link } from "react-router-dom";
+import usePreviewImage from "../hooks/usePreviewImage";
 
 const UpdateProfileFormKeys = {
     FirstName: 'firstName',
@@ -29,7 +30,8 @@ const UpdateProfileFormKeys = {
 
 const UpdateProfilePage = () => {
 
-    const { userId, fullName, email, profilePic, updateProfileSubmitHandler } = useContext(AuthContext);
+    const { userId, fullName, email, updateProfileSubmitHandler } = useContext(AuthContext);
+    let { profilePic } = useContext(AuthContext);
 
     //split firstName and lastName
     const [firstName, lastName] = fullName.split(' ');
@@ -39,22 +41,24 @@ const UpdateProfilePage = () => {
         [UpdateProfileFormKeys.LastName]: lastName,
         [UpdateProfileFormKeys.Email]: email,
         [UpdateProfileFormKeys.Password]: '',
-        [UpdateProfileFormKeys.RepeatPass]: '',
-        [UpdateProfileFormKeys.ProfilePic]: profilePic,
-
+        [UpdateProfileFormKeys.RepeatPass]: ''
     });
 
     const [showPassword, setShowPassword] = useState(false);
     const handleClick = () => setShowPassword((showPassword) => !showPassword);
 
+    const fileRef = useRef(null);
+
+    const { handleImageChange, imageUrl } = usePreviewImage();
 
     const handleFormSubmit = (e) => {
         e.preventDefault();
 
         // TODO: validate before making a request -> client side validation
         //check if password and repeat password match
-        updateProfileSubmitHandler(userId, userData);
+        updateProfileSubmitHandler(userId, userData, profilePic = imageUrl);
     }
+
 
     return (
         <form onSubmit={handleFormSubmit}>
@@ -73,13 +77,13 @@ const UpdateProfilePage = () => {
                     <FormControl>
                         <Stack direction={["column", "row"]} spacing={6}>
                             <Center>
-                                <Avatar size='xl' boxShadow={"md"} src={profilePic} />
+                                <Avatar size='xl' boxShadow={"md"} name={fullName} src={imageUrl || profilePic} />
                             </Center>
                             <Center w='full'>
-                                <Button w='full' onClick={() => { console.log('to do with ref'); }}>
+                                <Button w='full' onClick={() => fileRef.current.click()}>
                                     Промени профилна снимка
                                 </Button>
-                                <Input type='file' hidden />
+                                <Input type='file' hidden ref={fileRef} onChange={handleImageChange} />
                             </Center>
                         </Stack>
                     </FormControl>

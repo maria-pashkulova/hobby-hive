@@ -18,7 +18,6 @@ const GroupMembersModal = ({ isOpen, onClose, groupMembers, groupAdmin, isMember
     const [loading, setLoading] = useState(false);
     const toast = useToast();
 
-
     const handleSearch = async (query) => {
         setSearch(query);
 

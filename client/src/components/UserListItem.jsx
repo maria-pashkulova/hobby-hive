@@ -44,7 +44,7 @@ const UserListItem = ({ user, handleFunction, isRemovable, handleRemove, isAdmin
                     }}
                     cursor='pointer'
                 />)}
-            {isAdmin && <Text>(Админ)</Text>}
+            {isAdmin && <Text>(Администратор)</Text>}
         </Box>
     )
 }

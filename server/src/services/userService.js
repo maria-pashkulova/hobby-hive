@@ -3,6 +3,9 @@ const jwt = require('../lib/jwt');
 const User = require('../models/User');
 const Group = require('../models/Group');
 
+// const cloudinary = require('../config/cloudinaryConfig');
+const cloudinary = require('cloudinary').v2;
+
 //TODO: validate form inputs with express validator
 
 //подавам отделните пропърита
@@ -121,6 +124,16 @@ exports.updateUser = async (currUserId, userIdToUpdate, firstName, lastName, ema
         const hashedPassword = await bcrypt.hash(password, 10);
         user.password = hashedPassword;
     }
+
+    if (profilePic) {
+        if (user.profilePic) {
+            await cloudinary.uploader.destroy(user.profilePic.split('/').pop().split('.')[0]);
+        }
+        //if user uploaded a pic we upload it to cloudinary
+        const uploadedResponse = await cloudinary.uploader.upload(profilePic);
+        profilePic = uploadedResponse.secure_url;
+    }
+
 
     //за новите данни презаписва стойностите, а ако не е дошла стойност записва с предходните данни
     user.firstName = firstName || user.firstName;

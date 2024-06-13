@@ -74,9 +74,9 @@ export const AuthProvider = ({ children }) => {
 
 
     //update profile
-    const updateProfileSubmitHandler = async (userId, userData) => {
+    const updateProfileSubmitHandler = async (userId, userData, profilePic) => {
         try {
-            const result = await userService.updateUser(userId, userData);
+            const result = await userService.updateUser(userId, { ...userData, profilePic });
 
             //разчитаме че сървъра връща обект с _id, fullName, email, profilePic
             //можем да деструктурираме обекта за по-сигурно
