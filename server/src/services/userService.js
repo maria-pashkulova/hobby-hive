@@ -3,7 +3,7 @@ const jwt = require('../lib/jwt');
 const User = require('../models/User');
 const Group = require('../models/Group');
 
-const cloudinary = require('../config/cloudinaryConfig');
+const cloudinary = require('cloudinary').v2;
 const PROFILE_PICS_FOLDER = 'user-profile-pics';
 
 

@@ -1,9 +1,10 @@
 const express = require('express');
 
 require('dotenv').config() //прави process.env обекта глобално достъпен, преди да се require-нат други файлове, които евентуално на top-level
-//може да изискват достъп до environment variables (например clodinary config)
+//може да изискват достъп до environment variables
 const expressConfigurator = require('./config/expressConfigurator');
 const connectToDb = require('./config/dbConfig');
+const cloudinaryConfig = require('./config/cloudinaryConfig');
 const routes = require('./routes');
 
 
@@ -13,6 +14,8 @@ const app = express();
 //#Configs
 expressConfigurator(app);
 
+//#Cloudinary configuration
+cloudinaryConfig();
 
 //#Connecting to the database
 connectToDb()
