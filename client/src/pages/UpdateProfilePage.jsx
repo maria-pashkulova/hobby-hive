@@ -31,13 +31,15 @@ const UpdateProfileFormKeys = {
 
 const UpdateProfilePage = () => {
 
+    // console.log('update pre render');
+
     const { userId, fullName, email, updateProfileSubmitHandler, logoutHandler } = useContext(AuthContext);
     let { profilePic } = useContext(AuthContext);
 
     //split firstName and lastName
     const [firstName, lastName] = fullName.split(' ');
 
-    const { formValues: userData, onChange } = useForm({
+    const { formValues: userData, onChange, resetForm } = useForm({
         [UpdateProfileFormKeys.FirstName]: firstName,
         [UpdateProfileFormKeys.LastName]: lastName,
         [UpdateProfileFormKeys.Email]: email,
@@ -70,6 +72,11 @@ const UpdateProfilePage = () => {
                 duration: 5000,
                 isClosable: true,
                 position: "bottom",
+            });
+
+            resetForm({
+                [UpdateProfileFormKeys.Password]: '',
+                [UpdateProfileFormKeys.RepeatPass]: ''
             });
 
         } catch (error) {
