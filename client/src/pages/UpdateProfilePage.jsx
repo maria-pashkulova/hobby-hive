@@ -94,6 +94,15 @@ const UpdateProfilePage = () => {
                     isClosable: true,
                     position: "bottom",
                 });
+
+                //reset form fields with initial values if update was unsuccessful
+                resetForm({
+                    [UpdateProfileFormKeys.FirstName]: firstName,
+                    [UpdateProfileFormKeys.LastName]: lastName,
+                    [UpdateProfileFormKeys.Email]: email,
+                    [UpdateProfileFormKeys.Password]: '',
+                    [UpdateProfileFormKeys.RepeatPass]: ''
+                });
             }
 
         } finally {
