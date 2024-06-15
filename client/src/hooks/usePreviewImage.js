@@ -47,8 +47,16 @@ export default function usePreviewImage() {
         }
     }
 
+    //TODO: да export-на ли директно setImageUrl защото на практика правя същото
+    //въпреки че знам че това нарушава философията на реакт -> стейта трябва да се контролира от едно
+    //място, а не от много
+    const handleImageDecline = () => {
+        setImageUrl('');
+    }
+
     return {
         handleImageChange,
+        handleImageDecline,
         imageUrl
     }
 }
