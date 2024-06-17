@@ -7,21 +7,12 @@ export default function usePreviewImage() {
     const toast = useToast();
 
 
+
     const handleImageChange = (e) => {
         //it returns an array!
         const file = e.target.files[0];
 
-        if (!file) {
-            toast({
-                title: "Не прикачихте файл",
-                description: "Запазва се текущата Ви профилна снимка",
-                status: "error",
-                duration: 5000,
-                isClosable: true,
-                position: "bottom-left",
-            });
-            setImageUrl('');
-        } else if (file && file.type.startsWith('image/')) {
+        if (file && file.type.startsWith('image/')) {
             //file reader
 
             const reader = new FileReader();
@@ -45,10 +36,13 @@ export default function usePreviewImage() {
             });
             setImageUrl('');
         }
+
+        // Reset the file input to allow re-selection of the same file
+        e.target.value = null;
     }
 
-    //TODO: да export-на ли директно setImageUrl защото на практика правя същото
-    //въпреки че знам че това нарушава философията на реакт -> стейта трябва да се контролира от едно
+    //TODO: да export-на ли директно setImageUrl защото на практика правя същото - не против философията на реакт е
+    //-> стейта трябва да се контролира от едно
     //място, а не от много
     const handleImageDecline = () => {
         setImageUrl('');
