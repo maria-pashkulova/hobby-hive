@@ -2,7 +2,7 @@ import { Avatar, Box, Flex, Text, Image } from '@chakra-ui/react'
 import { BsThreeDots } from "react-icons/bs";
 import React from 'react'
 
-const Post = ({ text }) => {
+const Post = ({ text, img }) => {
     return (
         <Flex gap={3} mb={4} py={5}>
             <Flex flexDirection='column' alignItems='center'>
@@ -26,12 +26,12 @@ const Post = ({ text }) => {
 
                 </Flex>
 
-                <Text fontSize='sm'>{text}</Text>
+                <Text maxWidth={'lg'} fontSize='sm'>{text}</Text>
                 <Box
                     borderRadius={6}
                     overflow='hidden'
                 >
-                    <Image w='full' src='https://static01.nyt.com/images/2020/03/31/sports/31virus-tennis02/31virus-tennis02-articleLarge-v2.jpg?quality=75&auto=webp&disable=upscale'></Image>
+                    <Image w='full' src={img}></Image>
 
                 </Box>
             </Flex>

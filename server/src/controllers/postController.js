@@ -29,15 +29,15 @@ router.post('/', async (req, res) => {
         //2. той съвпада ли с текущо логнатия потребител
         const groupId = req.groupId;
 
-        //TODO validate
-        if (!text) {
-            return res.status(400).json({ message: 'Text and posted by fields are required!' });
+        //TODO validate -> направи да има или снимка или текстово описание, а не задължително текстово описание
+        if (!text && !img) {
+            return res.status(400).json({ message: 'Изисква се публикацията да съдържа или снимка, или описание' });
         }
 
         //check max length of text
-        const maxLength = 700;
+        const maxLength = 500;
         if (text.length > maxLength) {
-            return res.status(400).json({ message: `Твръде дълъг текст на публикацията! Лимит : ${maxLength}` });
+            return res.status(400).json({ message: `Твръде дълъг текст на публикацията! Лимит : ${maxLength} символа` });
         }
 
         const createdPost = await postService.createPost(text, img, _ownerId, groupId);

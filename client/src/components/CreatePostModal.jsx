@@ -1,6 +1,5 @@
 import { Button, Flex, FormControl, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Text, Textarea, Image, CloseButton, useToast, typography } from "@chakra-ui/react";
-import useForm from "../hooks/useForm";
-import { useContext, useRef } from "react";
+import { useContext, useRef, useState } from "react";
 import usePreviewImage from "../hooks/usePreviewImage";
 import { FiImage } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
@@ -8,27 +7,39 @@ import AuthContext from "../contexts/authContext";
 
 import * as postService from '../services/postService';
 
-
-const FormKeys = {
-    Text: 'text'
-}
+const MAX_CHAR = 500;
 
 
 const CreatePostModal = ({ isOpen, onClose, groupId, handleAddNewCreatedPost }) => {
 
+
+    const [postText, setPostText] = useState('');
+    const [remainingChar, setRemainingChar] = useState(MAX_CHAR);
+
     const toast = useToast();
     const navigate = useNavigate();
     const { logoutHandler } = useContext(AuthContext);
-
-    //make the form controlled
-    const { formValues, onChange } = useForm({
-        [FormKeys.Text]: '',
-    });
-
     const imageRef = useRef(null);
 
     //preview the picture which user has uploaded from file system
     const { handleImageChange, handleImageDecline, imageUrl } = usePreviewImage();
+
+
+    //HANDLERS
+
+    //make the text field controlled - not with my hook useForm because of additional logic
+    const handleTextChange = (e) => {
+        const inputText = e.target.value;
+
+        if (inputText.length > MAX_CHAR) {
+            const truncatedText = inputText.slice(0, MAX_CHAR);
+            setPostText(truncatedText);
+            setRemainingChar(0);
+        } else {
+            setPostText(inputText);
+            setRemainingChar(MAX_CHAR - inputText.length);
+        }
+    }
 
     const handleFormSubmit = async (e) => {
         e.preventDefault();
@@ -38,7 +49,7 @@ const CreatePostModal = ({ isOpen, onClose, groupId, handleAddNewCreatedPost }) 
         //due to slower request handling because of cloudinary image upload
         try {
             const newPost = await postService.createPost(groupId, {
-                ...formValues,
+                text: postText,
                 img: imageUrl
             });
 
@@ -58,13 +69,21 @@ const CreatePostModal = ({ isOpen, onClose, groupId, handleAddNewCreatedPost }) 
                 //и localStorage за да станеш неаутентикиран и за клиента и тогава редиректваш
                 navigate('/login');
             } else {
-                console.log(error);
+                toast({
+                    title: error.message,
+                    status: "error",
+                    duration: 5000,
+                    isClosable: true,
+                    position: "bottom",
+                });
             }
         }
 
 
     }
+
     return (
+
         <>
             <Modal isOpen={isOpen} onClose={onClose}>
                 <ModalOverlay />
@@ -78,9 +97,9 @@ const CreatePostModal = ({ isOpen, onClose, groupId, handleAddNewCreatedPost }) 
                             <FormControl>
                                 <Textarea
                                     placeholder='Напишете нещо за групово събитие...'
-                                    name={[FormKeys.Text]}
-                                    value={formValues[FormKeys.Text]}
-                                    onChange={onChange}
+                                    name='text'
+                                    value={postText}
+                                    onChange={handleTextChange}
                                 />
                                 <Text
                                     fontSize='xs'
@@ -89,7 +108,7 @@ const CreatePostModal = ({ isOpen, onClose, groupId, handleAddNewCreatedPost }) 
                                     margin={1}
                                     color="gray.700"
                                 >
-                                    700/700
+                                    {remainingChar}/{MAX_CHAR}
                                 </Text>
                             </FormControl>
                             <FormControl>

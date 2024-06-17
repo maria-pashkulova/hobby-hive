@@ -4,7 +4,7 @@ import { useContext, useEffect, useState } from "react";
 
 import * as postService from '../services/postService';
 import AuthContext from "../contexts/authContext";
-import { Button, Flex, IconButton, Tooltip, useDisclosure } from "@chakra-ui/react";
+import { Box, Button, Flex, IconButton, Tooltip, useDisclosure } from "@chakra-ui/react";
 import { FiPlus } from "react-icons/fi";
 import CreatePostModal from "./CreatePostModal";
 
@@ -19,6 +19,7 @@ const GroupPosts = () => {
     const { isOpen, onOpen, onClose } = useDisclosure();
 
     const handleAddNewCreatedPost = (newPost) => {
+
         setGroupPosts((posts) => ([newPost, ...posts]));
     }
 
@@ -40,7 +41,7 @@ const GroupPosts = () => {
     }, []);
 
     return (
-        <div>
+        <Box>
             {isMember && (<Button
                 position='fixed'
                 bottom={10}
@@ -63,11 +64,12 @@ const GroupPosts = () => {
                 <Post
                     key={post._id}
                     text={post.text}
+                    img={post.img}
                 />
 
             )}
 
-        </div>
+        </Box>
 
 
     )
