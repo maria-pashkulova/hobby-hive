@@ -15,6 +15,7 @@ const CreatePostModal = ({ isOpen, onClose, groupId, handleAddNewCreatedPost }) 
 
     const [postText, setPostText] = useState('');
     const [remainingChar, setRemainingChar] = useState(MAX_CHAR);
+    const [loading, setLoading] = useState(false);
 
     const toast = useToast();
     const navigate = useNavigate();
@@ -43,6 +44,7 @@ const CreatePostModal = ({ isOpen, onClose, groupId, handleAddNewCreatedPost }) 
 
     const handleFormSubmit = async (e) => {
         e.preventDefault();
+        setLoading(true)
 
 
         //TODO - add loading state of the button just like in UpdateUserProfile.jsx
@@ -77,6 +79,8 @@ const CreatePostModal = ({ isOpen, onClose, groupId, handleAddNewCreatedPost }) 
                     position: "bottom",
                 });
             }
+        } finally {
+            setLoading(false)
         }
 
 
@@ -146,7 +150,14 @@ const CreatePostModal = ({ isOpen, onClose, groupId, handleAddNewCreatedPost }) 
                         </ModalBody>
 
                         <ModalFooter>
-                            <Button type='submit' mr={3} colorScheme='blue'>Публикуване</Button>
+                            <Button
+                                type='submit'
+                                mr={3} colorScheme='blue'
+                                isLoading={loading}
+                                loadingText='Публикуване'
+                            >
+                                Публикуване
+                            </Button>
                             <Button variant='ghost' onClick={onClose}>
                                 Отмяна
                             </Button>
