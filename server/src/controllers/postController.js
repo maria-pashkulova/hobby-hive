@@ -2,7 +2,7 @@ const router = require('express').Router();
 
 const postService = require('../services/postService');
 
-
+//get all
 router.get('/', async (req, res) => {
 
     try {
@@ -17,6 +17,23 @@ router.get('/', async (req, res) => {
     }
 
 })
+
+
+//get user's posts in the current group - needed for update and delete
+router.get('/user-posts', async (req, res) => {
+
+    const groupId = req.groupId;
+    const currUserId = req.user._id;
+
+    try {
+
+        const userPosts = await postService.getUserPostsForGroup(groupId, currUserId)
+
+        res.json(userPosts);
+    } catch (error) {
+        res.status(error.statusCode || 500).json({ message: error.message });
+    }
+});
 
 
 router.post('/', async (req, res) => {
@@ -49,6 +66,8 @@ router.post('/', async (req, res) => {
         console.log('Error in create post:', error.message);
     }
 });
+
+
 
 
 module.exports = router;

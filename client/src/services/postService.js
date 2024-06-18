@@ -4,4 +4,6 @@ const baseUrl = 'http://localhost:5000/groups';
 
 export const getGroupPosts = (groupId) => request.get(`${baseUrl}/${groupId}/posts`);
 
+export const getUserPostsForGroup = (groupId) => request.get(`${baseUrl}/${groupId}/posts/user-posts`);
+
 export const createPost = (groupId, { text, img }) => request.post(`${baseUrl}/${groupId}/posts`, { text, img })
