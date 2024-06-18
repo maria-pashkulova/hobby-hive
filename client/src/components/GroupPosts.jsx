@@ -22,8 +22,6 @@ const GroupPosts = () => {
 
     const handleAddNewCreatedPost = (newPost) => {
 
-        console.log(userId);
-
         const newPostWithCreator = {
             ...newPost,
             _ownerId: {
@@ -35,8 +33,6 @@ const GroupPosts = () => {
 
         setGroupPosts((posts) => ([newPostWithCreator, ...posts]));
     }
-
-    console.log(groupPosts);
 
     useEffect(() => {
         postService.getGroupPosts(groupId)
@@ -82,6 +78,7 @@ const GroupPosts = () => {
                     img={post.img}
                     postedBy={post._ownerId?.fullName}
                     postedByProfilePic={post._ownerId?.profilePic}
+                    createdAt={post.createdAt}
                 />
 
             )}

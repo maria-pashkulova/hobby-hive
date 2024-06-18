@@ -1,8 +1,10 @@
 import { Avatar, Box, Flex, Text, Image } from '@chakra-ui/react'
 import { BsThreeDots } from "react-icons/bs";
 import React from 'react'
+import { formatDistanceToNow } from 'date-fns'
+import { bg } from 'date-fns/locale'
 
-const Post = ({ text, img, postedBy, postedByProfilePic }) => {
+const Post = ({ text, img, postedBy, postedByProfilePic, createdAt }) => {
     return (
         <Flex gap={3} mb={4} py={5}>
             <Flex flexDirection='column' alignItems='center'>
@@ -20,10 +22,11 @@ const Post = ({ text, img, postedBy, postedByProfilePic }) => {
 
                     <Text fontSize='sm' fontWeight='bold'>{postedBy}</Text>
 
-                    <Flex gap={4} alignItems='center'>
-                        <Text fontSize='sm' color={"gray.light"}>1d</Text>
-                        <BsThreeDots />
-                    </Flex>
+
+                    <Text fontSize='sm' color={"gray.light"}>
+                        преди {formatDistanceToNow(new Date(createdAt), { locale: bg })}
+                    </Text>
+
 
                 </Flex>
 
