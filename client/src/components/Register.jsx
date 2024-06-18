@@ -34,6 +34,8 @@ const Register = () => {
     const navigate = useNavigate();
     const toast = useToast();
     const { registerSubmitHandler } = useContext(AuthContext);
+    const [loading, setLoading] = useState(false);
+
 
     const { formValues: userData, onChange } = useForm({
         [RegisterFormKeys.FirstName]: '',
@@ -85,6 +87,8 @@ const Register = () => {
 
         //make request after client side validation
         try {
+            setLoading(true);
+
             await registerSubmitHandler(userData);
             toast({
                 title: "Успешна регистрация!",
@@ -122,6 +126,8 @@ const Register = () => {
                 });
             }
 
+        } finally {
+            setLoading(false);
         }
     }
 
@@ -197,6 +203,8 @@ const Register = () => {
                 bg={'blue.400'}
                 w='100%'
                 color={'white'}
+                isLoading={loading}
+                loadingText='Регистрация'
                 _hover={{
                     bg: 'blue.500',
                 }}

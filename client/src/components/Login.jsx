@@ -29,6 +29,7 @@ const Login = () => {
     const navigate = useNavigate();
     const toast = useToast();
     const { loginSubmitHandler } = useContext(AuthContext);
+    const [loading, setLoading] = useState(false);
 
 
     //Make Login form controlled
@@ -60,6 +61,7 @@ const Login = () => {
         }
 
         try {
+            setLoading(true);
             await loginSubmitHandler(userData);
 
             toast({
@@ -99,6 +101,8 @@ const Login = () => {
                 });
             }
 
+        } finally {
+            setLoading(false);
         }
 
     }
@@ -138,6 +142,8 @@ const Login = () => {
                 bg={'blue.400'}
                 w='100%'
                 color={'white'}
+                isLoading={loading}
+                loadingText='Вход'
                 _hover={{
                     bg: 'blue.500',
                 }}>

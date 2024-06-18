@@ -86,8 +86,10 @@ const UpdateProfilePage = () => {
                 //и localStorage за да станеш неаутентикиран и за клиента и тогава редиректваш
                 navigate('/login');
             } else {
+
+                //TODO: handle other types of errors when you create validation
                 toast({
-                    title: "Възникна грешка!",
+                    title: "Възникна грешка при свързване!",
                     description: "Не успяхме да обновим данните Ви!",
                     status: "error",
                     duration: 5000,
