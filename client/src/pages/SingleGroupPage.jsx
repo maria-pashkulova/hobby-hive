@@ -1,4 +1,4 @@
-import { Heading, Button, Container, Flex, useDisclosure, IconButton, Tooltip, AvatarGroup, Avatar, useToast } from "@chakra-ui/react"
+import { Heading, Button, Container, Flex, useDisclosure, IconButton, Tooltip, AvatarGroup, Avatar, useToast, Spinner } from "@chakra-ui/react"
 import { useContext, useEffect, useState } from "react"
 import { Link, Outlet, useNavigate, useParams } from "react-router-dom"
 import { FiEdit } from "react-icons/fi";
@@ -19,6 +19,7 @@ const SingleGroupPage = () => {
 
     const { groupId } = useParams();
     const [group, setGroup] = useState({});
+    const [loading, setLoading] = useState(true);
     const [isMember, setIsMember] = useState(false);
     const toast = useToast();
 
@@ -120,6 +121,8 @@ const SingleGroupPage = () => {
     }
 
 
+    //TODO: handle group info update
+
 
     //TODO: след като групата е успешно намерена - да направя заявка за нейните публикации
     useEffect(() => {
@@ -144,93 +147,103 @@ const SingleGroupPage = () => {
                     console.log(error.message);
                 }
 
-            });
+            })
+            .finally(() => {
+                setLoading(false);
+            })
 
     }, []);
 
-    return (
-        <>
+    return loading ?
+        (
+            <Flex justifyContent={'center'}>
+                <Spinner size='xl' />
+            </Flex>
 
-            <Flex justifyContent='space-between'>
+        ) :
+        (
+            <>
 
-                <Flex flexDirection='column' gap={2} mb={6}>
+                <Flex justifyContent='space-between'>
+
+                    <Flex flexDirection='column' gap={2} mb={6}>
+                        <Flex gap={2}>
+                            <Heading mb='6' size='lg'>{group.name}</Heading>
+
+                            {isMember && (<IconButton
+                                icon={<FiEdit />}
+                                onClick={editGroupDetailsModal.onOpen}
+                            />
+                            )}
+
+                        </Flex>
+                        <p>{group.description}</p>
+                    </Flex>
+                    <div>
+                        <p>Категория хоби : {group.category}</p>
+                        <p>Локация: {group.location}</p>
+                        <AvatarGroup size='md' max={2} cursor='pointer' onClick={groupMembersModal.onOpen}>
+                            {group.members?.map((member) => (
+                                <Avatar
+                                    key={member._id}
+                                    name={member.fullName}
+                                    src={member.profilePic}
+                                />
+                            ))}
+                        </AvatarGroup>
+
+                    </div>
+
+                </Flex>
+
+                {/* update group modal */}
+                {editGroupDetailsModal.isOpen && <UpdateGroupModal
+                    isOpen={editGroupDetailsModal.isOpen}
+                    onClose={editGroupDetailsModal.onClose}
+                />}
+
+                {/* see current and add members modal */}
+                {groupMembersModal.isOpen && <GroupMembersModal
+                    isOpen={groupMembersModal.isOpen}
+                    onClose={groupMembersModal.onClose}
+                    groupMembers={group.members}
+                    groupAdmin={group.groupAdmin}
+                    isMember={isMember}
+                    groupId={groupId}
+                    handleAddMember={handleAddMember}
+                    handleRemoveMember={handleRemoveMember}
+                />}
+
+                <Flex justifyContent='space-between'>
                     <Flex gap={2}>
-                        <Heading mb='6' size='lg'>{group.name}</Heading>
+                        <Button bgColor={"yellow.400"} as={Link} to={`/groups/${groupId}`}>Публикации</Button>
 
-                        {isMember && (<IconButton
-                            icon={<FiEdit />}
-                            onClick={editGroupDetailsModal.onOpen}
-                        />
-                        )}
+                        {
+                            isMember
+                                ? (<Button bgColor={"yellow.400"} as={Link} to={`/groups/${groupId}/events`}>Събития</Button>)
+                                : (
+                                    <Tooltip label='Присъединете се, за да имате достъп до събитията на групата' placement="bottom-end">
+                                        <Button bgColor={"yellow.400"} onClick={handleJoinGroup} >Присъединяване</Button>
+                                    </Tooltip>
+                                )
+                        }
 
                     </Flex>
-                    <p>{group.description}</p>
+                    {isMember && (
+                        <Button bgColor={"red.400"} onClick={handleLeaveGroup} >Напускане</Button>
+                    )}
                 </Flex>
-                <div>
-                    <p>Категория хоби : {group.category}</p>
-                    <p>Локация: {group.location}</p>
-                    <AvatarGroup size='md' max={2} cursor='pointer' onClick={groupMembersModal.onOpen}>
-                        {group.members?.map((member) => (
-                            <Avatar
-                                key={member._id}
-                                name={member.fullName}
-                                src={member.profilePic}
-                            />
-                        ))}
-                    </AvatarGroup>
-
-                </div>
-
-            </Flex>
-
-            {/* update group modal */}
-            {editGroupDetailsModal.isOpen && <UpdateGroupModal
-                isOpen={editGroupDetailsModal.isOpen}
-                onClose={editGroupDetailsModal.onClose}
-            />}
-
-            {/* see current and add members modal */}
-            {groupMembersModal.isOpen && <GroupMembersModal
-                isOpen={groupMembersModal.isOpen}
-                onClose={groupMembersModal.onClose}
-                groupMembers={group.members}
-                groupAdmin={group.groupAdmin}
-                isMember={isMember}
-                groupId={groupId}
-                handleAddMember={handleAddMember}
-                handleRemoveMember={handleRemoveMember}
-            />}
-
-            <Flex justifyContent='space-between'>
-                <Flex gap={2}>
-                    <Button bgColor={"yellow.400"} as={Link} to={`/groups/${groupId}`}>Публикации</Button>
-
-                    {
-                        isMember
-                            ? (<Button bgColor={"yellow.400"} as={Link} to={`/groups/${groupId}/events`}>Събития</Button>)
-                            : (
-                                <Tooltip label='Присъединете се, за да имате достъп до събитията на групата' placement="bottom-end">
-                                    <Button bgColor={"yellow.400"} onClick={handleJoinGroup} >Присъединяване</Button>
-                                </Tooltip>
-                            )
-                    }
-
-                </Flex>
-                {isMember && (
-                    <Button bgColor={"red.400"} onClick={handleLeaveGroup} >Напускане</Button>
-                )}
-            </Flex>
 
 
-            <Container>
-                <Outlet />
-            </Container>
+                <Container>
+                    <Outlet context={[groupId, isMember]} />
+                </Container>
 
 
 
-        </>
+            </>
 
-    )
+        )
 }
 
 export default SingleGroupPage
