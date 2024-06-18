@@ -14,7 +14,7 @@ import {
 
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import { useContext, useState } from 'react';
-import { Link as ReactRouterLink } from 'react-router-dom';
+import { Link as ReactRouterLink, useNavigate } from 'react-router-dom';
 
 import useForm from "../hooks/useForm";
 import AuthContext from '../contexts/authContext';
@@ -26,9 +26,10 @@ const LoginFormKeys = {
 
 const Login = () => {
 
-    // const navigate = useNavigate();
-    const { loginSubmitHandler } = useContext(AuthContext);
+    const navigate = useNavigate();
     const toast = useToast();
+    const { loginSubmitHandler } = useContext(AuthContext);
+
 
     //Make Login form controlled
     const { formValues: userData, onChange } = useForm({
@@ -40,17 +41,17 @@ const Login = () => {
     const handleClick = () => setShowPassword((showPassword) => !showPassword);
 
 
-    const handleFormSubmit = (e) => {
+    const handleFormSubmit = async (e) => {
         e.preventDefault();
 
 
-        // TODO: validate before making a request -> client side validation
-        //TODO - abstract
+        // validate before making a request -> client side validation
+        //TODO - abstract client side validation
 
         if (userData[LoginFormKeys.Email] === '' || userData[LoginFormKeys.Password] === '') {
             toast({
-                title: "Попълнете данните си!",
-                status: "warning",
+                title: "Попълнете всички полета!",
+                status: "error",
                 duration: 3000,
                 isClosable: true,
                 position: "bottom",
@@ -58,7 +59,48 @@ const Login = () => {
             return;
         }
 
-        loginSubmitHandler(userData);
+        try {
+            await loginSubmitHandler(userData);
+
+            toast({
+                title: "Успешно вписване!",
+                status: "success",
+                duration: 2000,
+                isClosable: true,
+                position: "bottom",
+            });
+
+            navigate('/')
+        } catch (error) {
+
+            //incorrect email or password
+            //TODO: ??? - просто така съм си написала сървъра в userController 
+            //да ми връща 400 ако има липсващи полета
+            //case: непопълнени полета - въпреки че мисля че е излишно
+            //защото сложих клиентска валидация за това
+            //а тази сървърната си остава за заявки от клиенти като постман
+
+            if (error.status === 401 || error.status === 400) {
+                toast({
+                    title: error.message,
+                    status: "error",
+                    duration: 5000,
+                    isClosable: true,
+                    position: "bottom",
+                });
+            } else {
+                //case изключвам си сървъра - грешка при свързването със сървъра
+                toast({
+                    title: 'Възникна грешка при свързване!',
+                    status: "error",
+                    duration: 5000,
+                    isClosable: true,
+                    position: "bottom",
+                });
+            }
+
+        }
+
     }
 
     return (

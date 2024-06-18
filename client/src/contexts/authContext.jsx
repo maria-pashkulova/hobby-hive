@@ -1,7 +1,4 @@
 import { createContext } from "react";
-import { useToast } from '@chakra-ui/react';
-import { useNavigate } from "react-router-dom";
-
 import * as userService from '../services/userService';
 import usePersistedState from "../hooks/usePersistedState";
 
@@ -11,12 +8,13 @@ const AuthContext = createContext();
 
 AuthContext.displayName = 'AuthContext';
 
+//* контекста не се занимава с обработка на грешки,
+//това се случва в самите компоненти
+//handlers за login, register, logout, updateProfile са
+//тук за да запаметят данни за потребителя в контекста
+
+
 export const AuthProvider = ({ children }) => {
-
-    const navigate = useNavigate();
-    const toast = useToast();
-
-
 
     //auth - данните върнати от сървъра след успешен логин
     const [auth, setAuth] = usePersistedState('user', {});
@@ -27,43 +25,25 @@ export const AuthProvider = ({ children }) => {
 
 
     //ВХОД:
+    //await is needed in order to save user data in the context
     const loginSubmitHandler = async (userData) => {
 
-        try {
-            const result = await userService.login(userData);
+        const result = await userService.login(userData);
 
-            toast({
-                title: "Успешно вписване!",
-                status: "success",
-                duration: 5000,
-                isClosable: true,
-                position: "bottom",
-            });
-
-            //разчитаме че сървъра връща обект с _id, fullName, email
-            //можем да деструктурираме обекта за по-сигурно
-            setAuth(result);
-            navigate('/')
-
-        } catch (error) {
-            console.log(error.message);
-        }
+        //разчитаме че сървъра връща обект с _id, fullName, email
+        //можем да деструктурираме обекта за по-сигурно
+        setAuth(result);
 
     }
 
     //Регистрация
     const registerSubmitHandler = async (userData) => {
 
-        try {
-            const result = await userService.register(userData);
+        const result = await userService.register(userData);
 
-            //разчитаме че сървъра връща обект с _id, fullName, email, profilePic
-            //можем да деструктурираме обекта за по-сигурно
-            setAuth(result);
-            navigate('/');
-        } catch (error) {
-            console.log(error.message);
-        }
+        //разчитаме че сървъра връща обект с _id, fullName, email, profilePic
+        //можем да деструктурираме обекта за по-сигурно
+        setAuth(result);
     }
 
     //logout + invalid or missing token handling (при изтичане на токена (бисквитката също в моя случай))
