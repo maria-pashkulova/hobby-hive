@@ -24,7 +24,7 @@ exports.register = async (firstName, lastName, email, password) => {
     //findOne() връща null, ако не намери търсен запис в колекцията
     const duplicate = await User.findOne({ email });
     if (duplicate) {
-        const error = new Error('User with the same email already exists!');
+        const error = new Error('Съществува потребител с този имейл!');
         error.statusCode = '409' // //status 409 - conflict
         throw error;
     }
@@ -43,12 +43,13 @@ exports.register = async (firstName, lastName, email, password) => {
 
 exports.login = async (email, password) => {
 
+    //TODO: index on email field for optimization?
     //find user (проверка дали изобщо съществува)
     //findOne() връща null, ако не намери търсен запис в колекцията
     const user = await User.findOne({ email }).select('_id firstName lastName email password profilePic');
 
     if (!user) {
-        throw new Error('Invalid email or password!');
+        throw new Error('Грешен имейл или парола!');
     }
 
     //validate password (правилна парола)
@@ -56,7 +57,7 @@ exports.login = async (email, password) => {
     const isValid = await bcrypt.compare(password, user.password);
 
     if (!isValid) {
-        throw new Error('Inavlid email or password');
+        throw new Error('Грешен имейл или парола!');
     }
 
     //create token + return user data as js object

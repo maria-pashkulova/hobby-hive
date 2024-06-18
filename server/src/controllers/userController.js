@@ -8,7 +8,7 @@ router.post('/login', async (req, res) => {
 
     //Invalid inputs by the user (server responds with a 400 response code);
     if (!email || !password) {
-        return res.status(400).json({ message: 'Username and password are required!' })
+        return res.status(400).json({ message: 'Имейла и паролата са задължителни!' })
     }
 
     try {
@@ -39,7 +39,7 @@ router.post('/register', async (req, res) => {
 
     //Invalid inputs by the user(server responds with a 400 response code);
     if (!firstName || !lastName || !email || !password) {
-        return res.status(400).json({ message: 'First name, Last name, email, password are required!' })
+        return res.status(400).json({ message: 'Име, фамилия, имейл и парола са задължителни!' })
     }
 
     //TODO: validate email format
