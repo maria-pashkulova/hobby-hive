@@ -143,7 +143,7 @@ const Login = () => {
                 w='100%'
                 color={'white'}
                 isLoading={loading}
-                loadingText='Вход'
+                loadingText='Вписване...'
                 _hover={{
                     bg: 'blue.500',
                 }}>

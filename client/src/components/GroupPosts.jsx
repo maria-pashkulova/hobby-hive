@@ -4,24 +4,39 @@ import { useContext, useEffect, useState } from "react";
 
 import * as postService from '../services/postService';
 import AuthContext from "../contexts/authContext";
-import { Box, Button, Flex, IconButton, Tooltip, useDisclosure } from "@chakra-ui/react";
+import { Box, Button, useDisclosure } from "@chakra-ui/react";
 import { FiPlus } from "react-icons/fi";
 import CreatePostModal from "./CreatePostModal";
 
 const GroupPosts = () => {
 
+
     const [groupId, isMember] = useOutletContext();
 
     const navigate = useNavigate();
     // const { groupId } = useParams();
-    const { logoutHandler } = useContext(AuthContext);
+    const { logoutHandler, userId, fullName, profilePic } = useContext(AuthContext);
+
     const [groupPosts, setGroupPosts] = useState([]);
     const { isOpen, onOpen, onClose } = useDisclosure();
 
     const handleAddNewCreatedPost = (newPost) => {
 
-        setGroupPosts((posts) => ([newPost, ...posts]));
+        console.log(userId);
+
+        const newPostWithCreator = {
+            ...newPost,
+            _ownerId: {
+                _id: userId,
+                profilePic,
+                fullName
+            }
+        }
+
+        setGroupPosts((posts) => ([newPostWithCreator, ...posts]));
     }
+
+    console.log(groupPosts);
 
     useEffect(() => {
         postService.getGroupPosts(groupId)
@@ -65,6 +80,8 @@ const GroupPosts = () => {
                     key={post._id}
                     text={post.text}
                     img={post.img}
+                    postedBy={post._ownerId?.fullName}
+                    postedByProfilePic={post._ownerId?.profilePic}
                 />
 
             )}
