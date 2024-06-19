@@ -4,7 +4,7 @@ import { useContext, useEffect, useState } from "react";
 
 import * as postService from '../services/postService';
 import AuthContext from "../contexts/authContext";
-import { Box, Button, useDisclosure } from "@chakra-ui/react";
+import { Box, Button, Flex, Spinner, useDisclosure } from "@chakra-ui/react";
 import { FiPlus } from "react-icons/fi";
 import CreatePostModal from "./CreatePostModal";
 
@@ -18,6 +18,7 @@ const GroupPosts = () => {
     const { logoutHandler, userId, fullName, profilePic } = useContext(AuthContext);
 
     const [groupPosts, setGroupPosts] = useState([]);
+    const [loading, setLoading] = useState(true);
     const { isOpen, onOpen, onClose } = useDisclosure();
 
     const handleAddNewCreatedPost = (newPost) => {
@@ -49,6 +50,9 @@ const GroupPosts = () => {
                     console.log(error.message);
                 }
             })
+            .finally(() => {
+                setLoading(false);
+            })
     }, []);
 
     return (
@@ -71,17 +75,28 @@ const GroupPosts = () => {
                 groupId={groupId}
                 handleAddNewCreatedPost={handleAddNewCreatedPost}
             />}
-            {groupPosts.map(post =>
-                <Post
-                    key={post._id}
-                    text={post.text}
-                    img={post.img}
-                    postedBy={post._ownerId?.fullName}
-                    postedByProfilePic={post._ownerId?.profilePic}
-                    createdAt={post.createdAt}
-                />
 
-            )}
+            {loading ?
+                (<Flex justifyContent={'center'}>
+                    <Spinner size='xl' />
+                </Flex>)
+                :
+                (groupPosts.length > 0 ?
+
+                    groupPosts.map(post =>
+                        <Post
+                            key={post._id}
+                            text={post.text}
+                            img={post.img}
+                            postedByName={post._ownerId?.fullName}
+                            postedByProfilePic={post._ownerId?.profilePic}
+                            createdAt={post.createdAt}
+                        />
+                    ) : <p>Все още няма публикации в групата</p>
+                )
+
+            }
+
 
         </Box>
 

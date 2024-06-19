@@ -116,7 +116,7 @@ exports.updateUser = async (currUserId, userIdToUpdate, firstName, lastName, ema
     //се опитва да промени данните на друг потребител
     if (userIdToUpdate !== currUserId) {
         const error = new Error('Не можете да редактирате профил на друг потребител');
-        error.statusCode = 401;
+        error.statusCode = 403;
         throw error;
     }
 

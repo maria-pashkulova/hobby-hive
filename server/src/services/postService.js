@@ -149,7 +149,7 @@ exports.delete = async (postIdToDelete, currUserId) => {
 
     if (post._ownerId.toString() !== currUserId) {
         const error = new Error('Не можете да изтриете публикация на друг потребител !');
-        error.statusCode = 401;
+        error.statusCode = 403;
         throw error;
     }
 

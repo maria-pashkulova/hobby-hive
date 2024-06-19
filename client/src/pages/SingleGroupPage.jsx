@@ -1,7 +1,7 @@
-import { Heading, Button, Container, Flex, useDisclosure, IconButton, Tooltip, AvatarGroup, Avatar, useToast, Spinner } from "@chakra-ui/react"
+import { Heading, Button, Container, Flex, useDisclosure, IconButton, Tooltip, AvatarGroup, Avatar, useToast, Spinner, Menu, MenuButton, MenuList, MenuItem } from "@chakra-ui/react"
 import { useContext, useEffect, useState } from "react"
 import { Link, Outlet, useNavigate, useParams } from "react-router-dom"
-import { FiEdit } from "react-icons/fi";
+import { FiEdit, FiChevronDown } from "react-icons/fi";
 
 import * as groupService from '../services/groupService';
 
@@ -216,7 +216,20 @@ const SingleGroupPage = () => {
 
                 <Flex justifyContent='space-between'>
                     <Flex gap={2}>
-                        <Button bgColor={"yellow.400"} as={Link} to={`/groups/${groupId}`}>Публикации</Button>
+                        {
+                            isMember
+                                ? (<Menu>
+                                    <MenuButton bgColor={"yellow.400"} as={Button} rightIcon={<FiChevronDown />} >
+                                        Публикации
+                                    </MenuButton>
+                                    <MenuList>
+                                        <MenuItem as={Link} to={`/groups/${groupId}`}>Всички публикации</MenuItem>
+                                        <MenuItem as={Link} to={`/groups/${groupId}/my-posts`}>Моите публикации</MenuItem>
+                                    </MenuList>
+                                </Menu>)
+                                : (<Button bgColor={"yellow.400"} as={Link} to={`/groups/${groupId}`}>Публикации</Button>)
+
+                        }
 
                         {
                             isMember
@@ -235,7 +248,7 @@ const SingleGroupPage = () => {
                 </Flex>
 
 
-                <Container>
+                <Container my={8}>
                     <Outlet context={[groupId, isMember]} />
                 </Container>
 

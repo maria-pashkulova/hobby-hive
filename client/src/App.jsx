@@ -17,6 +17,7 @@ import NotFoundPage from './components/NotFoundPage.jsx';
 import GroupEvents from './components/GroupEvents.jsx';
 import GroupPosts from './components/GroupPosts.jsx';
 import UpdateProfilePage from './pages/UpdateProfilePage.jsx';
+import MyGroupPosts from './components/MyGroupPosts.jsx';
 
 
 
@@ -35,6 +36,7 @@ function App() {
             <Route path='/update-profile' element={<UpdateProfilePage />} />
             <Route path='/groups/:groupId' element={<SingleGroupPage />} >
               <Route index element={<GroupPosts />} />
+              <Route path='my-posts' element={<MyGroupPosts />} />
               <Route path='events' element={<GroupEvents />} />
             </Route>
             <Route path={'/logout'} element={<Logout />} />
