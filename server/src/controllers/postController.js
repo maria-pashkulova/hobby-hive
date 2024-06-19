@@ -18,8 +18,9 @@ router.get('/', async (req, res) => {
 
 })
 
-
 //get user's posts in the current group - needed for update and delete
+//задължително преди долния път
+//a parametric path inserted just before a literal one takes the precedence over the literal one.
 router.get('/user-posts', async (req, res) => {
 
     const groupId = req.groupId;
@@ -36,6 +37,21 @@ router.get('/user-posts', async (req, res) => {
 });
 
 
+//get one
+router.get('/:postId', async (req, res) => {
+    try {
+        const post = await postService.getById(req.params.postId);
+        res.json(post);
+
+    } catch (error) {
+
+        //грешка ако върне null - аз я хвърлям
+        //Mongoose грешка - ако е подаден невалиден стринг който да се кастне към objectID
+        res.status(404).json({ message: error.message });
+    }
+})
+
+//CREATE POST
 router.post('/', async (req, res) => {
     try {
 
@@ -67,7 +83,23 @@ router.post('/', async (req, res) => {
     }
 });
 
+//EDIT POST - TODO
 
+//DELETE POST
+router.delete('/:postId', async (req, res) => {
+    const currUserId = req.user._id;
+    try {
+        await postService.delete(req.params.postId, currUserId);
+        res.status(204).end();
+
+    } catch (error) {
+
+        //грешка ако върне null - аз я хвърлям
+        //Mongoose грешка - ако е подаден невалиден стринг който да се кастне към objectID
+        //500 status code -> ако cloudinary върне грешка
+        res.status(error.statusCode || 500).json({ message: error.message });
+    }
+})
 
 
 module.exports = router;

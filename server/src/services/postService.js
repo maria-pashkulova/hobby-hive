@@ -4,6 +4,7 @@ const User = require('../models/User');
 
 const cloudinary = require('cloudinary').v2;
 const POST_PICS_FOLDER = 'post-pics';
+const mongoose = require('mongoose');
 
 
 exports.getAllGroupPosts = (groupId) => {
@@ -21,6 +22,28 @@ exports.getAllGroupPosts = (groupId) => {
         })
     return posts;
 }
+
+
+//Use this endpoint for populating edit post form
+exports.getById = async (postId) => {
+
+    let post;
+
+    //оптимизация -> не се правят заявки с невалидни objectId,
+    //а директно се хвърля грешка
+    if (mongoose.Types.ObjectId.isValid(postId)) {
+        post = await Post.findById(postId).select('text img _ownerId').lean();
+    } else {
+        throw new Error('Публикацията не съществува!');
+    }
+
+    if (!post) {
+        throw new Error('Публикацията не съществува!');
+    }
+
+    return post;
+}
+
 
 exports.getUserPostsForGroup = async (groupId, currUserId) => {
 
@@ -104,4 +127,42 @@ exports.createPost = async (text, img, _ownerId, groupId) => {
     const newPost = Post.create(newPostData);
 
     return newPost;
+}
+
+exports.delete = async (postIdToDelete, currUserId) => {
+
+    //проверка дали user-а съществува ?
+    //   const user = await User.findById(currUserId);
+    //   if (!user) {
+    //       const error = new Error('Не съществува такъв потребител!');
+    //       error.statusCode = 404;
+    //       throw error;
+    //   }
+
+
+    //reuse getById() service method
+    const post = await this.getById(postIdToDelete);
+
+
+    //ALTOUGH getById uses lean WE STILL NEED post._ownerId.toString()
+    //because post._ownerId is of type object
+
+    if (post._ownerId.toString() !== currUserId) {
+        const error = new Error('Не можете да изтриете публикация на друг потребител !');
+        error.statusCode = 401;
+        throw error;
+    }
+
+    //delete post's image from cloudinary as well
+
+    if (post.img) {
+        //extract public_id from secure_url
+        //concatenate with folder name
+        const public_id = `${POST_PICS_FOLDER}/${post.img.split('/').pop().split('.')[0]}`;
+        await cloudinary.uploader.destroy(public_id);
+
+    }
+
+    //не работеше без return; връщам promise, не await-вам
+    return Post.findByIdAndDelete(postIdToDelete);
 }

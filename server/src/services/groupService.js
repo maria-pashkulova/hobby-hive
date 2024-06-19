@@ -1,5 +1,6 @@
 const Group = require('../models/Group');
 const User = require('../models/User');
+const mongoose = require('mongoose');
 
 
 //In-memory storage
@@ -74,11 +75,19 @@ exports.getAll = async (name, category, location) => {
 
 //findById is a Mongoose method - we use it instead monogodb's findOne()
 exports.getById = async (groupId) => {
-    const group = await Group.findById(groupId).lean();
+    let group;
+
+    //оптимизация -> не се правят заявки с невалидни objectId,
+    //а директно се хвърля грешка
+    if (mongoose.Types.ObjectId.isValid(groupId)) {
+        group = await Group.findById(groupId).lean();
+    } else {
+        throw new Error('Групата не съществува!');
+    }
 
     //валиден стринг objectId, но несъществуващ
     if (!group) {
-        throw new Error('Group not found');
+        throw new Error('Групата не съществува!');
     };
 
     return group;

@@ -116,9 +116,10 @@ router.get('/my-groups', auth, async (req, res) => {
     }
 });
 
+//TODO: get single user endpoint
 
 //няма да го имам като функционалност сега
-//да преглеждаш други users мисля
+//да преглеждаш други users мисля -  НО може би ще ми трябва за да популирам формата за update на user
 // router.get('/:userId', auth, async (req, res) => {
 //     const { userId } = req.params;
 //     try {

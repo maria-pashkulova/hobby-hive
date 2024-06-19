@@ -34,7 +34,7 @@ const request = async (method, url, data) => {
             throw errorWithStatus;
         }
 
-        //204 - no content -> logout server response
+        //204 - no content -> logout server response and successful delete responses
         if (response.status === 204) {
             return {};
         }
