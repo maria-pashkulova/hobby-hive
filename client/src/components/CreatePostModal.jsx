@@ -47,7 +47,7 @@ const CreatePostModal = ({ isOpen, onClose, groupId, handleAddNewCreatedPost }) 
         setLoading(true)
 
 
-        //TODO - add loading state of the button just like in UpdateUserProfile.jsx
+        //loading state of the button just like in UpdateUserProfile.jsx
         //due to slower request handling because of cloudinary image upload
         try {
             const newPost = await postService.createPost(groupId, {

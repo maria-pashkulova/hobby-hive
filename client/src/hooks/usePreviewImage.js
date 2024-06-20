@@ -41,7 +41,7 @@ export default function usePreviewImage() {
         e.target.value = null;
     }
 
-    //TODO: да export-на ли директно setImageUrl защото на практика правя същото - не против философията на реакт е
+    //да export-на ли директно setImageUrl защото на практика правя същото - не против философията на реакт е
     //-> стейта трябва да се контролира от едно
     //място, а не от много
     const handleImageDecline = () => {

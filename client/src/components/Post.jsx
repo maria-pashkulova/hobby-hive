@@ -1,13 +1,11 @@
 import { Avatar, Box, Flex, Text, Image, Menu, MenuButton, MenuList, MenuItem, IconButton, useDisclosure } from '@chakra-ui/react'
 import { BsThreeDots } from "react-icons/bs";
-import React, { useContext } from 'react'
 import { formatDistanceToNow } from 'date-fns'
 import { bg } from 'date-fns/locale'
-import AuthContext from '../contexts/authContext';
 import DeletePostModal from './DeletePostModal';
+import EditPostModal from './EditPostModal';
 
-const Post = ({ postId, text, img, isOwner, postedByName, postedByProfilePic, createdAt, changeMyPostsOnDbDelete, groupId }) => {
-    const { userId } = useContext(AuthContext);
+const Post = ({ postId, text, img, isOwner, postedByName, postedByProfilePic, createdAt, changeMyPostsOnDbDelete, changeMyPostsOnDbUpdate, groupId }) => {
 
     //todo: handle delete post -> request + changeMyPostsOnDbDelete -> modal
     const deletePostModal = useDisclosure();
@@ -40,7 +38,7 @@ const Post = ({ postId, text, img, isOwner, postedByName, postedByProfilePic, cr
                                 <Menu>
                                     <MenuButton variant='ghost' as={IconButton} icon={< BsThreeDots />} />
                                     <MenuList>
-                                        <MenuItem>Редактирай</MenuItem>
+                                        <MenuItem onClick={editPostModal.onOpen}>Редактирай</MenuItem>
                                         <MenuItem onClick={deletePostModal.onOpen}>Изтрий</MenuItem>
                                     </MenuList>
                                 </Menu>
@@ -73,6 +71,14 @@ const Post = ({ postId, text, img, isOwner, postedByName, postedByProfilePic, cr
                 changeMyPostsOnDbDelete={changeMyPostsOnDbDelete}
                 groupId={groupId}
 
+            />}
+
+            {editPostModal.isOpen && <EditPostModal
+                isOpen={editPostModal.isOpen}
+                onClose={editPostModal.onClose}
+                postIdToUpdate={postId}
+                changeMyPostsOnDbUpdate={changeMyPostsOnDbUpdate}
+                groupId={groupId}
             />}
         </>
     )

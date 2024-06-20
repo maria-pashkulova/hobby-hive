@@ -10,4 +10,6 @@ export const getUserPostsForGroup = (groupId) => request.get(`${baseUrl}/${group
 
 export const createPost = (groupId, { text, img }) => request.post(`${baseUrl}/${groupId}/posts`, { text, img });
 
+export const editPost = (groupId, postId, { text, newImg, currImg }) => request.put(`${baseUrl}/${groupId}/posts/${postId}`, { text, newImg, currImg })
+
 export const deletePost = (groupId, postId) => request.remove(`${baseUrl}/${groupId}/posts/${postId}`);

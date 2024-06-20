@@ -144,6 +144,7 @@ exports.updateUser = async (currUserId, userIdToUpdate, firstName, lastName, ema
     }
 
 
+    //това защита срещу изтриване на задължителните полета ли е ? 
     //за новите данни презаписва стойностите, а ако не е дошла стойност записва с предходните данни
     user.firstName = firstName || user.firstName;
     user.lastName = lastName || user.lastName;

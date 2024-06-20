@@ -47,7 +47,7 @@ router.get('/:postId', async (req, res) => {
 
         //грешка ако върне null - аз я хвърлям
         //Mongoose грешка - ако е подаден невалиден стринг който да се кастне към objectID
-        res.status(404).json({ message: error.message });
+        res.status(error.statusCode || 500).json({ message: error.message });
     }
 })
 
@@ -62,9 +62,9 @@ router.post('/', async (req, res) => {
         //2. той съвпада ли с текущо логнатия потребител
         const groupId = req.groupId;
 
-        //TODO validate -> направи да има или снимка или текстово описание, а не задължително текстово описание
+        //TODO validate -> да има или снимка или текстово описание, а не задължително текстово описание
         if (!text && !img) {
-            return res.status(400).json({ message: 'Изисква се публикацията да съдържа или снимка, или описание' });
+            return res.status(400).json({ message: 'Изисква се публикацията да съдържа поне или снимка, или описание' });
         }
 
         //check max length of text
@@ -83,7 +83,36 @@ router.post('/', async (req, res) => {
     }
 });
 
-//EDIT POST - TODO
+//EDIT POST
+
+router.put('/:postId', async (req, res) => {
+    const currUserId = req.user._id;
+    const postIdToEdit = req.params.postId;
+    const { text, newImg, currImg } = req.body;
+
+    //case: потребителят е изтрил текста и е махнал снимките ако е имало такива
+    //и не е прикачил нова снимка -> реално публикацията трябва да има поне текст
+    //или поне снимка
+    if (!text && !newImg && !currImg) {
+        return res.status(400).json({ message: 'Изисква се публикацията да съдържа поне или снимка, или описание' });
+    }
+
+    //check max length of text
+    const maxLength = 500;
+    if (text.length > maxLength) {
+        return res.status(400).json({ message: `Твръде дълъг текст на публикацията! Лимит : ${maxLength} символа` });
+    }
+
+    try {
+
+        const updatedPost = await postService.edit(postIdToEdit, currUserId, text, newImg, currImg)
+
+        res.json(updatedPost);
+    } catch (error) {
+        res.status(error.statusCode || 500).json({ message: error.message });
+        console.log('Error in update post:', error.message);
+    }
+})
 
 //DELETE POST
 router.delete('/:postId', async (req, res) => {
