@@ -130,9 +130,13 @@ exports.createPost = async (text, img, _ownerId, groupId) => {
         groupId
     };
 
-    const newPost = Post.create(newPostData);
+    const newPost = await Post.create(newPostData);
+    const newPostWithOwnerData = await newPost.populate({
+        path: '_ownerId',
+        select: 'firstName lastName profilePic'
+    })
 
-    return newPost;
+    return newPostWithOwnerData;
 }
 
 exports.edit = async (postIdToEdit, currUserId, text, newImg, currImg) => {

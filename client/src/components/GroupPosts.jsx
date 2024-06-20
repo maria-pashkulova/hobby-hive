@@ -15,24 +15,14 @@ const GroupPosts = () => {
 
     const navigate = useNavigate();
     // const { groupId } = useParams();
-    const { logoutHandler, userId, fullName, profilePic } = useContext(AuthContext);
+    const { logoutHandler } = useContext(AuthContext);
 
     const [groupPosts, setGroupPosts] = useState([]);
     const [loading, setLoading] = useState(true);
     const { isOpen, onOpen, onClose } = useDisclosure();
 
     const handleAddNewCreatedPost = (newPost) => {
-
-        const newPostWithCreator = {
-            ...newPost,
-            _ownerId: {
-                _id: userId,
-                profilePic,
-                fullName
-            }
-        }
-
-        setGroupPosts((posts) => ([newPostWithCreator, ...posts]));
+        setGroupPosts((posts) => ([newPost, ...posts]));
     }
 
     useEffect(() => {
