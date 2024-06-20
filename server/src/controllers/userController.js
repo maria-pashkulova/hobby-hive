@@ -149,6 +149,8 @@ router.put('/:userId', auth, async (req, res) => {
         res.json(userData);
 
     } catch (error) {
+        //500 status code -> ако cloudinary върне грешка
+
         res.status(error.statusCode || 500).json({ message: error.message });
         console.log('Error in update user:', error.message);
     }

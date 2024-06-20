@@ -3,7 +3,7 @@ const jwt = require('../lib/jwt');
 const User = require('../models/User');
 const Group = require('../models/Group');
 
-const cloudinary = require('cloudinary').v2;
+const { uploadToCloudinary, destroyFromCloudinary } = require('../utils/cloudinaryUtils');
 const PROFILE_PICS_FOLDER = 'user-profile-pics';
 
 
@@ -130,17 +130,12 @@ exports.updateUser = async (currUserId, userIdToUpdate, firstName, lastName, ema
 
     if (profilePic) {
         if (user.profilePic) {
-            //extract public_id from secure_url
-            //concatenate with folder name
-            const public_id = `${PROFILE_PICS_FOLDER}/${user.profilePic.split('/').pop().split('.')[0]}`;
+            //destroy currentPhoto from cloudinary
 
-            await cloudinary.uploader.destroy(public_id);
+            await destroyFromCloudinary(user.profilePic, PROFILE_PICS_FOLDER);
         }
         //if user uploaded a pic we upload it to cloudinary
-        const uploadedResponse = await cloudinary.uploader.upload(profilePic, {
-            folder: PROFILE_PICS_FOLDER
-        });
-        profilePic = uploadedResponse.secure_url;
+        profilePic = await uploadToCloudinary(profilePic, PROFILE_PICS_FOLDER)
     }
 
 

@@ -78,6 +78,8 @@ router.post('/', async (req, res) => {
         res.status(201).json(createdPost);
 
     } catch (error) {
+
+        //евентуално грешки от cloudinary
         res.status(error.statusCode || 500).json({ message: error.message });
         console.log('Error in create post:', error.message);
     }
@@ -109,6 +111,9 @@ router.put('/:postId', async (req, res) => {
 
         res.json(updatedPost);
     } catch (error) {
+
+        //500 status code -> ако cloudinary върне грешка
+
         res.status(error.statusCode || 500).json({ message: error.message });
         console.log('Error in update post:', error.message);
     }

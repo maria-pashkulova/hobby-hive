@@ -2,8 +2,9 @@ const Post = require('../models/Post');
 const Group = require('../models/Group');
 const User = require('../models/User');
 
-const cloudinary = require('cloudinary').v2;
+
 const POST_PICS_FOLDER = 'post-pics';
+const { uploadToCloudinary, destroyFromCloudinary } = require('../utils/cloudinaryUtils');
 const mongoose = require('mongoose');
 
 
@@ -113,24 +114,25 @@ exports.createPost = async (text, img, _ownerId, groupId) => {
         throw error;
     }
 
+    let imageUrl;
+
     if (img) {
         //if user uploaded a pic we upload it to cloudinary
-        const uploadedResponse = await cloudinary.uploader.upload(img, {
-            folder: POST_PICS_FOLDER
-        });
-
-        img = uploadedResponse.secure_url;
+        imageUrl = await uploadToCloudinary(img, POST_PICS_FOLDER);
     }
 
     //TODO: add validation
     const newPostData = {
         text,
-        img,
+        img: imageUrl,
         _ownerId,
         groupId
     };
 
     const newPost = await Post.create(newPostData);
+
+    //keep the same form of post object so it can be added
+    //to the groupPosts state
     const newPostWithOwnerData = await newPost.populate({
         path: '_ownerId',
         select: 'firstName lastName profilePic'
@@ -181,45 +183,36 @@ exports.edit = async (postIdToEdit, currUserId, text, newImg, currImg) => {
 
     // Case 1: Post initially without image, user uploads a new image
     if (!post.img && newImg) {
-        const uploadedResponse = await cloudinary.uploader.upload(newImg, {
-            folder: POST_PICS_FOLDER
-        });
 
-        imageUrl = uploadedResponse.secure_url;
+        imageUrl = await uploadToCloudinary(newImg, POST_PICS_FOLDER);
+
     } else if (post.img && newImg && !currImg) {
         // Case 2: Post has an image, user uploads a new one
 
-        //extract public_id from secure_url
-        //concatenate with folder name
-        const public_id = `${POST_PICS_FOLDER}/${post.img.split('/').pop().split('.')[0]}`;
-        await cloudinary.uploader.destroy(public_id);
+        //destroy current image from cloudinary
+        await destroyFromCloudinary(post.img, POST_PICS_FOLDER);
 
         //user has uploaded new image - he wants to change the current picture
-        const uploadedResponse = await cloudinary.uploader.upload(newImg, {
-            folder: POST_PICS_FOLDER
-        });
 
-        imageUrl = uploadedResponse.secure_url;
+        imageUrl = await uploadToCloudinary(newImg, POST_PICS_FOLDER);
+
 
     } else if (post.img && !newImg && !currImg) {
         // Case 3: Post has an image, user wants to remove it
 
-        //extract public_id from secure_url
-        //concatenate with folder name
-        const public_id = `${POST_PICS_FOLDER}/${post.img.split('/').pop().split('.')[0]}`;
-        await cloudinary.uploader.destroy(public_id);
+        //destroy current image from cloudinary
+        await destroyFromCloudinary(post.img, POST_PICS_FOLDER)
 
         imageUrl = '';
     }
 
-    //ако досега публикацията не е имала снимка и не е била прикачена нова (newImg) си остава с '' -> let imageUrl = post.img;с
+    //ако досега публикацията не е имала снимка и не е била прикачена нова (newImg) си остава с '' -> let imageUrl = post.img;
 
     // Update post with new text and image url
     post.text = text;
     post.img = imageUrl;
 
     await post.save();
-
 
     return post;
 
@@ -242,8 +235,6 @@ exports.delete = async (postIdToDelete, currUserId) => {
     //reuse getById() service method -> тук е проверката дали публикацията съществува
     const post = await this.getById(postIdToDelete);
 
-
-
     //ALTOUGH getById uses lean WE STILL NEED post._ownerId.toString()
     //because post._ownerId is of type object
 
@@ -254,13 +245,8 @@ exports.delete = async (postIdToDelete, currUserId) => {
     }
 
     //delete post's image from cloudinary as well
-
     if (post.img) {
-        //extract public_id from secure_url
-        //concatenate with folder name
-        const public_id = `${POST_PICS_FOLDER}/${post.img.split('/').pop().split('.')[0]}`;
-        await cloudinary.uploader.destroy(public_id);
-
+        await destroyFromCloudinary(post.img, POST_PICS_FOLDER);
     }
 
     //не работеше без return; връщам promise, не await-вам
