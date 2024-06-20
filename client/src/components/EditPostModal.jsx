@@ -65,7 +65,28 @@ const EditPostModal = ({ postIdToUpdate, changeMyPostsOnDbUpdate, groupId, isOpe
                 position: "bottom",
             });
         } catch (error) {
-            console.log(error);
+            if (error.status === 401) {
+                logoutHandler(); //invalid or missing token - пр логнал си се, седял си опр време, изтича ти токена - сървъра връща unauthorized - изчистваш стейта
+                //и localStorage за да станеш неаутентикиран и за клиента и тогава редиректваш
+                navigate('/login');
+            } else if (error.status === 403) {
+                toast({
+                    title: error.message,
+                    status: "error",
+                    duration: 5000,
+                    isClosable: true,
+                    position: "bottom",
+                });
+            } else {
+                //case изключвам си сървъра - грешка при свързването със сървъра
+                toast({
+                    title: 'Възникна грешка при свързване!',
+                    status: "error",
+                    duration: 5000,
+                    isClosable: true,
+                    position: "bottom",
+                });
+            }
 
         } finally {
             setLoadingUpdate(false);
@@ -98,6 +119,7 @@ const EditPostModal = ({ postIdToUpdate, changeMyPostsOnDbUpdate, groupId, isOpe
                         isClosable: true,
                         position: "bottom",
                     });
+                    onClose();
                 }
             })
             .finally(() => {
