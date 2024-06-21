@@ -30,10 +30,11 @@ export const searchUser = (query) => request.get(`${baseUrl}?search=${query}`);
 
 export const getMyGroups = () => request.get(`${baseUrl}/my-groups`);
 
+export const getMyDetails = () => request.get(`${baseUrl}/my-details`);
 
 //return promise
 //repeatPass is also sent!
-export const updateUser = (userId, { firstName, lastName, email, password, profilePic }) => (
+export const updateUser = (userId, { firstName, lastName, email, password, newProfilePic, currProfilePic }) => (
 
     //TODO check if password and repeat password match - maybe here at service
     request.put(`${baseUrl}/${userId}`, {
@@ -41,7 +42,8 @@ export const updateUser = (userId, { firstName, lastName, email, password, profi
         lastName,
         email,
         password,
-        profilePic
+        newProfilePic,
+        currProfilePic
     })
 
 );

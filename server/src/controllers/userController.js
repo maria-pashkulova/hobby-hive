@@ -116,22 +116,13 @@ router.get('/my-groups', auth, async (req, res) => {
     }
 });
 
-//TODO: get single user endpoint
+//get current user details to populate update user profile edit form
 
-//няма да го имам като функционалност сега
-//да преглеждаш други users мисля -  НО може би ще ми трябва за да популирам формата за update на user
-// router.get('/:userId', auth, async (req, res) => {
-//     const { userId } = req.params;
-//     try {
+router.get('/my-details', auth, async (req, res) => {
 
-//         const user = await userService.getUser(userId);
-//         res.status(200).json(user);
+    res.status(200).json(req.user);
 
-//     } catch (error) {
-//         res.status(error.statusCode || 500).json({ message: error.message });
-//         console.log('Error in get user profile:', error.message);
-//     }
-// })
+})
 
 
 //оставям :userId да се взима от параметрите за да се запази
@@ -139,12 +130,12 @@ router.get('/my-groups', auth, async (req, res) => {
 
 router.put('/:userId', auth, async (req, res) => {
 
-    const { firstName, lastName, email, password, profilePic } = req.body;
+    const { firstName, lastName, email, password, newProfilePic, currProfilePic } = req.body;
     const currUserId = req.user._id; //този който прави заявката
-    const userIdToUpdate = req.params.userId; //този който ще бъде редактриан
+    const userIdToUpdate = req.params.userId; //този който ще бъде редактиран
 
     try {
-        const userData = await userService.updateUser(currUserId, userIdToUpdate, firstName, lastName, email, password, profilePic);
+        const userData = await userService.updateUser(currUserId, userIdToUpdate, firstName, lastName, email, password, newProfilePic, currProfilePic);
 
         res.json(userData);
 

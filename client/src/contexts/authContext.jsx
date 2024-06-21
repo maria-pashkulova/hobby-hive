@@ -54,12 +54,14 @@ export const AuthProvider = ({ children }) => {
 
 
     //update profile
-    const updateProfileSubmitHandler = async (userId, userData, profilePic) => {
-        const result = await userService.updateUser(userId, { ...userData, profilePic }); //updated user data
+    const updateProfileSubmitHandler = async (userId, userData, newProfilePic, currProfilePic) => {
+        const result = await userService.updateUser(userId, { ...userData, newProfilePic, currProfilePic }); //updated user data
 
         //разчитаме че сървъра връща обект с _id, fullName, email, profilePic
         //можем да деструктурираме обекта за по-сигурно
         setAuth(result);
+
+        return result;
 
     }
 

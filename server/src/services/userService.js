@@ -87,7 +87,7 @@ exports.getAll = async (search, currUserId) => {
     return users;
 }
 
-//used in authentication middleware, not in userController, no such endpoint for getting user details
+//used in authentication middleware only
 exports.getById = async (userId) => {
 
     //оптимизация -> не се правят заявки с невалидни ObjectId,
@@ -107,7 +107,7 @@ exports.getById = async (userId) => {
     return user;
 }
 
-exports.updateUser = async (currUserId, userIdToUpdate, firstName, lastName, email, password, profilePic) => {
+exports.updateUser = async (currUserId, userIdToUpdate, firstName, lastName, email, password, newProfilePic, currProfilePic) => {
 
     if (!mongoose.Types.ObjectId.isValid(userIdToUpdate)) {
         const error = new Error('Не съществува такъв потребител');
@@ -140,15 +140,38 @@ exports.updateUser = async (currUserId, userIdToUpdate, firstName, lastName, ema
         user.password = hashedPassword;
     }
 
-    if (profilePic) {
-        if (user.profilePic) {
-            //destroy currentPhoto from cloudinary
 
-            await destroyFromCloudinary(user.profilePic, PROFILE_PICS_FOLDER);
-        }
-        //if user uploaded a pic we upload it to cloudinary
-        profilePic = await uploadToCloudinary(profilePic, PROFILE_PICS_FOLDER)
+    //'' for users without profile pic
+    // or secure_url for cloudinary
+    let imageUrl = user.profilePic;
+
+    // Case 1: User initially without profile pic, user uploads a new image
+    if (!user.profilePic && newProfilePic) {
+
+        imageUrl = await uploadToCloudinary(newProfilePic, PROFILE_PICS_FOLDER);
+
+    } else if (user.profilePic && newProfilePic && !currProfilePic) {
+        // Case 2: User has a profile pic, user uploads a new one
+
+        //destroy current image from cloudinary
+        await destroyFromCloudinary(user.profilePic, PROFILE_PICS_FOLDER);
+
+        //user has uploaded new image - he wants to change the current profile pic
+        imageUrl = await uploadToCloudinary(newProfilePic, PROFILE_PICS_FOLDER);
+
+
+    } else if (user.profilePic && !newProfilePic && !currProfilePic) {
+        // Case 3: User has a profile pic and wants to remove it
+
+        //destroy current image from cloudinary
+        await destroyFromCloudinary(user.profilePic, PROFILE_PICS_FOLDER);
+
+        imageUrl = ''
+
     }
+
+    //ако досега потребителят не е имал снимка и не е била прикачена нова (newProfilePic) 
+    //си остава с '' -> let imageUrl = user.profilePic;
 
 
     //това защита срещу изтриване на задължителните полета ли е ? 
@@ -159,11 +182,12 @@ exports.updateUser = async (currUserId, userIdToUpdate, firstName, lastName, ema
     //TODO : проверка дали има потребител със същия имейл - както при регистрация ако ще може да си сменя имейла
     //или да бъде на ниво model with Mongoose errors -> виж workshop
     user.email = email || user.email;
-    user.profilePic = profilePic || user.profilePic;
+    user.profilePic = imageUrl;
 
     user = await user.save();
 
     //update user in all the groups he is a member to
+    //TODO: transaction
 
     await Group.updateMany(
         { _id: { $in: user.groups } },

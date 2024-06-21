@@ -9,6 +9,8 @@ import AuthContext from '../../contexts/authContext';
 const Header = ({ onOpen }) => {
 
     const { fullName, profilePic, userId } = useContext(AuthContext);
+    const avatarKey = profilePic ? 'withImage' : 'withoutImage';
+
     return (
         <Flex
             as='header'
@@ -48,6 +50,7 @@ const Header = ({ onOpen }) => {
                     <MenuButton py={2}>
                         <HStack >
                             <Avatar
+                                key={avatarKey}
                                 size={'sm'}
                                 name={fullName}
                                 src={profilePic}
