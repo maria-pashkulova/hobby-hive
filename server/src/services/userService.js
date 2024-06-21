@@ -2,6 +2,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('../lib/jwt');
 const User = require('../models/User');
 const Group = require('../models/Group');
+const mongoose = require('mongoose');
 
 const { uploadToCloudinary, destroyFromCloudinary } = require('../utils/cloudinaryUtils');
 const PROFILE_PICS_FOLDER = 'user-profile-pics';
@@ -86,20 +87,24 @@ exports.getAll = async (search, currUserId) => {
     return users;
 }
 
-//maybe return only bio ; other info comes from member fields in the group ?
-// exports.getUser = async (userId) => {
-//     //TODO - virtual property fullName is not returned  - fullName is not part of the schema (DB)
-//     //so it cant be used in select() as a field to be selected. The fields that it consist of 
-//     //MUST be selected
-//     const user = await User.findById(userId).select('_id firstName lastName profilePic createdAt');
+exports.getById = async (userId) => {
 
-//     if (!user) {
-//         const error = new Error('User not found');
-//         error.statusCode = 404;
-//         throw error;
-//     };
-//     return user;
-// }
+    //оптимизация -> не се правят заявки с невалидни ObjectId,
+    //а директно се хвърля грешка
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+        throw new Error('Не съществува такъв потребител!');
+    }
+
+    //Check if user still exists in DB after login
+    // Use lean() for better performance - no need for mongoose document methods
+    const user = await User.findById(userId).select('firstName lastName profilePic').lean();
+
+    if (!user) {
+        throw new Error('Не съществува такъв потребител!');
+    };
+
+    return user;
+}
 
 exports.updateUser = async (currUserId, userIdToUpdate, firstName, lastName, email, password, profilePic) => {
 

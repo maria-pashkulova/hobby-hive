@@ -1,4 +1,5 @@
 const jwt = require('../lib/jwt');
+const userService = require('../services/userService');
 
 
 //използвам го за protected routes, а не е глобален midlleware, тъй като само login и  register са публични
@@ -19,25 +20,32 @@ const auth = async (req, res, next) => {
     try {
         //validate token
         //връща декодирания токен, който в случая е обект с информация 
-        //за user-a
+        //за user-a (_id)
         const decodedToken = await jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
 
-        //записваме информацията от токена в req обекта
+        //Check if user still exists in DB after login
+        const user = await userService.getById(decodedToken._id);
+
+        //записваме информацията от токена в req обекта + допълнителна информация за потребителят
+        // (firstName, lastName, profilePic)
         //за да имат достъп до нея всички останали middlewares и action-a
         //тоест да знаят кой е user-a request-a; кой е произхода на всеки един request
         //имат достъп до контекста на заявката
-        req.user = decodedToken;
-
-        //дали да взимам само _id от decoded token - без iat и exp ?
-        console.log(req.user);
+        req.user = {
+            _id: decodedToken._id,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            profilePic: user.profilePic
+        }
 
         next();
 
-    } catch (err) {
+    } catch (error) {
         res.clearCookie(process.env.COOKIE_NAME)
-        //може би сървъра трябва да върне статус код 401 и примерно клиента да проверява
+        //сървърът връща статус код 401 и клиента да проверява
         //какъв е статус кода и самия клиент да редиректва
-        res.status(401).json({ message: 'Unautorized, invalid token!' }); //TODO
+        res.status(401).json({ message: 'Unautorized, invalid token or invalid user!' });
+        console.log(error.message);
     }
 
 
