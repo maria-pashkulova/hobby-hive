@@ -87,6 +87,7 @@ exports.getAll = async (search, currUserId) => {
     return users;
 }
 
+//used in authentication middleware, not in userController, no such endpoint for getting user details
 exports.getById = async (userId) => {
 
     //оптимизация -> не се правят заявки с невалидни ObjectId,
@@ -97,7 +98,7 @@ exports.getById = async (userId) => {
 
     //Check if user still exists in DB after login
     // Use lean() for better performance - no need for mongoose document methods
-    const user = await User.findById(userId).select('firstName lastName profilePic').lean();
+    const user = await User.findById(userId).select('firstName lastName email profilePic').lean();
 
     if (!user) {
         throw new Error('Не съществува такъв потребител!');
@@ -107,6 +108,12 @@ exports.getById = async (userId) => {
 }
 
 exports.updateUser = async (currUserId, userIdToUpdate, firstName, lastName, email, password, profilePic) => {
+
+    if (!mongoose.Types.ObjectId.isValid(userIdToUpdate)) {
+        const error = new Error('Не съществува такъв потребител');
+        error.statusCode = 404;
+        throw error;
+    }
 
     let user = await User.findById(userIdToUpdate);
 
@@ -183,8 +190,6 @@ exports.updateUser = async (currUserId, userIdToUpdate, firstName, lastName, ema
 }
 
 exports.getGroupsWithMembership = (userId) => {
-
-    //check if user exists?
 
     //sort results 
     const user = User.findById(userId).select('groups -_id').populate({ path: 'groups', options: { sort: { 'createdAt': -1 } } });

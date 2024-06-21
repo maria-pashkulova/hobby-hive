@@ -24,11 +24,11 @@ router.get('/', async (req, res) => {
 router.get('/user-posts', async (req, res) => {
 
     const groupId = req.groupId;
-    const currUserId = req.user._id;
+    const currUser = req.user;
 
     try {
 
-        const userPosts = await postService.getUserPostsForGroup(groupId, currUserId)
+        const userPosts = await postService.getUserPostsForGroup(groupId, currUser)
 
         res.json(userPosts);
     } catch (error) {
@@ -58,8 +58,7 @@ router.post('/', async (req, res) => {
         const { text, img } = req.body;
         const _ownerId = req.user._id; //текущо вписания потребител е owner на post-a
         //клиента не изпраща данни за това и не се налага да проверявам:
-        //1. съществува ли такъв потребител - всъщност това ще го проверя за вс случай в edge cases
-        //2. той съвпада ли с текущо логнатия потребител
+        //1. той съвпада ли с текущо логнатия потребител
         const groupId = req.groupId;
 
         //TODO validate -> да има или снимка или текстово описание, а не задължително текстово описание

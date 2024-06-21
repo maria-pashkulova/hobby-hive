@@ -95,37 +95,23 @@ exports.getById = async (groupId) => {
 }
 // exports.getByIdWithEvents = (groupId) => this.getById(groupId).populate('events'); (child referencing approach)
 
-exports.create = async (name, category, location, description, imageUrl, members, currUserId) => {
+exports.create = async (name, category, location, description, imageUrl, members, currUser) => {
 
-    //find user data for group admin
-    //cant use lean because of virtual field fullName
-    const currUser = await User.findById(currUserId).select('firstName lastName email profilePic');
 
     //add owner of the group to members with additional data 
     //if members.push() is used admin is added to the end of the array
     //искаме винаги админа да се запазва на 0-ва позиция в масива, с members за да се извежда
     //на първо място при листването на всички членове на дадена група
 
-
     //case 1: потребителят който създава групата е добавил други членове при нейното създаване и трябва да го добавим отпред - unshift() (mutator function)
     //модифицира се директно members - не се създава нова референция
 
     //case 2: потребителят който създава групата не е добавил други членове при нейното създаване
     if (members.length > 0) {
-        members.unshift({
-            _id: currUserId,
-            fullName: currUser.fullName,
-            email: currUser.email,
-            profilePic: currUser.profilePic
-        });
+        members.unshift(currUser);
 
     } else {
-        members.push({
-            _id: currUserId,
-            fullName: currUser.fullName,
-            email: currUser.email,
-            profilePic: currUser.profilePic
-        });
+        members.push(currUser);
     }
 
     // console.log(members);
@@ -139,10 +125,11 @@ exports.create = async (name, category, location, description, imageUrl, members
         location,
         description,
         imageUrl,
-        groupAdmin: currUserId,
+        groupAdmin: currUser._id,
         members
     };
 
+    //TODO: Transaction
     const newGroup = await Group.create(newGroupData);
 
     //Update users who are members to the newly created group - add it to their group field
@@ -171,6 +158,7 @@ exports.update = (groupId, name, category, location, description, members, image
     return updatedGroup;
 }
 
+//TODO
 exports.delete = (groupId) => Group.findByIdAndDelete(groupId);
 
 

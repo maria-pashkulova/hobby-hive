@@ -50,24 +50,10 @@ exports.getById = async (postId) => {
 }
 
 
-exports.getUserPostsForGroup = async (groupId, currUserId) => {
-
-    //ако изнасям проверката за съществуващ потребител в middleware трябва да осигуря начин
-    //тук да имам информацията за потребителя
-    const user = await User
-        .findById(currUserId)
-        .select('_id firstName lastName profilePic')
-        .lean();
-
-
-    if (!user) {
-        const error = new Error('Не съществува такъв потребител!');
-        error.statusCode = 404;
-        throw error;
-    }
+exports.getUserPostsForGroup = async (groupId, currUser) => {
 
     let posts = await Post
-        .find({ groupId, _ownerId: currUserId })
+        .find({ groupId, _ownerId: currUser._id })
         .select('-updatedAt')
         .sort({ createdAt: -1 })
         .lean();
@@ -77,9 +63,9 @@ exports.getUserPostsForGroup = async (groupId, currUserId) => {
     posts = posts.map(post => ({
         ...post,
         _ownerId: {
-            _id: user._id,
-            fullName: `${user.firstName} ${user.lastName}`,
-            profilePic: user.profilePic
+            _id: currUser._id,
+            fullName: currUser.fullName,
+            profilePic: currUser.profilePic
         }
     }))
 
@@ -97,13 +83,6 @@ exports.createPost = async (text, img, _ownerId, groupId) => {
         throw error;
     }
 
-    //проверка дали user-а съществува 
-    const user = await User.findById(_ownerId);
-    if (!user) {
-        const error = new Error('Не съществува такъв потребител!');
-        error.statusCode = 404;
-        throw error;
-    }
     // проверка дали този който се опитва да създаде поста е член на групата
 
     const isMember = group.members.find(member => member._id.toString() === _ownerId)
@@ -146,6 +125,8 @@ exports.edit = async (postIdToEdit, currUserId, text, newImg, currImg) => {
     // const post = await this.getById(postIdToEdit);
     //не мога да преизползвам getById, защото в него има lean() -> няма да мога да кажа post.save()
     //защото това няма да е Mongoose document , а POJO
+
+    //проверка дали потребителят, който се опитва да редактира съществува -> вече сме я направили в authMiddleware
 
     let post;
 
@@ -220,13 +201,7 @@ exports.edit = async (postIdToEdit, currUserId, text, newImg, currImg) => {
 
 exports.delete = async (postIdToDelete, currUserId) => {
 
-    //проверка дали user-а съществува ?
-    //   const user = await User.findById(currUserId);
-    //   if (!user) {
-    //       const error = new Error('Не съществува такъв потребител!');
-    //       error.statusCode = 404;
-    //       throw error;
-    //   }
+    //проверка дали потребителят, който се опитва да изтрива съществува -> вече сме я направили в authMiddleware
 
     //TODO : проверка групата съществува ли? - в постман пробвах да имам невалидно groupId
     //но валидно postId и си става

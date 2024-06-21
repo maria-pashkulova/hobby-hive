@@ -49,12 +49,12 @@ router.post('/', async (req, res) => {
     // console.log(req.body);
     //деструктурираме за да валидираме данните идващи от request-a
     const { name, category, location, description, imageUrl, members } = req.body;
-    const currUserId = req.user._id;
+    const currUser = req.user;
 
     //TODO: validate user input
 
     try {
-        const createdGroup = await groupService.create(name, category, location, description, imageUrl, members, currUserId);
+        const createdGroup = await groupService.create(name, category, location, description, imageUrl, members, currUser);
 
         const newGroupResult = {
             _id: createdGroup._id,
