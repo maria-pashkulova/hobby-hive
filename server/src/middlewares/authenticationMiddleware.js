@@ -33,8 +33,8 @@ const auth = async (req, res, next) => {
         //имат достъп до контекста на заявката
         req.user = {
             _id: decodedToken._id,
-            firstName: user.firstName,
-            lastName: user.lastName,
+            fullName: `${user.firstName} ${user.lastName}`,
+            email: user.email,
             profilePic: user.profilePic
         }
 
