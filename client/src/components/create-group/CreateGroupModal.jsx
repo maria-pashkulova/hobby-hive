@@ -1,4 +1,4 @@
-import { Modal, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Button, useDisclosure, ModalCloseButton, ModalBody, FormControl, FormLabel, Input, Select, useToast, Flex } from "@chakra-ui/react";
+import { Modal, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Button, useDisclosure, ModalCloseButton, ModalBody, FormControl, FormLabel, Input, Select, useToast, Flex, CloseButton, Image, Tooltip } from "@chakra-ui/react";
 import Loading from '../Loading';
 
 import useForm from "../../hooks/useForm";
@@ -6,10 +6,12 @@ import * as groupService from '../../services/groupService';
 import * as userService from '../../services/userService';
 
 import { useNavigate } from "react-router-dom";
-import { useContext, useState } from "react";
+import { useContext, useRef, useState } from "react";
 import AuthContext from "../../contexts/authContext";
 import UserListItem from "../UserListItem";
 import UserBadgeItem from "../UserBadgeItem";
+import usePreviewImage from "../../hooks/usePreviewImage";
+import { FiImage } from "react-icons/fi";
 
 const FormKeys = {
     Name: 'name',
@@ -20,7 +22,7 @@ const FormKeys = {
 }
 
 
-//TODO - fetch from DB
+//TODO - fetch from DB + loading indicator render
 const categoryOptions = [
 
     { label: 'Кулинарство', value: 'Кулинарство' },
@@ -31,7 +33,7 @@ const categoryOptions = [
 
 ];
 
-//TODO - fetch from DB
+//TODO - fetch from DB + loading indicator render
 const locationOptions = [
 
     { label: 'София', value: 'София' },
@@ -45,23 +47,34 @@ const locationOptions = [
 
 const CreateGroupModal = ({ isOpen, onClose, handleAddNewCreatedGroup }) => {
 
-    const navigate = useNavigate();
     const { logoutHandler } = useContext(AuthContext);
+
     const [selectedUsers, setSelectedUsers] = useState([]);
     const [search, setSearch] = useState('');
     const [searchResult, setSearchResult] = useState([]);
-    const [loading, setLoading] = useState(false);
-    const toast = useToast();
 
+    //preview the picture which user has uploaded from file system
+    const { handleImageChange, handleImageDecline, imageUrl } = usePreviewImage();
+    const imageRef = useRef(null);
 
-    //Make the form controlled
+    //Make the form controlled; 
+    //uploaded group image and selected members are managed separately
+
     const { formValues, onChange } = useForm({
         [FormKeys.Name]: '',
         [FormKeys.Category]: 'Кулинарство',
         [FormKeys.Location]: 'София',
         [FormKeys.Description]: '',
-        [FormKeys.ImageUrl]: '',
     });
+
+
+    const [loadingSearchedUsers, setLoadingSearchedUsers] = useState(false);
+    const [loadingGroupCreate, setLoadingGroupCreate] = useState(false);
+    const toast = useToast();
+    const navigate = useNavigate();
+
+
+
 
     const handleSearch = async (query) => {
         setSearch(query);
@@ -71,7 +84,7 @@ const CreateGroupModal = ({ isOpen, onClose, handleAddNewCreatedGroup }) => {
         if (query.trim().length >= 3) {
 
             try {
-                setLoading(true);
+                setLoadingSearchedUsers(true);
 
                 const users = await userService.searchUser(query);
                 setSearchResult(users);
@@ -94,7 +107,7 @@ const CreateGroupModal = ({ isOpen, onClose, handleAddNewCreatedGroup }) => {
                 }
 
             } finally {
-                setLoading(false);
+                setLoadingSearchedUsers(false);
             }
         } else if (query.trim() === '') {
             setSearchResult([]);
@@ -125,6 +138,7 @@ const CreateGroupModal = ({ isOpen, onClose, handleAddNewCreatedGroup }) => {
 
     const handleFormSubmit = async (e) => {
         e.preventDefault();
+        setLoadingGroupCreate(true);
 
         //TODO: client side validation for required fields
 
@@ -132,6 +146,7 @@ const CreateGroupModal = ({ isOpen, onClose, handleAddNewCreatedGroup }) => {
 
             const newGroup = await groupService.createGroup({
                 ...formValues,
+                imageUrl,
                 members: selectedUsers
             });
             handleAddNewCreatedGroup(newGroup);
@@ -151,8 +166,18 @@ const CreateGroupModal = ({ isOpen, onClose, handleAddNewCreatedGroup }) => {
                 //и localStorage за да станеш неаутентикиран и за клиента и тогава редиректваш
                 navigate('/login');
             } else {
-                console.log(error);
+                //case изключвам си сървъра - грешка при свързването със сървъра
+                toast({
+                    title: 'Възникна грешка при свързване!',
+                    description: 'Групата не беше създадена',
+                    status: "error",
+                    duration: 5000,
+                    isClosable: true,
+                    position: "bottom",
+                });
             }
+        } finally {
+            setLoadingGroupCreate(false);
         }
 
     }
@@ -204,16 +229,36 @@ const CreateGroupModal = ({ isOpen, onClose, handleAddNewCreatedGroup }) => {
                                     value={formValues[FormKeys.Description]}
                                     onChange={onChange} />
                             </FormControl>
-
-                            {/* TODO: upload picture functionality */}
                             <FormControl mt={4}>
-                                <FormLabel>Снимка на групата</FormLabel>
+                                <FormLabel>Прикачете снимка на групата</FormLabel>
                                 <Input
-                                    placeholder='Прикачи снимка на групата'
-                                    name={[FormKeys.ImageUrl]}
-                                    value={formValues[FormKeys.ImageUrl]}
-                                    onChange={onChange} />
+                                    type='file'
+                                    hidden
+                                    ref={imageRef}
+                                    onChange={handleImageChange} />
+                                <FiImage
+                                    style={{
+                                        marginLeft: '5px',
+                                        cursor: 'pointer'
+                                    }}
+                                    size={20}
+                                    onClick={() => imageRef.current.click()}
+
+                                />
+
                             </FormControl>
+                            {imageUrl && (
+                                <Flex mt={5} w='full' position='relative'>
+                                    <Image src={imageUrl} alt='Selected image' />
+                                    <CloseButton
+                                        onClick={handleImageDecline}
+                                        bg='gray.200'
+                                        position='absolute'
+                                        top={2}
+                                        right={2}
+                                    />
+                                </Flex>
+                            )}
 
                             <FormControl mt={4}>
                                 <FormLabel>Добавяне на членове</FormLabel>
@@ -237,7 +282,7 @@ const CreateGroupModal = ({ isOpen, onClose, handleAddNewCreatedGroup }) => {
                             </Flex>
 
                             {/* render searched users */}
-                            {loading ? <Loading /> : (
+                            {loadingSearchedUsers ? <Loading /> : (
                                 searchResult?.map((user) => (
                                     <UserListItem
                                         key={user._id}
@@ -248,12 +293,18 @@ const CreateGroupModal = ({ isOpen, onClose, handleAddNewCreatedGroup }) => {
                                 ))
                             )}
 
-
-
                         </ModalBody>
 
                         <ModalFooter>
-                            <Button type='submit' mr={3} colorScheme='blue'>Създай</Button>
+                            <Button
+                                type='submit'
+                                mr={3}
+                                colorScheme='blue'
+                                isLoading={loadingGroupCreate}
+                                loadingText='Създаване'
+                            >
+                                Създай
+                            </Button>
                             <Button variant='ghost' onClick={onClose}>
                                 Отмяна
                             </Button>

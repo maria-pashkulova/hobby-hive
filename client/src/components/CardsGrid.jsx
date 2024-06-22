@@ -13,12 +13,12 @@ const CardsGrid = ({ groups, partialLinkToGroup }) => {
                     overflow='hidden'
                     variant='outline'
                 >
-                    <Image
+                    {group.imageUrl && <Image
                         objectFit='cover'
                         maxW={{ base: '100%', md: '200px' }}
                         src={group.imageUrl}
                         alt={group.name}
-                    />
+                    />}
 
                     <Flex direction='column' width='100%' >
                         <CardBody>

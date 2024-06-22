@@ -70,6 +70,7 @@ router.post('/', async (req, res) => {
         res.status(201).json(newGroupResult);
 
     } catch (error) {
+        //case: грешка при upload на снимка в cloudinary
         res.status(500).json({
             message: error.message,
         });

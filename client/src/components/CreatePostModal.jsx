@@ -142,8 +142,6 @@ const CreatePostModal = ({ isOpen, onClose, groupId, handleAddNewCreatedPost }) 
                                         top={2}
                                         right={2}
                                     />
-
-
                                 </Flex>
                             )}
 

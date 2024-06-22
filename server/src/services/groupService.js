@@ -2,26 +2,9 @@ const Group = require('../models/Group');
 const User = require('../models/User');
 const mongoose = require('mongoose');
 
+const GROUP_PICS_FOLDER = 'group-pics';
+const { uploadToCloudinary, destroyFromCloudinary } = require('../utils/cloudinaryUtils');
 
-//In-memory storage
-// const groups = [{
-//     id: "1",
-//     name: "Swimming group",
-//     category: "sport",
-//     location: "Plovdiv",
-//     imageUrl: 'https://d1s9j44aio5gjs.cloudfront.net/2016/07/The_Benefits_of_Swimming.jpg',
-//     description: "Description here"
-// },
-
-// {
-//     id: "2",
-//     name: "Painting",
-//     category: "Art",
-//     location: "Sofia",
-//     imageUrl: 'https://reviewed-com-res.cloudinary.com/image/fetch/s--UJ2sGByA--/b_white,c_limit,cs_srgb,f_auto,fl_progressive.strip_profile,g_center,q_auto,w_972/https://reviewed-production.s3.amazonaws.com/1597356287543/GettyImages-1171084311.jpg',
-//     description: "Description here"
-// },
-// ];
 
 
 //ако една функция просто ще взима и връща promise, няма нужда да
@@ -98,6 +81,12 @@ exports.getById = async (groupId) => {
 exports.create = async (name, category, location, description, imageUrl, members, currUser) => {
 
 
+    if (imageUrl) {
+        //if user uploaded a pic we upload it to cloudinary
+        imageUrl = await uploadToCloudinary(imageUrl, GROUP_PICS_FOLDER);
+    }
+
+
     //add owner of the group to members with additional data 
     //if members.push() is used admin is added to the end of the array
     //искаме винаги админа да се запазва на 0-ва позиция в масива, с members за да се извежда
@@ -115,10 +104,23 @@ exports.create = async (name, category, location, description, imageUrl, members
     }
 
     // console.log(members);
-    //check for duplicate users - case:postman request with duplicate users (skips client side validation)
+    //TODO: check for duplicate users - case:postman request with duplicate users (skips client side validation)
+    //TODO: check for invalid format of members array
+    /*
+    [
+        {
+            "_id": "6662076f0b71dd4af8a245e1",
+            "fullName": "Александър Петров",
+            "email": "alex@abv.bg",
+            "profilePic": ""
+        },
+    ]
+    */
+
 
     //createdAt, editedAt...
     //TODO: add validation
+
     const newGroupData = {
         name,
         category,
@@ -208,6 +210,7 @@ exports.addMember = async (groupId, userIdToAdd, currUserId) => {
         throw error;
     }
 
+    //TODO transaction
 
     //if the useToAdd is not a member of a group:
     //add member to the group with additional data
@@ -292,6 +295,8 @@ exports.removeMember = async (groupId, userIdToRemove, currUserId) => {
             throw error;
         }
     }
+
+    //TODO transaction
 
     // if user is a member, remove group id from the groups array
     const newGroups = userToRemove.groups.filter(currGroupId => currGroupId.toString() !== groupId);

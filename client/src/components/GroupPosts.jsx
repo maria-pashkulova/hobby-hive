@@ -52,6 +52,7 @@ const GroupPosts = () => {
                 bottom={10}
                 right={4}
                 d='flex'
+                size={{ base: 'sm', sm: 'md' }}
                 leftIcon={<FiPlus />}
                 onClick={onOpen}
             >
@@ -59,36 +60,39 @@ const GroupPosts = () => {
             </Button>)
             }
 
-            {isOpen && <CreatePostModal
-                isOpen={isOpen}
-                onClose={onClose}
-                groupId={groupId}
-                handleAddNewCreatedPost={handleAddNewCreatedPost}
-            />}
+            {
+                isOpen && <CreatePostModal
+                    isOpen={isOpen}
+                    onClose={onClose}
+                    groupId={groupId}
+                    handleAddNewCreatedPost={handleAddNewCreatedPost}
+                />
+            }
 
-            {loading ?
-                (<Flex justifyContent={'center'}>
-                    <Spinner size='xl' />
-                </Flex>)
-                :
-                (groupPosts.length > 0 ?
+            {
+                loading ?
+                    (<Flex justifyContent={'center'}>
+                        <Spinner size='xl' />
+                    </Flex>)
+                    :
+                    (groupPosts.length > 0 ?
 
-                    groupPosts.map(post =>
-                        <Post
-                            key={post._id}
-                            text={post.text}
-                            img={post.img}
-                            postedByName={post._ownerId?.fullName}
-                            postedByProfilePic={post._ownerId?.profilePic}
-                            createdAt={post.createdAt}
-                        />
-                    ) : <p>Все още няма публикации в групата</p>
-                )
+                        groupPosts.map(post =>
+                            <Post
+                                key={post._id}
+                                text={post.text}
+                                img={post.img}
+                                postedByName={post._ownerId?.fullName}
+                                postedByProfilePic={post._ownerId?.profilePic}
+                                createdAt={post.createdAt}
+                            />
+                        ) : <p>Все още няма публикации в групата</p>
+                    )
 
             }
 
 
-        </Box>
+        </Box >
 
 
     )
