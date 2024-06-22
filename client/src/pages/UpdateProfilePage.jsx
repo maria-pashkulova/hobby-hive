@@ -99,6 +99,14 @@ const UpdateProfilePage = () => {
                 logoutHandler(); //invalid or missing token - пр логнал си се, седял си опр време, изтича ти токена - сървъра връща unauthorized - изчистваш стейта
                 //и localStorage за да станеш неаутентикиран и за клиента и тогава редиректваш
                 navigate('/login');
+            } else if (error.status === 403) {
+                toast({
+                    title: error.message,
+                    status: "error",
+                    duration: 5000,
+                    isClosable: true,
+                    position: "bottom",
+                });
             } else {
 
                 //TODO: handle other types of errors when you create validation

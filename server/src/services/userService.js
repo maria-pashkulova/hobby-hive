@@ -109,28 +109,20 @@ exports.getById = async (userId) => {
 
 exports.updateUser = async (currUserId, userIdToUpdate, firstName, lastName, email, password, newProfilePic, currProfilePic) => {
 
-    if (!mongoose.Types.ObjectId.isValid(userIdToUpdate)) {
-        const error = new Error('Не съществува такъв потребител');
-        error.statusCode = 404;
-        throw error;
-    }
-
-    let user = await User.findById(userIdToUpdate);
-
-    //проверка дали изобщо съществува такъв потребител ( с такова id)
-    if (!user) {
-        const error = new Error('Не съществува такъв потребител');
-        error.statusCode = 404;
-        throw error;
-    };
+    //ако userIdToUpdate не невалидно (user-a със сиг не съществува), то няма да съвпада с id на текущия потребител (който със сигурност съществува)
+    //и му връщаме само 403 грешка. Защото единствения случай в който искаме да позволим edit е само ако човек редактира себе си.
+    // и няма нужда да проверявам дали човека съществува ако той е текущо логнатия, защото съм сигурна
+    //дори така като не връщам 404 може би е по-малко expose-ване на информация
 
     //case:автентикиран потребител за нашето приложение (с валиден токен)
     //се опитва да промени данните на друг потребител
     if (userIdToUpdate !== currUserId) {
-        const error = new Error('Не можете да редактирате профил на друг потребител');
+        const error = new Error('Можете да редактирате само собствения си профил!');
         error.statusCode = 403;
         throw error;
     }
+
+    let user = await User.findById(userIdToUpdate);
 
     //само ако потребителят е променил паролата си, се хешира отново
     if (password) {
