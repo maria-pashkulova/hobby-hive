@@ -93,17 +93,15 @@ exports.createPost = async (text, img, _ownerId, groupId) => {
         throw error;
     }
 
-    let imageUrl;
-
     if (img) {
         //if user uploaded a pic we upload it to cloudinary
-        imageUrl = await uploadToCloudinary(img, POST_PICS_FOLDER);
+        img = await uploadToCloudinary(img, POST_PICS_FOLDER);
     }
 
     //TODO: add validation
     const newPostData = {
         text,
-        img: imageUrl,
+        img,
         _ownerId,
         groupId
     };
