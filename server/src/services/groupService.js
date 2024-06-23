@@ -159,6 +159,9 @@ exports.delete = (groupId) => Group.findByIdAndDelete(groupId);
 
 //JOIN GROUP / ADD ANOTHER MEMBER TO A GROUP
 exports.addMember = async (groupId, userIdToAdd, currUserId) => {
+    if (!mongoose.Types.ObjectId.isValid(userIdToAdd) || !mongoose.Types.ObjectId.isValid(groupId)) {
+        throw new Error('Неуспешно добавяне на член!');
+    }
 
     // find this user in the database
     const userToAdd = await User.findById(userIdToAdd).select('firstName lastName email profilePic groups');
@@ -226,6 +229,10 @@ exports.addMember = async (groupId, userIdToAdd, currUserId) => {
 //LEAVE A GROUP
 //REMOVE ANOTHER MEMBER FROM A GROUP - само администратора на групата може да премахва потребители от групата
 exports.removeMember = async (groupId, userIdToRemove, currUserId) => {
+
+    if (!mongoose.Types.ObjectId.isValid(userIdToAdd) || !mongoose.Types.ObjectId.isValid(groupId)) {
+        throw new Error('Неуспешно премахване на член!');
+    }
 
     // find this user in the database
     const userToRemove = await User.findById(userIdToRemove).select('firstName lastName email profilePic groups');
