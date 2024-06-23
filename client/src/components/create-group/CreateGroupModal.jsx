@@ -1,17 +1,21 @@
-import { Modal, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Button, useDisclosure, ModalCloseButton, ModalBody, FormControl, FormLabel, Input, Select, useToast, Flex, CloseButton, Image, Tooltip } from "@chakra-ui/react";
+import { Modal, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Button, ModalCloseButton, ModalBody, FormControl, FormLabel, Input, Select, useToast, Flex, CloseButton, Image, Spinner } from "@chakra-ui/react";
 import Loading from '../Loading';
 
 import useForm from "../../hooks/useForm";
 import * as groupService from '../../services/groupService';
 import * as userService from '../../services/userService';
+import * as categoryService from '../../services/categoryService';
+import * as locationService from '../../services/locationService';
+
 
 import { useNavigate } from "react-router-dom";
-import { useContext, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import AuthContext from "../../contexts/authContext";
 import UserListItem from "../UserListItem";
 import UserBadgeItem from "../UserBadgeItem";
 import usePreviewImage from "../../hooks/usePreviewImage";
 import { FiImage } from "react-icons/fi";
+
 
 const FormKeys = {
     Name: 'name',
@@ -20,30 +24,6 @@ const FormKeys = {
     Description: 'description',
     ImageUrl: 'imageUrl'
 }
-
-
-//TODO - fetch from DB + loading indicator render
-const categoryOptions = [
-
-    { label: 'Кулинарство', value: 'Кулинарство' },
-
-    { label: 'Спорт', value: 'Спорт' },
-
-    { label: 'Изкуство', value: 'Изкуство' }
-
-];
-
-//TODO - fetch from DB + loading indicator render
-const locationOptions = [
-
-    { label: 'София', value: 'София' },
-
-    { label: 'Пловдив', value: 'Пловдив' },
-
-    { label: 'Варна', value: 'Варна' }
-
-];
-
 
 const CreateGroupModal = ({ isOpen, onClose, handleAddNewCreatedGroup }) => {
 
@@ -60,21 +40,58 @@ const CreateGroupModal = ({ isOpen, onClose, handleAddNewCreatedGroup }) => {
     //Make the form controlled; 
     //uploaded group image and selected members are managed separately
 
-    const { formValues, onChange } = useForm({
+    const { formValues, onChange, resetForm } = useForm({
         [FormKeys.Name]: '',
-        [FormKeys.Category]: 'Кулинарство',
-        [FormKeys.Location]: 'София',
+        [FormKeys.Category]: '',
+        [FormKeys.Location]: '',
         [FormKeys.Description]: '',
     });
+    const [categoryOptions, setCategoryOptions] = useState([]);
+    const [locationOptions, setLocationOptions] = useState([]);
 
 
+    const [loadingCategoriesAndLocations, setLoadingCategoriesAndLocations] = useState(true);
     const [loadingSearchedUsers, setLoadingSearchedUsers] = useState(false);
     const [loadingGroupCreate, setLoadingGroupCreate] = useState(false);
     const toast = useToast();
     const navigate = useNavigate();
 
 
+    useEffect(() => {
 
+        Promise.all([
+            categoryService.getCategories(),
+            locationService.getLocations()
+        ])
+            .then(([categories, locations]) => {
+                resetForm({
+                    [FormKeys.Category]: categories[0]?.name, // optional chaining -> handle case where categories might be empty
+                    [FormKeys.Location]: locations[0]?.name // optional chaining ->  handle case where locations might be empty
+                });
+                setCategoryOptions(categories);
+                setLocationOptions(locations);
+            })
+            .catch(error => {
+                if (error.status === 401) {
+                    logoutHandler(); //invalid or missing token
+                    navigate('/login');
+                } else {
+                    //case изключвам си сървъра - грешка при свързването със сървъра
+                    toast({
+                        title: 'Възникна грешка при свързване!',
+                        status: "error",
+                        duration: 5000,
+                        isClosable: true,
+                        position: "bottom",
+                    });
+
+                    onClose();
+                }
+            })
+            .finally(() => {
+                setLoadingCategoriesAndLocations(false);
+            })
+    }, []);
 
     const handleSearch = async (query) => {
         setSearch(query);
@@ -191,126 +208,134 @@ const CreateGroupModal = ({ isOpen, onClose, handleAddNewCreatedGroup }) => {
                 <ModalContent>
                     <ModalHeader>Попълнете данни за групата</ModalHeader>
                     <ModalCloseButton />
-
-                    <form onSubmit={handleFormSubmit}>
-                        <ModalBody>
-
-                            <FormControl>
-                                <FormLabel>Име</FormLabel>
-                                <Input
-                                    placeholder='Име на групата'
-                                    name={[FormKeys.Name]}
-                                    value={formValues[FormKeys.Name]}
-                                    onChange={onChange} />
-                            </FormControl>
-
-                            <FormControl mt={4}>
-                                <FormLabel>Категория занимания</FormLabel>
-                                <Select name={[FormKeys.Category]} value={formValues[FormKeys.Category]} onChange={onChange}>
-                                    {categoryOptions.map((option, index) => (
-                                        <option key={index} value={option.value}>{option.label}</option>
-                                    ))}
-                                </Select>
-                            </FormControl>
-
-                            <FormControl mt={4}>
-                                <FormLabel>Основна локация</FormLabel>
-                                <Select name={[FormKeys.Location]} value={formValues[FormKeys.Location]} onChange={onChange}>
-                                    {locationOptions.map((option, index) => (
-                                        <option key={index} value={option.value}>{option.label}</option>
-                                    ))}
-                                </Select>
-                            </FormControl>
-
-                            <FormControl mt={4}>
-                                <FormLabel>Описание</FormLabel>
-                                <Input
-                                    placeholder='Описание'
-                                    name={[FormKeys.Description]}
-                                    value={formValues[FormKeys.Description]}
-                                    onChange={onChange} />
-                            </FormControl>
-                            <FormControl mt={4}>
-                                <FormLabel>Прикачете снимка на групата</FormLabel>
-                                <Input
-                                    type='file'
-                                    hidden
-                                    ref={imageRef}
-                                    onChange={handleImageChange} />
-                                <FiImage
-                                    style={{
-                                        marginLeft: '5px',
-                                        cursor: 'pointer'
-                                    }}
-                                    size={20}
-                                    onClick={() => imageRef.current.click()}
-
-                                />
-
-                            </FormControl>
-                            {imageUrl && (
-                                <Flex mt={5} w='full' position='relative'>
-                                    <Image src={imageUrl} alt='Selected image' />
-                                    <CloseButton
-                                        onClick={handleImageDecline}
-                                        bg='gray.200'
-                                        position='absolute'
-                                        top={2}
-                                        right={2}
-                                    />
-                                </Flex>
-                            )}
-
-                            <FormControl mt={4}>
-                                <FormLabel>Добавяне на членове</FormLabel>
-                                <Input
-                                    placeholder='Потърсете потребители...'
-                                    value={search}
-                                    onChange={(e) => handleSearch(e.target.value)}
-                                />
-
-                            </FormControl>
-                            {/*  selected users */}
-                            <Flex gap={2} py={2} flexWrap={"wrap"}>
-                                {selectedUsers.map((user) => (
-                                    <UserBadgeItem
-                                        key={user._id}
-                                        user={user}
-                                        handleRemoveUser={() => handleRemoveUser(user)}
-                                    />
-                                ))}
-
+                    {loadingCategoriesAndLocations ?
+                        (<ModalBody>
+                            <Flex justifyContent={'center'} my={5}>
+                                <Spinner size='xl' />
                             </Flex>
+                        </ModalBody>)
+                        :
+                        (<form onSubmit={handleFormSubmit}>
+                            <ModalBody>
 
-                            {/* render searched users */}
-                            {loadingSearchedUsers ? <Loading /> : (
-                                searchResult?.map((user) => (
-                                    <UserListItem
-                                        key={user._id}
-                                        user={user}
-                                        handleFunction={() => handleSelectUser(user)}
+                                <FormControl>
+                                    <FormLabel>Име</FormLabel>
+                                    <Input
+                                        placeholder='Име на групата'
+                                        name={[FormKeys.Name]}
+                                        value={formValues[FormKeys.Name]}
+                                        onChange={onChange} />
+                                </FormControl>
+
+                                <FormControl mt={4}>
+                                    <FormLabel>Категория занимания</FormLabel>
+                                    <Select name={[FormKeys.Category]} value={formValues[FormKeys.Category]} onChange={onChange}>
+                                        {categoryOptions.map((option) => (
+                                            <option key={option._id} value={option._id}>{option.name}</option>
+                                        ))}
+                                    </Select>
+                                </FormControl>
+
+                                <FormControl mt={4}>
+                                    <FormLabel>Основна локация</FormLabel>
+                                    <Select name={[FormKeys.Location]} value={formValues[FormKeys.Location]} onChange={onChange}>
+                                        {locationOptions.map((option) => (
+                                            <option key={option._id} value={option._id}>{option.name}</option>
+                                        ))}
+                                    </Select>
+                                </FormControl>
+
+                                <FormControl mt={4}>
+                                    <FormLabel>Описание</FormLabel>
+                                    <Input
+                                        placeholder='Описание'
+                                        name={[FormKeys.Description]}
+                                        value={formValues[FormKeys.Description]}
+                                        onChange={onChange} />
+                                </FormControl>
+                                <FormControl mt={4}>
+                                    <FormLabel>Прикачете снимка на групата</FormLabel>
+                                    <Input
+                                        type='file'
+                                        hidden
+                                        ref={imageRef}
+                                        onChange={handleImageChange} />
+                                    <FiImage
+                                        style={{
+                                            marginLeft: '5px',
+                                            cursor: 'pointer'
+                                        }}
+                                        size={20}
+                                        onClick={() => imageRef.current.click()}
+
                                     />
 
-                                ))
-                            )}
+                                </FormControl>
+                                {imageUrl && (
+                                    <Flex mt={5} w='full' position='relative'>
+                                        <Image src={imageUrl} alt='Selected image' />
+                                        <CloseButton
+                                            onClick={handleImageDecline}
+                                            bg='gray.200'
+                                            position='absolute'
+                                            top={2}
+                                            right={2}
+                                        />
+                                    </Flex>
+                                )}
 
-                        </ModalBody>
+                                <FormControl mt={4}>
+                                    <FormLabel>Добавяне на членове</FormLabel>
+                                    <Input
+                                        placeholder='Потърсете потребители...'
+                                        value={search}
+                                        onChange={(e) => handleSearch(e.target.value)}
+                                    />
 
-                        <ModalFooter>
-                            <Button
-                                type='submit'
-                                mr={3}
-                                colorScheme='blue'
-                                isLoading={loadingGroupCreate}
-                                loadingText='Създаване'
-                            >
-                                Създай
-                            </Button>
-                            <Button variant='ghost' onClick={onClose}>
-                                Отмяна
-                            </Button>
-                        </ModalFooter>
-                    </form>
+                                </FormControl>
+                                {/*  selected users */}
+                                <Flex gap={2} py={2} flexWrap={"wrap"}>
+                                    {selectedUsers.map((user) => (
+                                        <UserBadgeItem
+                                            key={user._id}
+                                            user={user}
+                                            handleRemoveUser={() => handleRemoveUser(user)}
+                                        />
+                                    ))}
+
+                                </Flex>
+
+                                {/* render searched users */}
+                                {loadingSearchedUsers ? <Loading /> : (
+                                    searchResult?.map((user) => (
+                                        <UserListItem
+                                            key={user._id}
+                                            user={user}
+                                            handleFunction={() => handleSelectUser(user)}
+                                        />
+
+                                    ))
+                                )}
+
+                            </ModalBody>
+
+                            <ModalFooter>
+                                <Button
+                                    type='submit'
+                                    mr={3}
+                                    colorScheme='blue'
+                                    isLoading={loadingGroupCreate}
+                                    loadingText='Създаване'
+                                >
+                                    Създай
+                                </Button>
+                                <Button variant='ghost' onClick={onClose}>
+                                    Отмяна
+                                </Button>
+                            </ModalFooter>
+                        </form>)
+                    }
+
 
                 </ModalContent>
 

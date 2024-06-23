@@ -180,8 +180,8 @@ const SingleGroupPage = () => {
                         <p>{group.description}</p>
                     </Flex>
                     <div>
-                        <p>Категория хоби : {group.category}</p>
-                        <p>Локация: {group.location}</p>
+                        <p>Категория хоби : {group.category.name}</p>
+                        <p>Локация: {group.location.name}</p>
                         <AvatarGroup size='md' max={2} cursor='pointer' onClick={groupMembersModal.onOpen}>
                             {group.members?.map((member) => (
                                 <Avatar
