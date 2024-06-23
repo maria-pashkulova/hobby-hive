@@ -5,7 +5,7 @@ const mongoose = require('mongoose');
 const GROUP_PICS_FOLDER = 'group-pics';
 const { uploadToCloudinary, destroyFromCloudinary } = require('../utils/cloudinaryUtils');
 
-
+const { validateAddedOtherMembers, checkForDuplicateUsers } = require('../utils/validateMembers');
 
 //ако една функция просто ще взима и връща promise, няма нужда да
 //awaitваме, защото на ниво контролер ще я awaitваме пак
@@ -81,11 +81,8 @@ exports.getById = async (groupId) => {
 exports.create = async (name, category, location, description, imageUrl, members, currUser) => {
 
 
-    if (imageUrl) {
-        //if user uploaded a pic we upload it to cloudinary
-        imageUrl = await uploadToCloudinary(imageUrl, GROUP_PICS_FOLDER);
-    }
-
+    //check for invalid format of members array
+    members = await validateAddedOtherMembers(members);
 
     //add owner of the group to members with additional data 
     //if members.push() is used admin is added to the end of the array
@@ -96,6 +93,7 @@ exports.create = async (name, category, location, description, imageUrl, members
     //модифицира се директно members - не се създава нова референция
 
     //case 2: потребителят който създава групата не е добавил други членове при нейното създаване
+    //сигурно е че currUser е валиден, понеже се взима от req.user, закачен в authenticationMiddleware.js
     if (members.length > 0) {
         members.unshift(currUser);
 
@@ -103,19 +101,14 @@ exports.create = async (name, category, location, description, imageUrl, members
         members.push(currUser);
     }
 
-    // console.log(members);
-    //TODO: check for duplicate users - case:postman request with duplicate users (skips client side validation)
-    //TODO: check for invalid format of members array
-    /*
-    [
-        {
-            "_id": "6662076f0b71dd4af8a245e1",
-            "fullName": "Александър Петров",
-            "email": "alex@abv.bg",
-            "profilePic": ""
-        },
-    ]
-    */
+
+    //check for duplicate users after adding the creator of the group
+    checkForDuplicateUsers(members.map(member => member._id));
+
+    if (imageUrl) {
+        //if user uploaded a pic we upload it to cloudinary
+        imageUrl = await uploadToCloudinary(imageUrl, GROUP_PICS_FOLDER);
+    }
 
 
     //createdAt, editedAt...

@@ -167,6 +167,7 @@ const CreateGroupModal = ({ isOpen, onClose, handleAddNewCreatedGroup }) => {
                 navigate('/login');
             } else {
                 //case изключвам си сървъра - грешка при свързването със сървъра
+                //възможно ли е да се хвърли грешка със статус 500 от клиента ако се прескочи UI по някакъв начин
                 toast({
                     title: 'Възникна грешка при свързване!',
                     description: 'Групата не беше създадена',

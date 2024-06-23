@@ -71,6 +71,7 @@ router.post('/', async (req, res) => {
 
     } catch (error) {
         //case: грешка при upload на снимка в cloudinary
+        //case: опит за добавяне на невалидни членове в новосъздавана група
         res.status(500).json({
             message: error.message,
         });
@@ -134,6 +135,7 @@ router.put('/:groupId/removeMember', async (req, res) => {
             message: 'Успешно премахнахте член от групата.'
         })
     } catch (error) {
+        console.log(error);
         res.status(error.statusCode || 500).json({
             message: error.message,
         });
