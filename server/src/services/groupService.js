@@ -63,7 +63,17 @@ exports.getById = async (groupId) => {
     //оптимизация -> не се правят заявки с невалидни objectId,
     //а директно се хвърля грешка
     if (mongoose.Types.ObjectId.isValid(groupId)) {
-        group = await Group.findById(groupId).lean();
+        group = await Group
+            .findById(groupId)
+            .populate({
+                path: 'category',
+                select: '-_id'
+            })
+            .populate({
+                path: 'location',
+                select: '-_id'
+            })
+            .lean();
     } else {
         throw new Error('Групата не съществува!');
     }
@@ -230,7 +240,7 @@ exports.addMember = async (groupId, userIdToAdd, currUserId) => {
 //REMOVE ANOTHER MEMBER FROM A GROUP - само администратора на групата може да премахва потребители от групата
 exports.removeMember = async (groupId, userIdToRemove, currUserId) => {
 
-    if (!mongoose.Types.ObjectId.isValid(userIdToAdd) || !mongoose.Types.ObjectId.isValid(groupId)) {
+    if (!mongoose.Types.ObjectId.isValid(userIdToRemove) || !mongoose.Types.ObjectId.isValid(groupId)) {
         throw new Error('Неуспешно премахване на член!');
     }
 

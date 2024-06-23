@@ -6,9 +6,17 @@ const groupSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    category: String,
+    category: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Category',
+        required: true
+    },
     description: String,
-    location: String,
+    location: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Location',
+        required: true
+    },
     imageUrl: String,
     members: [
         {
