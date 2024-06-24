@@ -13,45 +13,50 @@ const { validateAddedOtherMembers, checkForDuplicateUsers } = require('../utils/
 
 exports.getAll = async (name, category, location) => {
 
-    //Search functionality with array storage (in-memory)
-    // let result = groups.slice();
+    // Initialize the aggregation pipeline array
+    const pipeline = [];
 
-    // let groups = await Group.find().lean();
+
+    //TODO: search by name
+
+    if (category || location) {
+        const matchStage = {};
+        if (category) {
+            // Convert category to ObjectId
+            matchStage.category = new mongoose.Types.ObjectId(category);
+        }
+        if (location) {
+            // Convert location to ObjectId
+            matchStage.location = new mongoose.Types.ObjectId(location);
+        }
+
+        pipeline.push({ $match: matchStage });
+    }
+
+    // Add $project stage to the pipeline
+
+    //the key $project refers to the stage type, and the value { } describes its parameters
+    /*When the projection document contains keys with 1 as their values, it describes the list of fields that will be included in the result. 
+    If, on the other hand, projection keys are set to 0, 
+    the projection document describes the list of fields that will be excluded from the result. */
+    pipeline.push({
+        $project: {
+            name: 1,
+            description: 1,
+            category: 1,
+            location: 1,
+            imageUrl: 1,
+            createdAt: 1,
+            membersCount: { $size: "$members" }
+        }
+    });
+
+    // Add $sort stage to the pipeline
+    pipeline.push({ $sort: { "createdAt": -1 } });
 
     //_id се включва автоматично; get members count but not the actual members' ids in the home page
-    let groups = await Group.aggregate([
-
-        //the key $project refers to the stage type, and the value { } describes its parameters
-        /*When the projection document contains keys with 1 as their values, it describes the list of fields that will be included in the result. 
-        If, on the other hand, projection keys are set to 0, 
-        the projection document describes the list of fields that will be excluded from the result. */
-
-        {
-            $project: {
-                name: 1,
-                description: 1,
-                category: 1,
-                location: 1,
-                imageUrl: 1,
-                createdAt: 1,
-                membersCount: { $size: "$members" }
-            }
-        },
-        { $sort: { "createdAt": -1 } }
-    ]);
-
-    // console.log(groups);
-
-    //TODO: use mongoose to filter in the db -> $or mongodb operator
-    if (name) {
-        groups = groups.filter(group => group.name.toLowerCase().includes(name.toLowerCase()));
-    }
-    if (category) {
-        groups = groups.filter(group => group.category.toLowerCase() === category.toLowerCase());
-    }
-    if (location) {
-        groups = groups.filter(group => group.location === location);
-    }
+    // Execute the aggregation pipeline
+    const groups = Group.aggregate(pipeline);
 
     return groups;
 }

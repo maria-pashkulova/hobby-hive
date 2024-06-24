@@ -5,30 +5,55 @@ import AuthContext from '../contexts/authContext';
 import Loading from '../components/Loading';
 
 import * as groupService from '../services/groupService';
+import * as categoryService from '../services/categoryService';
+import * as locationService from '../services/locationService';
+
 import CardsGrid from '../components/CardsGrid';
-import { useToast } from '@chakra-ui/react';
+import { Button, Flex, FormControl, Input, Select, filter, useToast } from '@chakra-ui/react';
+import useForm from '../hooks/useForm';
+
+
+
+const FormKeys = {
+    Name: 'name',
+    Category: 'category',
+    Location: 'location'
+}
+
 
 const GroupsPage = () => {
 
     const navigate = useNavigate();
     const { logoutHandler } = useContext(AuthContext);
 
+    const { formValues, onChange, resetForm } = useForm({
+        [FormKeys.Name]: '',
+        [FormKeys.Category]: '',
+        [FormKeys.Location]: ''
+    });
+
+
     const [groups, setGroups] = useState([]);
-    const [loading, setLoading] = useState(false);
+    const [categoryOptions, setCategoryOptions] = useState([]);
+    const [locationOptions, setLocationOptions] = useState([]);
+
+    const [loading, setLoading] = useState(true);
+    const [loadingFilterGroups, setLoadingFilterGroups] = useState(false);
+
     const toast = useToast();
 
     useEffect(() => {
-
-        setLoading(true);
-
-        groupService.getAll()
-            .then((groups) => {
+        Promise.all([
+            categoryService.getCategories(),
+            locationService.getLocations(),
+            groupService.getAll()
+        ])
+            .then(([categories, locations, groups]) => {
+                setCategoryOptions(categories);
+                setLocationOptions(locations);
                 setGroups(groups);
             })
             .catch(error => {
-                //мисля че тук има нужда да проверявам статус кодовете
-                //сървъра връща 401 - ако е изтекла бисквитката
-                // ако го спра и не отговаря обаче не трябва да редиректва към login
                 if (error.status === 401) {
                     logoutHandler(); //invalid or missing token - пр логнал си се, седял си опр време, изтича ти токена - сървъра връща unauthorized - изчистваш стейта
                     //и localStorage за да станеш неаутентикиран и за клиента и тогава редиректваш
@@ -51,10 +76,87 @@ const GroupsPage = () => {
 
     }, []);
 
+    const handleFormSubmit = async (e) => {
+        e.preventDefault();
+        setLoadingFilterGroups(true);
+
+        try {
+            const filteredGroups = await groupService.getAll({
+                name: formValues[FormKeys.Name],
+                category: formValues[FormKeys.Category],
+                location: formValues[FormKeys.Location]
+            });
+
+            setGroups(filteredGroups);
+
+        } catch (error) {
+
+        } finally {
+            setLoadingFilterGroups(false);
+        }
+
+        //TODO: client side validation for at least one of the fields to be changed
+        //to perform a request to the server - иначе ще е напразно и ще даде същия резултат
+
+    }
 
     return loading ?
         (<Loading />) :
-        (<CardsGrid groups={groups} partialLinkToGroup='groups' />);
+        (
+            <>
+                <form onSubmit={handleFormSubmit}>
+                    <Flex
+                        mb={10}
+                        gap={3}
+                        direction={{ base: 'column', md: 'row' }}
+                        justifyContent='space-between'
+                    >
+                        <Flex
+                            gap={3}
+                            direction={{ base: 'column', md: 'row' }}
+                            flex="0 0 70%">
+                            <FormControl>
+                                <Input
+                                    placeholder='Потърсете група...'
+                                    name={[FormKeys.Name]}
+                                    value={formValues[FormKeys.Name]}
+                                    onChange={onChange}
+                                />
+                            </FormControl>
+                            <FormControl>
+                                <Select name={[FormKeys.Category]} value={formValues[FormKeys.Category]} onChange={onChange}>
+                                    <option value=''>Всички категории</option>
+                                    {categoryOptions.map((option) => (
+                                        <option key={option._id} value={option._id}>{option.name}</option>
+                                    ))}
+                                </Select>
+                            </FormControl>
+                            <FormControl>
+                                <Select name={[FormKeys.Location]} value={formValues[FormKeys.Location]} onChange={onChange}>
+                                    <option value=''>Всички локации</option>
+                                    {locationOptions.map((option) => (
+                                        <option key={option._id} value={option._id}>{option.name}</option>
+                                    ))}
+                                </Select>
+                            </FormControl>
+                        </Flex>
+                        <Button
+                            type='submit'
+                            mr={3}
+                            colorScheme='blue'
+                            isLoading={loadingFilterGroups}
+                            loadingText='Приложи'
+                        >
+                            Приложи
+                        </Button>
+                    </Flex>
+
+                </form>
+
+                <CardsGrid groups={groups} partialLinkToGroup='groups' />
+            </>
+
+        );
 
 
 

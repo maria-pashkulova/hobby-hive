@@ -17,7 +17,7 @@ const groupService = require('../services/groupService');
 //READ
 router.get('/', async (req, res) => {
     const { name, category, location } = req.query;
-    // console.log(req.query);
+    console.log(req.query);
 
     const allGroups = await groupService.getAll(name, category, location);
 

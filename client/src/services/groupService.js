@@ -3,7 +3,12 @@ import * as request from '../lib/request';
 const baseUrl = 'http://localhost:5000/groups';
 
 
-export const getAll = () => request.get(baseUrl);
+export const getAll = (filter = {}) => {
+    // Converts the filter object to a query string
+    const params = new URLSearchParams(filter).toString();
+
+    return request.get(`${baseUrl}?${params}`);
+}
 
 
 export const getById = (groupId) => request.get(`${baseUrl}/${groupId}`);
