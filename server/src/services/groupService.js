@@ -19,8 +19,12 @@ exports.getAll = async (name, category, location) => {
 
     //TODO: search by name
 
-    if (category || location) {
+    // Add $match stage to the pipeline if name, category or location are provided
+    if (name || category || location) {
         const matchStage = {};
+        if (name) {
+            matchStage.name = { $regex: name, $options: 'i' } //case-insensitive search
+        }
         if (category) {
             // Convert category to ObjectId
             matchStage.category = new mongoose.Types.ObjectId(category);
@@ -32,6 +36,7 @@ exports.getAll = async (name, category, location) => {
 
         pipeline.push({ $match: matchStage });
     }
+
 
     // Add $project stage to the pipeline
 

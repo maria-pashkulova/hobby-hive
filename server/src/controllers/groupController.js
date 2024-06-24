@@ -12,12 +12,12 @@ const groupService = require('../services/groupService');
 //path /groups/[...]
 
 //TODO : Search and filter
-//http://localhost:5000/groups?category=sport&location=Plovdiv
+//http://localhost:5000/groups?name=...&category=...&location=...
 
 //READ
 router.get('/', async (req, res) => {
     const { name, category, location } = req.query;
-    console.log(req.query);
+    // console.log(req.query);
 
     const allGroups = await groupService.getAll(name, category, location);
 
