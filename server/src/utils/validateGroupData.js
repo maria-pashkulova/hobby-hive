@@ -1,4 +1,7 @@
 const User = require('../models/User');
+const Category = require('../models/Category');
+const Location = require('../models/Location');
+
 const mongoose = require('mongoose');
 
 
@@ -74,4 +77,35 @@ exports.checkForDuplicateUsers = (memberIds) => {
     if (uniqueMembersIds.size !== memberIds.length) {
         throw new Error('Не можете да добавите потребител повече от веднъж в група')
     }
+}
+
+//Check for valid group category and location
+exports.validateCategoryAndLocation = async (category, location) => {
+
+    //so we can use it in getAll for filtering functionality
+    if (category === '' || location === '') {
+        return true;
+    }
+
+    //check for invalid category and location object ids
+    if (!mongoose.Types.ObjectId.isValid(category) || !mongoose.Types.ObjectId.isValid(location)) {
+        throw new Error('Невалидна категория или локация');
+    }
+
+    //find category in the db; select only _id field without name
+    const foundCategory = await Category.findById(category).select('_id');
+    if (!foundCategory) {
+        throw new Error('Несъществуваща категория');
+    }
+    //find location in the db; select only _id field without name
+    const foundLocation = await Location.findById(location).select('_id');
+    if (!foundLocation) {
+        throw new Error('Несъществуваща локация');
+    }
+
+    return {
+        foundCategory,
+        foundLocation
+    };
+
 }

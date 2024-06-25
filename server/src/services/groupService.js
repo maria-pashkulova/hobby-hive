@@ -5,7 +5,7 @@ const mongoose = require('mongoose');
 const GROUP_PICS_FOLDER = 'group-pics';
 const { uploadToCloudinary, destroyFromCloudinary } = require('../utils/cloudinaryUtils');
 
-const { validateAddedOtherMembers, checkForDuplicateUsers } = require('../utils/validateMembers');
+const { validateAddedOtherMembers, checkForDuplicateUsers, validateCategoryAndLocation } = require('../utils/validateGroupData');
 
 //ако една функция просто ще взима и връща promise, няма нужда да
 //awaitваме, защото на ниво контролер ще я awaitваме пак
@@ -16,8 +16,7 @@ exports.getAll = async (name, category, location) => {
     // Initialize the aggregation pipeline array
     const pipeline = [];
 
-
-    //TODO: search by name
+    //TODO: validate category and name with util
 
     // Add $match stage to the pipeline if name, category or location are provided
     if (name || category || location) {
@@ -26,7 +25,7 @@ exports.getAll = async (name, category, location) => {
             matchStage.name = { $regex: name, $options: 'i' } //case-insensitive search
         }
         if (category) {
-            // Convert category to ObjectId
+            // Convert category to ObjectId - error ocurrs without converting
             matchStage.category = new mongoose.Types.ObjectId(category);
         }
         if (location) {
@@ -100,6 +99,8 @@ exports.getById = async (groupId) => {
 
 exports.create = async (name, category, location, description, imageUrl, members, currUser) => {
 
+    //check for invalid category and location object ids
+    await validateCategoryAndLocation(category, location);
 
     //check for invalid format of members array
     members = await validateAddedOtherMembers(members);
