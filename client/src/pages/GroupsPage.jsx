@@ -238,7 +238,7 @@ const GroupsPage = () => {
 
                 </form>
                 {groups.length === 0
-                    ? (<Text>Не бяха намерени групи</Text>)
+                    ? (<Text>Не бяха намерени групи, отговарящи на зададените критерии</Text>)
                     : (<CardsGrid groups={groups} partialLinkToGroup='groups' />)}
 
             </>

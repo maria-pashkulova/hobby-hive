@@ -83,25 +83,38 @@ exports.checkForDuplicateUsers = (memberIds) => {
 exports.validateCategoryAndLocation = async (category, location) => {
 
     //so we can use it in getAll for filtering functionality
-    if (category === '' || location === '') {
+    if (category === '' && location === '') {
         return true;
     }
 
     //check for invalid category and location object ids
-    if (!mongoose.Types.ObjectId.isValid(category) || !mongoose.Types.ObjectId.isValid(location)) {
-        throw new Error('Невалидна категория или локация');
+    let foundCategory;
+    let foundLocation;
+
+    if (category) {
+        if (!mongoose.Types.ObjectId.isValid(category)) {
+            throw new Error('Невалидна категория');
+        }
+
+        //find category in the db; select only _id field without name;lean for optimization
+        foundCategory = await Category.findById(category).select('_id').lean();
+        if (!foundCategory) {
+            throw new Error('Несъществуваща категория');
+        }
     }
 
-    //find category in the db; select only _id field without name
-    const foundCategory = await Category.findById(category).select('_id');
-    if (!foundCategory) {
-        throw new Error('Несъществуваща категория');
+    if (location) {
+        if (!mongoose.Types.ObjectId.isValid(location)) {
+            throw new Error('Невалидна локация');
+        }
+
+        //find location in the db; select only _id field without name; lean for optimization;
+        foundLocation = await Location.findById(location).select('_id').lean();
+        if (!foundLocation) {
+            throw new Error('Несъществуваща локация');
+        }
     }
-    //find location in the db; select only _id field without name
-    const foundLocation = await Location.findById(location).select('_id');
-    if (!foundLocation) {
-        throw new Error('Несъществуваща локация');
-    }
+
 
     return {
         foundCategory,

@@ -19,9 +19,16 @@ router.get('/', async (req, res) => {
     const { name, category, location } = req.query;
     // console.log(req.query);
 
-    const allGroups = await groupService.getAll(name, category, location);
+    try {
+        const allGroups = await groupService.getAll(name, category, location);
 
-    res.json(allGroups);
+        res.json(allGroups);
+
+    } catch (error) {
+        //error handling just in case for edge cases
+        res.status(500).json({ message: error.message });
+    }
+
 });
 
 
