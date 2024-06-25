@@ -65,8 +65,8 @@ const CreateGroupModal = ({ isOpen, onClose, handleAddNewCreatedGroup }) => {
         ])
             .then(([categories, locations]) => {
                 resetForm({
-                    [FormKeys.Category]: categories[0]?.name, // optional chaining -> handle case where categories might be empty
-                    [FormKeys.Location]: locations[0]?.name // optional chaining ->  handle case where locations might be empty
+                    [FormKeys.Category]: categories[0]?._id, // optional chaining -> handle case where categories might be empty
+                    [FormKeys.Location]: locations[0]?._id // optional chaining ->  handle case where locations might be empty
                 });
                 setCategoryOptions(categories);
                 setLocationOptions(locations);
