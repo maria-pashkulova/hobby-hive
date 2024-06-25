@@ -133,7 +133,9 @@ const GroupMembersModal = ({ isOpen, onClose, groupMembers, groupAdmin, isMember
         <>
             <Modal isOpen={isOpen} onClose={onClose}>
                 <ModalOverlay />
-                <ModalContent>
+                <ModalContent
+                    maxWidth={{ base: '90vw', md: '80vw', lg: '50vw', xl: '35vw' }}
+                >
                     <ModalHeader>Членове на групата</ModalHeader>
                     <ModalCloseButton />
 

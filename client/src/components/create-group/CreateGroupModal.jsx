@@ -205,7 +205,9 @@ const CreateGroupModal = ({ isOpen, onClose, handleAddNewCreatedGroup }) => {
         <>
             <Modal isOpen={isOpen} onClose={onClose}>
                 <ModalOverlay />
-                <ModalContent>
+                <ModalContent
+                    maxWidth={{ base: '90vw', md: '80vw', lg: '50vw', xl: '35vw' }}
+                >
                     <ModalHeader>Попълнете данни за групата</ModalHeader>
                     <ModalCloseButton />
                     {loadingCategoriesAndLocations ?
@@ -254,7 +256,7 @@ const CreateGroupModal = ({ isOpen, onClose, handleAddNewCreatedGroup }) => {
                                         onChange={onChange} />
                                 </FormControl>
                                 <FormControl mt={4}>
-                                    <FormLabel>Прикачете снимка на групата</FormLabel>
+                                    <FormLabel mb={4}>Прикачете снимка на групата</FormLabel>
                                     <Input
                                         type='file'
                                         hidden
@@ -272,7 +274,7 @@ const CreateGroupModal = ({ isOpen, onClose, handleAddNewCreatedGroup }) => {
 
                                 </FormControl>
                                 {imageUrl && (
-                                    <Flex mt={5} w='full' position='relative'>
+                                    <Flex my={7} w='full' position='relative' justifyContent='center'>
                                         <Image src={imageUrl} alt='Selected image' />
                                         <CloseButton
                                             onClick={handleImageDecline}

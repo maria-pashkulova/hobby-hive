@@ -12,6 +12,8 @@ const UserListItem = ({ user, handleFunction, isRemovable, handleRemove, isAdmin
             }}
             w="100%"
             display='flex'
+            flexDir={{ base: 'column', sm: 'row' }}
+            gap={{ base: '4', sm: '0' }}
             justifyContent="space-between"
             color="black"
             px={3}
@@ -23,7 +25,7 @@ const UserListItem = ({ user, handleFunction, isRemovable, handleRemove, isAdmin
                 alignItems="center">
                 <Avatar
                     mr={2}
-                    size="sm"
+                    size={{ base: 'sm', sm: 'md' }}
                     name={user.fullName}
                     src={user.profilePic}
                 />
@@ -36,15 +38,18 @@ const UserListItem = ({ user, handleFunction, isRemovable, handleRemove, isAdmin
                 </Box>
             </Box>
 
-            {isRemovable && (
-                <FiX pl={1}
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        handleRemove()
-                    }}
-                    cursor='pointer'
-                />)}
-            {isAdmin && <Text>(Администратор)</Text>}
+            <Box display='flex' justifyContent={{ base: 'center', sm: 'space-betweeen' }}>
+                {isRemovable && (
+                    <FiX pl={1}
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            handleRemove()
+                        }}
+                        cursor='pointer'
+                    />)}
+                {isAdmin && <Text>(Администратор)</Text>}
+            </Box>
+
         </Box>
     )
 }

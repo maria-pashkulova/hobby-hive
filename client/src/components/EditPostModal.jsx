@@ -131,7 +131,9 @@ const EditPostModal = ({ postIdToUpdate, changeMyPostsOnDbUpdate, groupId, isOpe
     return (
         <Modal isOpen={isOpen} onClose={onClose}>
             <ModalOverlay />
-            <ModalContent>
+            <ModalContent
+                maxWidth={{ base: '90vw', md: '80vw', lg: '50vw', xl: '35vw' }}
+            >
                 <ModalHeader>Редактиране на публикацията</ModalHeader>
                 <ModalCloseButton />
                 {loadingPostData ?
@@ -184,7 +186,7 @@ const EditPostModal = ({ postIdToUpdate, changeMyPostsOnDbUpdate, groupId, isOpe
                                 />
                             </FormControl>
                             {(imageUrl || currentImg) && (
-                                <Flex mt={5} w='full' position='relative'>
+                                <Flex mt={5} w='full' position='relative' justifyContent='center'>
                                     <Image src={imageUrl || currentImg} alt='Selected image' />
                                     <CloseButton
                                         onClick={() => {
