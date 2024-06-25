@@ -133,8 +133,17 @@ const GroupsPage = () => {
     }
 
     const handleResetFilter = async () => {
-        setLoadingResetFilter(true);
+
+        //client side validation for at least one of the fields to be changed
+        //to perform a request to the server - иначе ще е напразно и ще даде същия резултат
+        //извеждащ всички групи тоест
+        const hasFilter = Object.values(formValues).some(filterField => filterField !== '');
+        if (!hasFilter) {
+            return;
+        }
+
         try {
+            setLoadingResetFilter(true);
             const allGroups = await groupService.getAll()
             setGroups(allGroups);
             resetForm({
