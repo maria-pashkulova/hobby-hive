@@ -13,10 +13,6 @@ const { validateAddedOtherMembers, checkForDuplicateUsers, validateCategoryAndLo
 
 exports.getAll = async (name, category, location) => {
 
-
-    //validate category and name valid ObjectIds and present in DB
-    await validateCategoryAndLocation(category, location);
-
     // Initialize the aggregation pipeline array
     const pipeline = [];
 

@@ -74,7 +74,9 @@ const UpdateGroupModal = ({ isOpen, onClose }) => {
         <>
             <Modal isOpen={isOpen} onClose={onClose}>
                 <ModalOverlay />
-                <ModalContent>
+                <ModalContent
+                    maxWidth={{ base: '90vw', md: '80vw', lg: '50vw', xl: '35vw' }}
+                >
                     <ModalHeader>Редактиране на данните за групата</ModalHeader>
                     <ModalCloseButton />
 
