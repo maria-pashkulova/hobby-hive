@@ -17,12 +17,14 @@ const groupService = require('../services/groupService');
 //READ
 router.get('/', async (req, res) => {
     const { name, category, location } = req.query;
+    const page = parseInt(req.query.page || '0');
+    const limit = parseInt(req.query.limit || '3')
     // console.log(req.query);
 
     try {
-        const allGroups = await groupService.getAll(name, category, location);
+        const groupsResult = await groupService.getAll(name, category, location, page, limit);
 
-        res.json(allGroups);
+        res.json(groupsResult);
 
     } catch (error) {
         //error handling just in case for edge cases
@@ -58,7 +60,7 @@ router.post('/', async (req, res) => {
     const { name, category, location, description, imageUrl, members } = req.body;
     const currUser = req.user;
 
-    //TODO: validate user input
+    //TODO: validate user input - required fields!!!
 
     try {
         const createdGroup = await groupService.create(name, category, location, description, imageUrl, members, currUser);

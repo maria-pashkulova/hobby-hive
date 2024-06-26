@@ -3,9 +3,9 @@ import * as request from '../lib/request';
 const baseUrl = 'http://localhost:5000/groups';
 
 
-export const getAll = (filter = {}) => {
+export const getAll = (filterAndPagination = {}) => {
     // Converts the filter object to a query string
-    const params = new URLSearchParams(filter).toString();
+    const params = new URLSearchParams(filterAndPagination).toString();
 
     return request.get(`${baseUrl}?${params}`);
 }

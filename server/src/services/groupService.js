@@ -11,14 +11,17 @@ const { validateAddedOtherMembers, checkForDuplicateUsers, validateCategoryAndLo
 //awaitваме, защото на ниво контролер ще я awaitваме пак
 
 
-exports.getAll = async (name, category, location) => {
+exports.getAll = async (name, category, location, page, limit) => {
+
+    const skip = page * limit;
+    const matchStage = {};
 
     // Initialize the aggregation pipeline array
     const pipeline = [];
 
     // Add $match stage to the pipeline if name, category or location are provided
     if (name || category || location) {
-        const matchStage = {};
+
         if (name) {
             matchStage.name = { $regex: name, $options: 'i' } //case-insensitive search
         }
@@ -33,6 +36,13 @@ exports.getAll = async (name, category, location) => {
 
         pipeline.push({ $match: matchStage });
     }
+
+    // Add $sort stage to the pipeline -  before $skip and $limit!
+    pipeline.push({ $sort: { "createdAt": -1 } });
+
+    //Add $skip and $limit stages to the pipeline for pagination
+    pipeline.push({ $skip: skip });
+    pipeline.push({ $limit: limit })
 
 
     // Add $project stage to the pipeline
@@ -53,14 +63,18 @@ exports.getAll = async (name, category, location) => {
         }
     });
 
-    // Add $sort stage to the pipeline
-    pipeline.push({ $sort: { "createdAt": -1 } });
 
-    //_id се включва автоматично; get members count but not the actual members' ids in the home page
     // Execute the aggregation pipeline
-    const groups = Group.aggregate(pipeline);
+    //get members count but not the actual members' ids in the home page
 
-    return groups;
+    const groups = await Group.aggregate(pipeline);
+
+    //If filter is applied - total count of groups matching the filter
+    //If no filter is applied - total count of groups in the Group model
+    const total = await Group.countDocuments(matchStage);
+    const totalPages = Math.ceil(total / limit)
+
+    return { groups, totalPages };
 }
 
 //findById is a Mongoose method - we use it instead monogodb's findOne()

@@ -9,8 +9,10 @@ import * as categoryService from '../services/categoryService';
 import * as locationService from '../services/locationService';
 
 import CardsGrid from '../components/CardsGrid';
-import { Button, Flex, FormControl, Input, Select, Text, useToast } from '@chakra-ui/react';
+import { Box, Button, Flex, FormControl, Input, Select, Text, useToast } from '@chakra-ui/react';
 import useForm from '../hooks/useForm';
+
+import Pagination from '../components/Pagination';
 
 
 
@@ -19,6 +21,8 @@ const FormKeys = {
     Category: 'category',
     Location: 'location'
 }
+
+const GROUPS_PER_PAGE = 3;
 
 
 const GroupsPage = () => {
@@ -32,33 +36,70 @@ const GroupsPage = () => {
         [FormKeys.Location]: ''
     });
 
-
-    const [groups, setGroups] = useState([]);
     const [categoryOptions, setCategoryOptions] = useState([]);
     const [locationOptions, setLocationOptions] = useState([]);
+    const [groups, setGroups] = useState([]);
+    const [currentPage, setCurrentPage] = useState(0);
+    const [pagesCount, setPagesCount] = useState(0);
+    const [appliedFilters, setAppliedFilters] = useState({
+        name: '',
+        category: '',
+        location: ''
+    });
 
-    const [loading, setLoading] = useState(true);
+
+    const [initialLoading, setInitialLoading] = useState(true);
     const [loadingFilterGroups, setLoadingFilterGroups] = useState(false);
     const [loadingResetFilter, setLoadingResetFilter] = useState(false);
 
+
     const toast = useToast();
 
+
+
+    //FILTER AND GROUPS RELATED 
+
+    //Fetch static data (categories and location) on initial mount
     useEffect(() => {
         Promise.all([
             categoryService.getCategories(),
             locationService.getLocations(),
-            groupService.getAll()
         ])
-            .then(([categories, locations, groups]) => {
+            .then(([categories, locations]) => {
                 setCategoryOptions(categories);
                 setLocationOptions(locations);
-                setGroups(groups);
             })
             .catch(error => {
+                console.log(error);
+            });
+
+    }, []);
+
+
+    //Fetch paginated groups when current page changes
+    //while taking applied filters into consideration
+    useEffect(() => {
+
+        const { name, category, location } = appliedFilters;
+
+        groupService.getAll({
+            name,
+            category,
+            location,
+            page: currentPage,
+            limit: GROUPS_PER_PAGE
+        })
+
+            .then(({ groups, totalPages }) => {
+                setGroups(groups);
+                setPagesCount(totalPages);
+            })
+            .catch(error => {
+
                 if (error.status === 401) {
-                    logoutHandler(); //invalid or missing token - пр логнал си се, седял си опр време, изтича ти токена - сървъра връща unauthorized - изчистваш стейта
-                    //и localStorage за да станеш неаутентикиран и за клиента и тогава редиректваш
+                    logoutHandler();
                     navigate('/login');
+
                 } else {
                     //TODO: add some image or text so that the page wont be left empty (white screen)
                     toast({
@@ -72,108 +113,64 @@ const GroupsPage = () => {
                 }
             })
             .finally(() => {
-                setLoading(false);
+                //check for state's current value to avoid unnecessary state updates
+                //which will result in re-renders;
+                if (initialLoading) {
+                    setInitialLoading(false);
+                }
+                if (loadingFilterGroups) {
+                    setLoadingFilterGroups(false);
+                }
+                if (loadingResetFilter) {
+                    setLoadingResetFilter(false);
+                }
             });
 
-    }, []);
+    }, [currentPage, appliedFilters]);
 
     const handleFormSubmit = async (e) => {
         e.preventDefault();
 
-
-        //client side validation for at least one of the fields to be changed
-        //to perform a request to the server - иначе ще е напразно и ще даде същия резултат
-        //извеждащ всички групи тоест
-
-        const hasFilter = Object.values(formValues).some(filterField => filterField !== '');
-        if (!hasFilter) {
-            toast({
-                title: "Не сте приложили филтър",
-                description: "Филтрирайте по име, категория или локация",
-                status: "error",
-                duration: 5000,
-                isClosable: true,
-                position: "bottom",
-            });
-            return;
-        }
-
-        //Perform a request to filter groups
-        try {
+        //check if objects are different references
+        if (appliedFilters !== formValues) {
             setLoadingFilterGroups(true);
-            const filteredGroups = await groupService.getAll({
-                name: formValues[FormKeys.Name],
-                category: formValues[FormKeys.Category],
-                location: formValues[FormKeys.Location]
-            });
-
-            setGroups(filteredGroups);
-
-        } catch (error) {
-            if (error.status === 401) {
-                logoutHandler(); //invalid or missing token - пр логнал си се, седял си опр време, изтича ти токена - сървъра връща unauthorized - изчистваш стейта
-                //и localStorage за да станеш неаутентикиран и за клиента и тогава редиректваш
-                navigate('/login');
-            } else {
-                //TODO: add some image or text so that the page wont be left empty (white screen)
-                toast({
-                    title: "Възникна грешка!",
-                    description: "Опитайте по-късно",
-                    status: "error",
-                    duration: 5000,
-                    isClosable: true,
-                    position: "bottom",
-                });
-            }
-
-        } finally {
-            setLoadingFilterGroups(false);
+            //Trigger useEffect()
+            setAppliedFilters(formValues);
+            setCurrentPage(0);
         }
 
     }
 
     const handleResetFilter = async () => {
 
-        //client side validation for at least one of the fields to be changed
-        //to perform a request to the server - иначе ще е напразно и ще даде същия резултат
-        //извеждащ всички групи тоест
-        const hasFilter = Object.values(formValues).some(filterField => filterField !== '');
-        if (!hasFilter) {
-            return;
-        }
-
-        try {
-            setLoadingResetFilter(true);
-            const allGroups = await groupService.getAll()
-            setGroups(allGroups);
+        //if formValues has values different from '', reset formValues state
+        const hasFormValuesChanged = Object.values(formValues).some(filterField => filterField !== '');
+        if (hasFormValuesChanged) {
             resetForm({
                 [FormKeys.Name]: '',
                 [FormKeys.Category]: '',
                 [FormKeys.Location]: ''
             });
-        } catch (error) {
-            if (error.status === 401) {
-                logoutHandler(); //invalid or missing token - пр логнал си се, седял си опр време, изтича ти токена - сървъра връща unauthorized - изчистваш стейта
-                //и localStorage за да станеш неаутентикиран и за клиента и тогава редиректваш
-                navigate('/login');
-            } else {
-                //TODO: add some image or text so that the page wont be left empty (white screen)
-                toast({
-                    title: "Възникна грешка!",
-                    description: "Опитайте по-късно",
-                    status: "error",
-                    duration: 5000,
-                    isClosable: true,
-                    position: "bottom",
-                });
-            }
-        } finally {
-            setLoadingResetFilter(false);
+        }
+
+        //if appliedFilters has values different from '', reset appliedFilters state
+        const hasFilterApplied = Object.values(appliedFilters).some(filterField => filterField !== '');
+        if (hasFilterApplied) {
+            setLoadingResetFilter(true);
+            setAppliedFilters({ name: '', category: '', location: '' }); //reset applied filters state
+            setCurrentPage(0);
         }
 
     }
 
-    return loading ?
+
+    //PAGINATION RELATED
+    const handleCurrentPageChange = (currPage) => {
+        setCurrentPage(currPage);
+    }
+
+
+    return initialLoading ?
         (<Loading />) :
         (
             <>
@@ -237,15 +234,25 @@ const GroupsPage = () => {
                     </Flex>
 
                 </form>
+
                 {groups.length === 0
                     ? (<Text>Не бяха намерени групи, отговарящи на зададените критерии</Text>)
                     : (<CardsGrid groups={groups} partialLinkToGroup='groups' />)}
 
+                <Box
+                    position='sticky'
+                    top='100%'
+                >
+                    <Pagination
+                        pagesCount={pagesCount}
+                        currentPage={currentPage}
+                        handleCurrentPageChange={handleCurrentPageChange}
+                    />
+                </Box>
+
             </>
 
         );
-
-
 
 }
 

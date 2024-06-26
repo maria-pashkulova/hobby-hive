@@ -28,7 +28,12 @@ const AuthLayout = () => {
                 </DrawerContent>
             </Drawer>
             <Header onOpen={onOpen} />
-            <Box as='main' ml={{ base: 0, md: 60 }} p="4">
+            <Box
+                as='main'
+                ml={{ base: 0, md: 60 }}
+                p="4"
+                minH={'full'}
+            >
                 <Outlet />
             </Box>
         </>
