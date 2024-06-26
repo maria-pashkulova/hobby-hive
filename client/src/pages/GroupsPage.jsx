@@ -239,16 +239,18 @@ const GroupsPage = () => {
                     ? (<Text>Не бяха намерени групи, отговарящи на зададените критерии</Text>)
                     : (<CardsGrid groups={groups} partialLinkToGroup='groups' />)}
 
-                <Box
-                    position='sticky'
-                    top='100%'
-                >
-                    <Pagination
-                        pagesCount={pagesCount}
-                        currentPage={currentPage}
-                        handleCurrentPageChange={handleCurrentPageChange}
-                    />
-                </Box>
+                {pagesCount > 1 && (
+                    <Box
+                        position='sticky'
+                        top='100%'
+                    >
+                        <Pagination
+                            pagesCount={pagesCount}
+                            currentPage={currentPage}
+                            handleCurrentPageChange={handleCurrentPageChange}
+                        />
+                    </Box>)
+                }
 
             </>
 

@@ -93,22 +93,16 @@ router.get('/', auth, async (req, res) => {
 //задължително преди долния път
 //a parametric path inserted just before a literal one takes the precedence over the literal one.
 router.get('/my-groups', auth, async (req, res) => {
+
+    const currentUserId = req.user._id;
+    const page = parseInt(req.query.page || '0');
+    const limit = parseInt(req.query.limit || '3')
+
+
     try {
-        const user = await userService.getGroupsWithMembership(req.user._id).lean();
+        const userGroupsResult = await userService.getGroupsWithMembership(currentUserId, page, limit);
 
-
-        const groupsWithMembersCount = user.groups.map(group => ({
-            _id: group._id,
-            name: group.name,
-            category: group.category,
-            description: group.description,
-            location: group.location,
-            imageUrl: group.imageUrl,
-            membersCount: group.members.length
-        }));
-
-
-        res.json(groupsWithMembersCount);
+        res.json(userGroupsResult);
 
     } catch (error) {
         res.status(500).json({ message: error.message });

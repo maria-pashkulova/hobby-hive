@@ -206,12 +206,76 @@ exports.updateUser = async (currUserId, userIdToUpdate, firstName, lastName, ema
     }
 }
 
-exports.getGroupsWithMembership = (userId) => {
+exports.getGroupsWithMembership = async (userId, page, limit) => {
 
-    //sort results 
-    const user = User.findById(userId).select('groups -_id').populate({ path: 'groups', options: { sort: { 'createdAt': -1 } } });
+    const skip = page * limit;
 
-    return user;
+    const result = await User.aggregate([
+
+        // Match the user by userId
+        { $match: { _id: new mongoose.Types.ObjectId(userId) } },
+
+        //Extract only _id and groups from users collection
+        //exclude all other fileds for optimization
+        { $project: { groups: 1 } },
+
+        // Create a separate document for each group the user is a member of
+        { $unwind: "$groups" },
+
+        // Lookup to replace group ids with group details, fetching only required fields
+        //from groups collection for optimization
+        {
+            $lookup: {
+                from: "groups",
+                let: { groupId: "$groups" },
+                pipeline: [
+                    { $match: { $expr: { $eq: ["$_id", "$$groupId"] } } },
+                    {
+                        $project: {
+                            name: 1,
+                            description: 1,
+                            imageUrl: 1,
+                            createdAt: 1,
+                            membersCount: { $size: "$members" }
+                        }
+                    }
+                ],
+                as: "groupDetails"
+            }
+        },
+        // Unwind(flatten) groupDetails ->
+        //after $lookup it is an array with a single document!
+        { $unwind: "$groupDetails" },
+
+        // Replace root with groupDetails
+        { $replaceRoot: { newRoot: "$groupDetails" } },
+
+        // Sort by createdAt descending
+        { $sort: { createdAt: -1 } },
+        // Use $facet to get both the data and the total count
+        {
+            $facet: {
+                data: [
+                    // Skip and limit for pagination
+                    { $skip: skip },
+                    { $limit: limit }
+                ],
+                totalCount: [
+                    // Get the count of all documents that match the conditions
+                    { $count: "count" }
+                ]
+            }
+        }
+    ]);
+
+
+    // Extract the paginated data and the total count of groups the current user is a member of
+    const groups = result[0].data;
+    const total = result[0].totalCount[0] ? result[0].totalCount[0].count : 0;
+    const totalPages = Math.ceil(total / limit);
+
+    return { groups, totalPages };
+
 }
 
 

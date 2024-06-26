@@ -1,4 +1,4 @@
-import { Button, Flex, Heading, useDisclosure } from "@chakra-ui/react"
+import { Box, Button, Flex, Heading, Text, useDisclosure, useToast } from "@chakra-ui/react"
 import CreateGroupModal from "../components/create-group/CreateGroupModal"
 import { FiPlus } from "react-icons/fi";
 
@@ -8,6 +8,10 @@ import { Link, useNavigate } from "react-router-dom";
 import * as userService from '../services/userService';
 import AuthContext from "../contexts/authContext";
 import CardsGrid from "../components/CardsGrid";
+import Pagination from "../components/Pagination";
+
+const GROUPS_PER_PAGE = 3;
+
 
 const MyGroupsPage = () => {
 
@@ -15,24 +19,50 @@ const MyGroupsPage = () => {
     const { logoutHandler } = useContext(AuthContext);
 
     const [groups, setGroups] = useState([]);
+    const [currentPage, setCurrentPage] = useState(0);
+    const [pagesCount, setPagesCount] = useState(0);
+
+
+
+    const toast = useToast();
 
     useEffect(() => {
-        userService.getMyGroups()
-            .then(setGroups)
+        userService.getMyGroups({
+            page: currentPage,
+            limit: GROUPS_PER_PAGE
+        })
+            .then(({ groups, totalPages }) => {
+                setGroups(groups);
+                setPagesCount(totalPages);
+            })
             .catch(error => {
                 if (error.status === 401) {
                     logoutHandler(); //invalid or missing token - пр логнал си се, седял си опр време, изтича ти токена - сървъра връща unauthorized - изчистваш стейта
                     //и localStorage за да станеш неаутентикиран и за клиента и тогава редиректваш
                     navigate('/login');
                 } else {
-                    console.log(error);
+                    toast({
+                        title: "Възникна грешка!",
+                        description: "Опитайте по-късно",
+                        status: "error",
+                        duration: 5000,
+                        isClosable: true,
+                        position: "bottom",
+                    });
                 }
             })
-    }, []);
+    }, [currentPage]);
 
+    //todo : test
     const handleAddNewCreatedGroup = (newGroup) => {
         setGroups((groups) => ([newGroup, ...groups]));
     }
+
+    //PAGINATION RELATED
+    const handleCurrentPageChange = (currPage) => {
+        setCurrentPage(currPage);
+    }
+
 
     const { isOpen, onOpen, onClose } = useDisclosure();
     return (
@@ -57,7 +87,25 @@ const MyGroupsPage = () => {
 
             </Flex>
 
-            <CardsGrid groups={groups} partialLinkToGroup='/groups' />
+            {groups.length === 0
+                ? (<Text>Не членувате в нито една група. Създайте своята сега!</Text>)
+                : (<CardsGrid groups={groups} partialLinkToGroup='/groups' />)
+            }
+
+            {pagesCount > 1 && (
+                <Box
+                    position='sticky'
+                    top='100%'
+                >
+                    <Pagination
+                        pagesCount={pagesCount}
+                        currentPage={currentPage}
+                        handleCurrentPageChange={handleCurrentPageChange}
+                    />
+                </Box>)
+            }
+
+
 
         </>
     )

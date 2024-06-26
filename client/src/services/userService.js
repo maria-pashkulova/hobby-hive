@@ -28,7 +28,13 @@ export const logout = () => request.get(`${baseUrl}/logout`);
 
 export const searchUser = (query) => request.get(`${baseUrl}?search=${query}`);
 
-export const getMyGroups = () => request.get(`${baseUrl}/my-groups`);
+export const getMyGroups = (pagination = {}) => {
+
+    // Converts the pagination object to a query string
+    const params = new URLSearchParams(pagination).toString();
+
+    return request.get(`${baseUrl}/my-groups?${params}`);
+}
 
 export const getMyDetails = () => request.get(`${baseUrl}/my-details`);
 

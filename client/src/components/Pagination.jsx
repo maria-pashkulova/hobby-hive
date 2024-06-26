@@ -17,13 +17,13 @@ const Pagination = ({ pagesCount, currentPage, handleCurrentPageChange }) => {
             gap={2}
             justifyContent='center'
         >
-            {pagesCount > 1 &&
-                (<IconButton
-                    variant='ghost'
-                    fontSize={{ base: 'xs', md: 'md' }}
-                    icon={<FiChevronLeft />}
-                    onClick={goToPrevious}
-                />)}
+
+            <IconButton
+                variant='ghost'
+                fontSize={{ base: 'xs', md: 'md' }}
+                icon={<FiChevronLeft />}
+                onClick={goToPrevious}
+            />
             {pages.map((pageIndex) => (
                 <Button
                     key={pageIndex}
@@ -34,16 +34,12 @@ const Pagination = ({ pagesCount, currentPage, handleCurrentPageChange }) => {
                     {pageIndex + 1}
                 </Button>
             ))}
-            {
-                pagesCount > 1 &&
-                (<IconButton
-                    variant='ghost'
-                    fontSize={{ base: 'xs', md: 'md' }}
-                    icon={<FiChevronRight />}
-                    onClick={goToNext}
-                />)
-            }
-
+            <IconButton
+                variant='ghost'
+                fontSize={{ base: 'xs', md: 'md' }}
+                icon={<FiChevronRight />}
+                onClick={goToNext}
+            />
 
         </Flex>
     )
