@@ -55,8 +55,6 @@ exports.getAll = async (name, category, location, page, limit) => {
         $project: {
             name: 1,
             description: 1,
-            category: 1,
-            location: 1,
             imageUrl: 1,
             createdAt: 1,
             membersCount: { $size: "$members" }
