@@ -168,7 +168,17 @@ exports.create = async (name, category, location, description, imageUrl, members
     );
 
 
-    return newGroup;
+    const newGroupWithSelectedFields = {
+        _id: newGroup._id,
+        name: newGroup.name,
+        description: newGroup.description,
+        imageUrl: newGroup.imageUrl,
+        createdAt: newGroup.createdAt,
+        membersCount: newGroup.members.length
+    }
+
+
+    return newGroupWithSelectedFields;
 }
 
 exports.update = (groupId, name, category, location, description, members, imageUrl) => {

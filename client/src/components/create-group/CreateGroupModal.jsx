@@ -25,7 +25,7 @@ const FormKeys = {
     ImageUrl: 'imageUrl'
 }
 
-const CreateGroupModal = ({ isOpen, onClose, handleAddNewCreatedGroup }) => {
+const CreateGroupModal = ({ isOpen, onClose, setRefetch, handleCurrentPageChange }) => {
 
     const { logoutHandler } = useContext(AuthContext);
 
@@ -161,12 +161,16 @@ const CreateGroupModal = ({ isOpen, onClose, handleAddNewCreatedGroup }) => {
 
         try {
 
-            const newGroup = await groupService.createGroup({
+            await groupService.createGroup({
                 ...formValues,
                 imageUrl,
                 members: selectedUsers
             });
-            handleAddNewCreatedGroup(newGroup);
+
+            //Refresh the UI with newly created group on the first page
+            setRefetch(true);
+            handleCurrentPageChange(0);
+
             onClose();
             toast({
                 title: "Успешно създадохте група!",

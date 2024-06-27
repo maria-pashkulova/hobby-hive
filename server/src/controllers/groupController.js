@@ -65,18 +65,8 @@ router.post('/', async (req, res) => {
     try {
         const createdGroup = await groupService.create(name, category, location, description, imageUrl, members, currUser);
 
-        const newGroupResult = {
-            _id: createdGroup._id,
-            name: createdGroup.name,
-            category: createdGroup.category,
-            description: createdGroup.description,
-            location: createdGroup.location,
-            imageUrl: createdGroup.imageUrl,
-            membersCount: createdGroup.members.length
-        }
 
-
-        res.status(201).json(newGroupResult);
+        res.status(201).json(createdGroup);
 
     } catch (error) {
         //case: грешка при upload на снимка в cloudinary

@@ -22,8 +22,9 @@ const MyGroupsPage = () => {
     const [currentPage, setCurrentPage] = useState(0);
     const [pagesCount, setPagesCount] = useState(0);
 
+    const [fetchMyGroupsAgain, setFetchMyGroupsAgain] = useState(false);
 
-
+    const { isOpen, onOpen, onClose } = useDisclosure();
     const toast = useToast();
 
     useEffect(() => {
@@ -51,20 +52,21 @@ const MyGroupsPage = () => {
                     });
                 }
             })
-    }, [currentPage]);
+    }, [currentPage, fetchMyGroupsAgain]);
 
-    //todo : test
-    const handleAddNewCreatedGroup = (newGroup) => {
-        setGroups((groups) => ([newGroup, ...groups]));
+
+    //When new group is created, groups are re-fetched
+    //Handler needed in Create group modal
+    const setRefetch = (status) => {
+        setFetchMyGroupsAgain(status);
     }
 
     //PAGINATION RELATED
+    //Handler needed in Create group modal and Pagination components
     const handleCurrentPageChange = (currPage) => {
         setCurrentPage(currPage);
     }
 
-
-    const { isOpen, onOpen, onClose } = useDisclosure();
     return (
         <>
             <Flex justifyContent='space-between' py={8} flexDirection={{ base: 'column', lg: 'row' }}>
@@ -82,7 +84,8 @@ const MyGroupsPage = () => {
                 {isOpen && <CreateGroupModal
                     isOpen={isOpen}
                     onClose={onClose}
-                    handleAddNewCreatedGroup={handleAddNewCreatedGroup}
+                    setRefetch={setRefetch}
+                    handleCurrentPageChange={handleCurrentPageChange}
                 />}
 
             </Flex>
