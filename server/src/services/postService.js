@@ -8,20 +8,30 @@ const { uploadToCloudinary, destroyFromCloudinary } = require('../utils/cloudina
 const mongoose = require('mongoose');
 
 
-exports.getAllGroupPosts = (groupId) => {
+exports.getAllGroupPosts = async (groupId, page, limit) => {
 
-    //TODO: pagination
-    //TODO: efficient data transfer -> use select( needed fields only)
+    const skip = (page - 1) * limit;
+
     //ако се подаде несъществуващо groupId, което е валидно ObjectId, ще върне празен масив
-    //sort in descending order
-    const posts = Post
+    //remove unnecessary post fields ; sort in descending order
+    const posts = await Post
         .find({ groupId })
+        .select('_id text img groupId _ownerId createdAt')
         .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
         .populate({
             path: '_ownerId',
             select: 'firstName lastName profilePic'
-        })
-    return posts;
+        });
+
+    //Group posts count 
+    const total = await Post.countDocuments({ groupId });
+    const totalPages = Math.ceil(total / limit);
+    const hasMore = page < totalPages;
+
+
+    return { posts, hasMore };
 }
 
 

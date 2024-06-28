@@ -12,7 +12,7 @@ const groupService = require('../services/groupService');
 //path /groups/[...]
 
 //TODO : Search and filter
-//http://localhost:5000/groups?name=...&category=...&location=...
+//http://localhost:5000/groups?name=...&category=...&location=...&page=...&limit=...
 
 //READ
 router.get('/', async (req, res) => {

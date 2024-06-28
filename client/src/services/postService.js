@@ -2,7 +2,11 @@ import * as request from '../lib/request';
 
 const baseUrl = 'http://localhost:5000/groups';
 
-export const getGroupPosts = (groupId) => request.get(`${baseUrl}/${groupId}/posts`);
+export const getGroupPosts = (groupId, pagination = {}) => {
+    const params = new URLSearchParams(pagination).toString();
+
+    return request.get(`${baseUrl}/${groupId}/posts?${params}`);
+}
 
 export const getById = (groupId, postId) => request.get(`${baseUrl}/${groupId}/posts/${postId}`);
 

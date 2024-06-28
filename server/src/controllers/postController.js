@@ -2,13 +2,17 @@ const router = require('express').Router();
 
 const postService = require('../services/postService');
 
-//get all
+//get posts with pagination (as infinite scroll at the front end)
 router.get('/', async (req, res) => {
 
-    try {
-        const posts = await postService.getAllGroupPosts(req.groupId);
+    const groupId = req.groupId;
+    const page = parseInt(req.query.page || '1');
+    const limit = parseInt(req.query.limit || '3');
 
-        res.json(posts);
+    try {
+        const postsResult = await postService.getAllGroupPosts(groupId, page, limit);
+
+        res.json(postsResult);
 
     } catch (error) {
         //case : Mongoose грешка - ако groupId e невалидно ObjectId - todo проверка преди заявка
