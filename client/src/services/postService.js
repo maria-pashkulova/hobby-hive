@@ -10,7 +10,12 @@ export const getGroupPosts = (groupId, pagination = {}) => {
 
 export const getById = (groupId, postId) => request.get(`${baseUrl}/${groupId}/posts/${postId}`);
 
-export const getUserPostsForGroup = (groupId) => request.get(`${baseUrl}/${groupId}/posts/user-posts`);
+export const getUserPostsForGroup = (groupId, pagination = {}) => {
+
+    const params = new URLSearchParams(pagination).toString();
+
+    return request.get(`${baseUrl}/${groupId}/posts/user-posts?${params}`);
+};
 
 export const createPost = (groupId, { text, img }) => request.post(`${baseUrl}/${groupId}/posts`, { text, img });
 

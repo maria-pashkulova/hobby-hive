@@ -7,7 +7,7 @@ router.get('/', async (req, res) => {
 
     const groupId = req.groupId;
     const page = parseInt(req.query.page || '1');
-    const limit = parseInt(req.query.limit || '3');
+    const limit = parseInt(req.query.limit || '10');
 
     try {
         const postsResult = await postService.getAllGroupPosts(groupId, page, limit);
@@ -23,18 +23,23 @@ router.get('/', async (req, res) => {
 })
 
 //get user's posts in the current group - needed for update and delete
+
 //задължително преди долния път
 //a parametric path inserted just before a literal one takes the precedence over the literal one.
+
+//get posts with pagination (as infinite scroll at the front end)
 router.get('/user-posts', async (req, res) => {
 
     const groupId = req.groupId;
     const currUser = req.user;
+    const page = parseInt(req.query.page || '1');
+    const limit = parseInt(req.query.limit || '10');
 
     try {
 
-        const userPosts = await postService.getUserPostsForGroup(groupId, currUser)
+        const userPostsResult = await postService.getUserPostsForGroup(groupId, currUser, page, limit)
 
-        res.json(userPosts);
+        res.json(userPostsResult);
     } catch (error) {
         res.status(error.statusCode || 500).json({ message: error.message });
     }

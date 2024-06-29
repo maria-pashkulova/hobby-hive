@@ -1,21 +1,32 @@
-import { useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import AuthContext from "../contexts/authContext";
-import { Box, Flex, Spinner } from "@chakra-ui/react";
+import { Box, Flex, Spinner, useToast } from "@chakra-ui/react";
 import Post from "./Post";
 
-
 import * as postService from '../services/postService';
+
+const POSTS_PER_PAGE = 10;
 
 const MyGroupPosts = () => {
 
     const [groupId] = useOutletContext();
     const navigate = useNavigate();
+    const toast = useToast();
+
 
     const { logoutHandler } = useContext(AuthContext);
 
     const [myPosts, setMyPosts] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const [isInitialLoading, setIsInitialLoading] = useState(true);
+    const [isLoadingMore, setIsLoadingMore] = useState(false);
+    const [currentPage, setCurrentPage] = useState(2);
+    const [hasMore, setHasMore] = useState(false);
+
+    const spinnerRef = useRef(null);
+
+    //TODO : delete post
+    const [fetchPostsAgain, setFetchPostsAgain] = useState(false);
 
 
     //TODO: use these for update post modal - separate component which
@@ -38,15 +49,25 @@ const MyGroupPosts = () => {
 
     }
 
+
+    //TODO - instead re-fetch users posts when you implement
+    //pagination / infinite scroll
     const changeMyPostsOnDbDelete = (postIdToDelete) => {
 
         setMyPosts((posts) => posts.filter(currPost => currPost._id !== postIdToDelete));
     }
 
 
+    //Load initial posts
     useEffect(() => {
-        postService.getUserPostsForGroup(groupId)
-            .then(setMyPosts)
+        postService.getUserPostsForGroup(groupId, {
+            page: 1,
+            limit: POSTS_PER_PAGE
+        })
+            .then(({ posts, hasMore }) => {
+                setMyPosts(posts);
+                setHasMore(hasMore);
+            })
             .catch(error => {
                 if (error.status === 401) {
                     logoutHandler(); //invalid or missing token - пр логнал си се, седял си опр време, изтича ти токена - сървъра връща unauthorized - изчистваш стейта
@@ -56,41 +77,127 @@ const MyGroupPosts = () => {
                     navigate('/not-found');
                 } else {
                     //handle other errors
-                    console.log(error.message);
+                    toast({
+                        title: "Възникна грешка!",
+                        description: "Опитайте по-късно",
+                        status: "error",
+                        duration: 5000,
+                        isClosable: true,
+                        position: "bottom",
+                    });
                 }
             })
             .finally(() => {
-                setLoading(false);
+                if (isInitialLoading) {
+                    setIsInitialLoading(false);
+                }
             })
     }, []);
 
+    //Handle additional post retrieval
+    const fetchMorePosts = useCallback(async () => {
 
-    return loading ?
+        //if there is already running a request for more posts
+        //do not trigger another one (if user scrolls up and down -> up and down)
+        if (isLoadingMore || !hasMore) return;
+
+        setIsLoadingMore(true);
+
+        postService.getUserPostsForGroup(groupId, {
+            page: currentPage,
+            limit: POSTS_PER_PAGE
+        })
+            .then(({ posts, hasMore }) => {
+                setMyPosts((prevPosts) => [...prevPosts, ...posts]);
+
+                setCurrentPage((prevCurrPage) => prevCurrPage + 1);
+                setHasMore(hasMore);
+
+
+            })
+            .catch(error => {
+                if (error.status === 401) {
+                    logoutHandler(); //invalid or missing token - пр логнал си се, седял си опр време, изтича ти токена - сървъра връща unauthorized - изчистваш стейта
+                    //и localStorage за да станеш неаутентикиран и за клиента и тогава редиректваш
+                    navigate('/login');
+                } else if (error.status === 404) {
+                    navigate('/not-found');
+                } else {
+                    //handle other errors
+                    toast({
+                        title: "Възникна грешка!",
+                        description: "Опитайте по-късно",
+                        status: "error",
+                        duration: 5000,
+                        isClosable: true,
+                        position: "bottom",
+                    });
+                }
+            })
+            .finally(() => {
+                setIsLoadingMore(false);
+            })
+
+    }, [currentPage, isLoadingMore, hasMore]);
+
+    //Configure Intersection Observer
+    useEffect(() => {
+
+        const observer = new IntersectionObserver((entries) => {
+            const target = entries[0];
+
+            if (target.isIntersecting) {
+                fetchMorePosts();
+            }
+        });
+
+        if (spinnerRef.current) {
+            observer.observe(spinnerRef.current);
+        }
+
+        return () => {
+            if (spinnerRef.current) {
+                observer.unobserve(spinnerRef.current);
+            }
+        };
+
+    }, [fetchMorePosts]);
+
+
+    return isInitialLoading ?
         (<Flex justifyContent={'center'}>
             <Spinner size='xl' />
         </Flex>)
-        : (
-            <Box>
-                {
-                    myPosts.length > 0 ?
-                        myPosts.map(post =>
-                            <Post
-                                key={post._id}
-                                postId={post._id}
-                                text={post.text}
-                                img={post.img}
-                                postedByName={post._ownerId?.fullName}
-                                isOwner={true}
-                                postedByProfilePic={post._ownerId?.profilePic}
-                                createdAt={post.createdAt}
-                                changeMyPostsOnDbDelete={changeMyPostsOnDbDelete}
-                                changeMyPostsOnDbUpdate={changeMyPostsOnDbUpdate}
-                                groupId={groupId}
-                            />
+        : (myPosts.length > 0 ?
 
-                        ) : <p>Все още не сте публикували в тази група.</p>
-                }
-            </Box>
+            <>
+                {myPosts.map(post => (
+                    <Post
+                        key={post._id}
+                        postId={post._id}
+                        text={post.text}
+                        img={post.img}
+                        postedByName={post._ownerId?.fullName}
+                        isOwner={true}
+                        postedByProfilePic={post._ownerId?.profilePic}
+                        createdAt={post.createdAt}
+                        changeMyPostsOnDbDelete={changeMyPostsOnDbDelete}
+                        changeMyPostsOnDbUpdate={changeMyPostsOnDbUpdate}
+                        groupId={groupId}
+                    />
+                ))}
+                {hasMore && (
+                    <div ref={spinnerRef}>
+                        {isLoadingMore && (
+                            <Flex justifyContent={'center'}>
+                                <Spinner />
+                            </Flex>
+                        )}
+
+                    </div>)}
+
+            </> : (<p> Все още не сте публикували в тази група.</p>)
+
         )
 }
 

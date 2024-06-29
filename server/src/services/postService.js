@@ -60,12 +60,16 @@ exports.getById = async (postId) => {
 }
 
 
-exports.getUserPostsForGroup = async (groupId, currUser) => {
+exports.getUserPostsForGroup = async (groupId, currUser, page, limit) => {
+
+    const skip = (page - 1) * limit;
 
     let posts = await Post
         .find({ groupId, _ownerId: currUser._id })
-        .select('-updatedAt')
+        .select('_id text img groupId _ownerId createdAt')
         .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
         .lean();
 
     //слагам данните за потребителя който им е owner ръчно, защото той винаги ще е един и същ
@@ -77,9 +81,14 @@ exports.getUserPostsForGroup = async (groupId, currUser) => {
             fullName: currUser.fullName,
             profilePic: currUser.profilePic
         }
-    }))
+    }));
 
-    return posts;
+    //Current user's posts in the current group count;
+    const total = await Post.countDocuments({ groupId, _ownerId: currUser._id });
+    const totalPages = Math.ceil(total / limit);
+    const hasMore = page < totalPages;
+
+    return { posts, hasMore };
 
 }
 
