@@ -122,6 +122,7 @@ const GroupsPage = () => {
                 //which will result in re-renders;
 
                 if (!isInitialLoading) {
+                    //if isInitialLoading is false, we have changed page or applied filters
                     setIsLoading(false);
                 }
 
