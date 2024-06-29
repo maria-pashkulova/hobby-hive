@@ -5,7 +5,7 @@ import { bg } from 'date-fns/locale'
 import DeletePostModal from './DeletePostModal';
 import EditPostModal from './EditPostModal';
 
-const Post = ({ postId, text, img, isOwner, postedByName, postedByProfilePic, createdAt, changeMyPostsOnDbDelete, changeMyPostsOnDbUpdate, groupId }) => {
+const Post = ({ postId, text, img, isOwner, postedByName, postedByProfilePic, createdAt, refetchOnDelete, changeMyPostsOnDbUpdate, groupId }) => {
 
     //todo: handle delete post -> request + changeMyPostsOnDbDelete -> modal
     const deletePostModal = useDisclosure();
@@ -68,7 +68,7 @@ const Post = ({ postId, text, img, isOwner, postedByName, postedByProfilePic, cr
                 isOpen={deletePostModal.isOpen}
                 onClose={deletePostModal.onClose}
                 postIdToDelete={postId}
-                changeMyPostsOnDbDelete={changeMyPostsOnDbDelete}
+                refetchOnDelete={refetchOnDelete}
                 groupId={groupId}
 
             />}

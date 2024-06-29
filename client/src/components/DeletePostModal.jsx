@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import AuthContext from "../contexts/authContext";
 
 
-const DeletePostModal = ({ postIdToDelete, changeMyPostsOnDbDelete, groupId, isOpen, onClose }) => {
+const DeletePostModal = ({ postIdToDelete, refetchOnDelete, groupId, isOpen, onClose }) => {
 
     const navigate = useNavigate();
     const { logoutHandler } = useContext(AuthContext);
@@ -20,7 +20,7 @@ const DeletePostModal = ({ postIdToDelete, changeMyPostsOnDbDelete, groupId, isO
         try {
 
             await postService.deletePost(groupId, postIdToDelete);
-            changeMyPostsOnDbDelete(postIdToDelete);
+            refetchOnDelete();
             onClose();
             toast({
                 title: "Успешно изтрихте публикацията!",

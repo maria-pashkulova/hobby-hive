@@ -25,7 +25,6 @@ const MyGroupPosts = () => {
 
     const spinnerRef = useRef(null);
 
-    //TODO : delete post
     const [fetchPostsAgain, setFetchPostsAgain] = useState(false);
 
 
@@ -50,15 +49,14 @@ const MyGroupPosts = () => {
     }
 
 
-    //TODO - instead re-fetch users posts when you implement
-    //pagination / infinite scroll
-    const changeMyPostsOnDbDelete = (postIdToDelete) => {
-
-        setMyPosts((posts) => posts.filter(currPost => currPost._id !== postIdToDelete));
+    const refetchOnDelete = () => {
+        setFetchPostsAgain(true);
+        setCurrentPage(2);
     }
 
 
     //Load initial posts
+    //Refetch when post is deleted
     useEffect(() => {
         postService.getUserPostsForGroup(groupId, {
             page: 1,
@@ -91,8 +89,12 @@ const MyGroupPosts = () => {
                 if (isInitialLoading) {
                     setIsInitialLoading(false);
                 }
+
+                if (fetchPostsAgain) {
+                    setFetchPostsAgain(false);
+                }
             })
-    }, []);
+    }, [fetchPostsAgain]);
 
     //Handle additional post retrieval
     const fetchMorePosts = useCallback(async () => {
@@ -181,7 +183,7 @@ const MyGroupPosts = () => {
                         isOwner={true}
                         postedByProfilePic={post._ownerId?.profilePic}
                         createdAt={post.createdAt}
-                        changeMyPostsOnDbDelete={changeMyPostsOnDbDelete}
+                        refetchOnDelete={refetchOnDelete}
                         changeMyPostsOnDbUpdate={changeMyPostsOnDbUpdate}
                         groupId={groupId}
                     />
