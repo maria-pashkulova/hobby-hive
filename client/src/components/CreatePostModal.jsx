@@ -55,7 +55,7 @@ const CreatePostModal = ({ isOpen, onClose, groupId, handleAddNewCreatedPost }) 
                 img: imageUrl
             });
 
-            handleAddNewCreatedPost(newPost);
+            handleAddNewCreatedPost();
             onClose();
             toast({
                 title: "Успешна публикация!",

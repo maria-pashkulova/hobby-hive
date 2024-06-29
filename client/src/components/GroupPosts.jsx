@@ -29,14 +29,17 @@ const GroupPosts = () => {
 
     const spinnerRef = useRef(null);
 
+    const [fetchPostsAgain, setFetchPostsAgain] = useState(false);
 
-    //TODO- re-fetch posts instead
-    const handleAddNewCreatedPost = (newPost) => {
-        setGroupPosts((posts) => ([newPost, ...posts]));
+
+    const handleAddNewCreatedPost = () => {
+        setFetchPostsAgain(true);
+        setCurrentPage(2);
     }
 
 
     //Load initial posts
+    //Load new posts (first page only) when new post is created
     useEffect(() => {
         postService.getGroupPosts(groupId, {
             page: 1,
@@ -66,12 +69,22 @@ const GroupPosts = () => {
                 }
             })
             .finally(() => {
-                setIsInitialLoading(false);
+
+                if (isInitialLoading) {
+                    setIsInitialLoading(false);
+                }
+
+                if (fetchPostsAgain) {
+                    setFetchPostsAgain(false);
+                }
             })
-    }, []);
+    }, [fetchPostsAgain]);
 
     //Handle additional posts retrieval
     const fetchMorePosts = useCallback(async () => {
+
+        //if there is already running a request for more posts
+        //do not trigger another one (if user scrolls up and down -> up and down)
         if (isLoadingMore || !hasMore) return;
 
         setIsLoadingMore(true);
