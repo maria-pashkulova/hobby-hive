@@ -168,7 +168,7 @@ const CreateGroupModal = ({ isOpen, onClose, setRefetch, handleCurrentPageChange
             });
 
             //Refresh the UI with newly created group on the first page
-            setRefetch(true);
+            setRefetch();
             handleCurrentPageChange(0);
 
             onClose();

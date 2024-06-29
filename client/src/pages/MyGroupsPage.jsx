@@ -9,6 +9,7 @@ import * as userService from '../services/userService';
 import AuthContext from "../contexts/authContext";
 import CardsGrid from "../components/CardsGrid";
 import Pagination from "../components/Pagination";
+import Loading from "../components/Loading";
 
 const GROUPS_PER_PAGE = 3;
 
@@ -19,6 +20,7 @@ const MyGroupsPage = () => {
     const { logoutHandler } = useContext(AuthContext);
 
     const [groups, setGroups] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
     const [currentPage, setCurrentPage] = useState(0);
     const [pagesCount, setPagesCount] = useState(0);
 
@@ -28,6 +30,8 @@ const MyGroupsPage = () => {
     const toast = useToast();
 
     useEffect(() => {
+        setIsLoading(true);
+
         userService.getMyGroups({
             page: currentPage,
             limit: GROUPS_PER_PAGE
@@ -52,16 +56,21 @@ const MyGroupsPage = () => {
                     });
                 }
             })
+            .finally(() => {
+                if (fetchMyGroupsAgain) {
+                    setFetchMyGroupsAgain(false);
+                }
+                setIsLoading(false);
+            })
     }, [currentPage, fetchMyGroupsAgain]);
 
 
     //When new group is created, groups are re-fetched
     //Handler needed in Create group modal
-    const setRefetch = (status) => {
-        setFetchMyGroupsAgain(status);
+    const setRefetch = () => {
+        setFetchMyGroupsAgain(true);
     }
 
-    //PAGINATION RELATED
     //Handler needed in Create group modal and Pagination components
     const handleCurrentPageChange = (currPage) => {
         setCurrentPage(currPage);
@@ -90,24 +99,32 @@ const MyGroupsPage = () => {
 
             </Flex>
 
-            {groups.length === 0
-                ? (<Text>Не членувате в нито една група. Създайте своята сега!</Text>)
-                : (<CardsGrid groups={groups} partialLinkToGroup='/groups' />)
-            }
+            {isLoading ?
+                (<Loading />) :
+                (
+                    <>
+                        {groups.length === 0
+                            ? (<Text>Не членувате в нито една група. Създайте своята сега!</Text>)
+                            : (<CardsGrid groups={groups} partialLinkToGroup='/groups' />)
+                        }
 
-            {pagesCount > 1 && (
-                <Box
-                    position='sticky'
-                    top='100%'
-                >
-                    <Pagination
-                        pagesCount={pagesCount}
-                        currentPage={currentPage}
-                        handleCurrentPageChange={handleCurrentPageChange}
-                    />
-                </Box>)
-            }
+                        {pagesCount > 1 && (
+                            <Box
+                                position='sticky'
+                                top='100%'
+                            >
+                                <Pagination
+                                    pagesCount={pagesCount}
+                                    currentPage={currentPage}
+                                    handleCurrentPageChange={handleCurrentPageChange}
+                                />
+                            </Box>)
+                        }
 
+                    </>
+                )
+
+            }
 
 
         </>
