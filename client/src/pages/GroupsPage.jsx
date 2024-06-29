@@ -2,17 +2,17 @@ import { useContext, useEffect, useState } from 'react';
 import { useNavigate } from "react-router-dom";
 
 import AuthContext from '../contexts/authContext';
-import Loading from '../components/Loading';
 
 import * as groupService from '../services/groupService';
 import * as categoryService from '../services/categoryService';
 import * as locationService from '../services/locationService';
 
 import CardsGrid from '../components/CardsGrid';
-import { Box, Button, Flex, FormControl, Input, Select, Text, useToast } from '@chakra-ui/react';
+import { Box, Button, Flex, FormControl, Input, Select, Spinner, Text, useToast } from '@chakra-ui/react';
 import useForm from '../hooks/useForm';
 
 import Pagination from '../components/Pagination';
+import Loading from '../components/Loading';
 
 
 
@@ -48,7 +48,8 @@ const GroupsPage = () => {
     });
 
 
-    const [initialLoading, setInitialLoading] = useState(true);
+    const [isInitialLoading, setIsInitialLoading] = useState(true);
+    const [isLoading, setIsLoading] = useState(false);
     const [loadingFilterGroups, setLoadingFilterGroups] = useState(false);
     const [loadingResetFilter, setLoadingResetFilter] = useState(false);
 
@@ -81,6 +82,10 @@ const GroupsPage = () => {
     useEffect(() => {
 
         const { name, category, location } = appliedFilters;
+
+        if (!isInitialLoading) {
+            setIsLoading(true);
+        }
 
         groupService.getAll({
             name,
@@ -115,9 +120,15 @@ const GroupsPage = () => {
             .finally(() => {
                 //check for state's current value to avoid unnecessary state updates
                 //which will result in re-renders;
-                if (initialLoading) {
-                    setInitialLoading(false);
+
+                if (!isInitialLoading) {
+                    setIsLoading(false);
                 }
+
+                if (isInitialLoading) {
+                    setIsInitialLoading(false);
+                }
+
                 if (loadingFilterGroups) {
                     setLoadingFilterGroups(false);
                 }
@@ -170,8 +181,10 @@ const GroupsPage = () => {
     }
 
 
-    return initialLoading ?
-        (<Loading />) :
+    return isInitialLoading ?
+        (<Flex justifyContent={'center'}>
+            <Spinner size='xl' />
+        </Flex>) :
         (
             <>
                 <form onSubmit={handleFormSubmit}>
@@ -215,16 +228,14 @@ const GroupsPage = () => {
                                 type='submit'
                                 mr={3}
                                 colorScheme='blue'
-                                isLoading={loadingFilterGroups}
-                                loadingText='Приложи'
+                                isDisabled={loadingFilterGroups}
                             >
                                 Приложи
                             </Button>
 
                             <Button
                                 colorScheme='blue'
-                                isLoading={loadingResetFilter}
-                                loadingText='Изчисти'
+                                isDisabled={loadingResetFilter}
                                 onClick={handleResetFilter}
                             >
                                 Изчисти
@@ -235,22 +246,29 @@ const GroupsPage = () => {
 
                 </form>
 
-                {groups.length === 0
-                    ? (<Text>Не бяха намерени групи, отговарящи на зададените критерии</Text>)
-                    : (<CardsGrid groups={groups} partialLinkToGroup='groups' />)}
+                {isLoading ?
+                    (<Loading />) :
+                    (
+                        <>
+                            {groups.length === 0
+                                ? (<Text>Не бяха намерени групи, отговарящи на зададените критерии</Text>)
+                                : (<CardsGrid groups={groups} partialLinkToGroup='groups' />)}
 
-                {pagesCount > 1 && (
-                    <Box
-                        position='sticky'
-                        top='100%'
-                    >
-                        <Pagination
-                            pagesCount={pagesCount}
-                            currentPage={currentPage}
-                            handleCurrentPageChange={handleCurrentPageChange}
-                        />
-                    </Box>)
-                }
+                            {pagesCount > 1 && (
+                                <Box
+                                    position='sticky'
+                                    top='100%'
+                                >
+                                    <Pagination
+                                        pagesCount={pagesCount}
+                                        currentPage={currentPage}
+                                        handleCurrentPageChange={handleCurrentPageChange}
+                                    />
+                                </Box>)
+                            }
+                        </>
+                    )}
+
 
             </>
 
