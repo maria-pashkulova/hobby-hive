@@ -118,14 +118,7 @@ exports.createPost = async (text, img, _ownerId, groupId) => {
 
     const newPost = await Post.create(newPostData);
 
-    //keep the same form of post object so it can be added
-    //to the groupPosts state
-    const newPostWithOwnerData = await newPost.populate({
-        path: '_ownerId',
-        select: 'firstName lastName profilePic'
-    })
-
-    return newPostWithOwnerData;
+    return newPost;
 }
 
 exports.edit = async (postIdToEdit, currUserId, text, newImg, currImg) => {
