@@ -1,5 +1,4 @@
 import { Modal, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Button, ModalCloseButton, ModalBody, FormControl, FormLabel, Input, Select, useToast, Flex, CloseButton, Image, Spinner } from "@chakra-ui/react";
-import Loading from '../Loading';
 
 import useForm from "../../hooks/useForm";
 import * as groupService from '../../services/groupService';
@@ -11,10 +10,10 @@ import * as locationService from '../../services/locationService';
 import { useNavigate } from "react-router-dom";
 import { useContext, useEffect, useRef, useState } from "react";
 import AuthContext from "../../contexts/authContext";
-import UserListItem from "../UserListItem";
 import UserBadgeItem from "../UserBadgeItem";
 import usePreviewImage from "../../hooks/usePreviewImage";
 import { FiImage } from "react-icons/fi";
+import SearchUser from "../SearchUser";
 
 
 const FormKeys = {
@@ -30,8 +29,6 @@ const CreateGroupModal = ({ isOpen, onClose, setRefetch, handleCurrentPageChange
     const { logoutHandler } = useContext(AuthContext);
 
     const [selectedUsers, setSelectedUsers] = useState([]);
-    const [search, setSearch] = useState('');
-    const [searchResult, setSearchResult] = useState([]);
 
     //preview the picture which user has uploaded from file system
     const { handleImageChange, handleImageDecline, imageUrl } = usePreviewImage();
@@ -51,7 +48,6 @@ const CreateGroupModal = ({ isOpen, onClose, setRefetch, handleCurrentPageChange
 
 
     const [loadingCategoriesAndLocations, setLoadingCategoriesAndLocations] = useState(true);
-    const [loadingSearchedUsers, setLoadingSearchedUsers] = useState(false);
     const [loadingGroupCreate, setLoadingGroupCreate] = useState(false);
     const toast = useToast();
     const navigate = useNavigate();
@@ -93,44 +89,6 @@ const CreateGroupModal = ({ isOpen, onClose, setRefetch, handleCurrentPageChange
             })
     }, []);
 
-    const handleSearch = async (query) => {
-        setSearch(query);
-
-        //Make request when user has entered at least 3 characters 
-        //(whitespace handling included)
-        if (query.trim().length >= 3) {
-
-            try {
-                setLoadingSearchedUsers(true);
-
-                const users = await userService.searchUser(query);
-                setSearchResult(users);
-
-            } catch (error) {
-
-                if (error.status === 401) {
-                    logoutHandler(); //invalid or missing token - пр логнал си се, седял си опр време, изтича ти токена - сървъра връща unauthorized - изчистваш стейта
-                    //и localStorage за да станеш неаутентикиран и за клиента и тогава редиректваш
-                    navigate('/login');
-                } else {
-                    toast({
-                        title: "Възникна грешка!",
-                        description: "Не успяхме да изведем резултата от търсенето",
-                        status: "error",
-                        duration: 5000,
-                        isClosable: true,
-                        position: "bottom-left",
-                    });
-                }
-
-            } finally {
-                setLoadingSearchedUsers(false);
-            }
-        } else if (query.trim() === '') {
-            setSearchResult([]);
-        }
-
-    };
 
     const handleSelectUser = (userToAdd) => {
 
@@ -290,17 +248,10 @@ const CreateGroupModal = ({ isOpen, onClose, setRefetch, handleCurrentPageChange
                                     </Flex>
                                 )}
 
-                                <FormControl mt={4}>
-                                    <FormLabel>Добавяне на членове</FormLabel>
-                                    <Input
-                                        placeholder='Потърсете потребители...'
-                                        value={search}
-                                        onChange={(e) => handleSearch(e.target.value)}
-                                    />
 
-                                </FormControl>
+                                <SearchUser mt='4' handleFunction={handleSelectUser} />
                                 {/*  selected users */}
-                                <Flex gap={2} py={2} flexWrap={"wrap"}>
+                                <Flex mt={2} gap={2} py={2} flexWrap={"wrap"}>
                                     {selectedUsers.map((user) => (
                                         <UserBadgeItem
                                             key={user._id}
@@ -310,18 +261,6 @@ const CreateGroupModal = ({ isOpen, onClose, setRefetch, handleCurrentPageChange
                                     ))}
 
                                 </Flex>
-
-                                {/* render searched users */}
-                                {loadingSearchedUsers ? <Loading /> : (
-                                    searchResult?.map((user) => (
-                                        <UserListItem
-                                            key={user._id}
-                                            user={user}
-                                            handleFunction={() => handleSelectUser(user)}
-                                        />
-
-                                    ))
-                                )}
 
                             </ModalBody>
 
