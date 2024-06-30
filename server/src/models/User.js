@@ -41,6 +41,8 @@ userSchema.virtual('fullName').get(function () {
     return this.firstName + ' ' + this.lastName
 });
 
+// Ensure virtual fields are included in toJSON outputs
+
 userSchema.set("toJSON", {
     virtuals: true,
     versionKey: false,

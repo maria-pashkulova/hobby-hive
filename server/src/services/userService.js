@@ -71,19 +71,39 @@ exports.login = async (email, password) => {
 
 exports.getAll = async (search, currUserId) => {
 
-    const keyword = search
-        ? {
-            $or: [
-                { firstName: { $regex: search, $options: 'i' } },
-                { lastName: { $regex: search, $options: 'i' } },
-                { email: { $regex: search, $options: 'i' } }
-            ]
+    const users = await User.aggregate([
+        {
+            $match: {
+                _id: { $ne: currUserId }
+            }
+        },
+        {
+            $addFields: {
+                fullName: { $concat: ["$firstName", " ", "$lastName"] }
+            }
+        },
+        {
+            $match: {
+                $or: [
+                    { firstName: { $regex: search, $options: 'i' } },
+                    { lastName: { $regex: search, $options: 'i' } },
+                    { email: { $regex: search, $options: 'i' } },
+                    { fullName: { $regex: search, $options: 'i' } }
+                ]
+            }
+        },
+        {
+            $project: {
+                _id: 1,
+                fullName: 1,
+                email: 1,
+                profilePic: 1
+            }
+        },
+        {
+            $limit: 10
         }
-        : {};
-
-    //всички потребители, които match-ват условията - съдържат в името си или имейла си търсения стринг
-    //и са различни от текущо логнатия потребител
-    const users = User.find(keyword).find({ _id: { $ne: currUserId } }).select('_id firstName lastName email profilePic');
+    ]);
 
     return users;
 }
