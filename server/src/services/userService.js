@@ -74,7 +74,7 @@ exports.getAll = async (search, currUserId) => {
     const users = await User.aggregate([
         {
             $match: {
-                _id: { $ne: currUserId }
+                _id: { $ne: new mongoose.Types.ObjectId(currUserId) }
             }
         },
         {
