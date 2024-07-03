@@ -39,6 +39,10 @@ const groupSchema = new mongoose.Schema({
 
         }
     ],
+    activityTags: [{
+        type: String,
+        unique: true
+    }],
     groupAdmin: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',

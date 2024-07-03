@@ -1,10 +1,25 @@
 const mongoose = require('mongoose');
 
 const eventSchema = new mongoose.Schema({
-    title: String,
-    description: String,
-    city: String,
-    location: String,
+    name: String,
+    description: {
+        type: String,
+        maxLength: 300
+    },
+    specificLocation: {
+        name: String,
+        coordinates: {
+            type: [Number]
+        }
+    },
+    time: {
+        type: Date,
+        required: true
+    },
+    activityTags: {
+        type: [String],
+        default: []
+    },
     groupId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Group',
