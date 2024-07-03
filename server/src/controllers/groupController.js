@@ -119,7 +119,7 @@ router.delete('/:groupId', async (req, res) => {
 
 //JOIN GROUP / ADD ANOTHER MEMBER TO A GROUP
 
-router.put('/:groupId/addMember', async (req, res) => {
+router.patch('/:groupId/addMember', async (req, res) => {
     const groupId = req.params.groupId;
     //текущо вписания потребител
     const currUserId = req.user._id;
@@ -139,7 +139,7 @@ router.put('/:groupId/addMember', async (req, res) => {
 });
 
 //REMOVE MEMBER FROM A GROUP - само администратора на групата може да премахва потребители от групата
-router.put('/:groupId/removeMember', async (req, res) => {
+router.patch('/:groupId/removeMember', async (req, res) => {
     const groupId = req.params.groupId;
     //текущо вписания потребител
     const currUserId = req.user._id;
