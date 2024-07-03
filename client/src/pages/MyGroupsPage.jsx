@@ -1,5 +1,5 @@
 import { Box, Button, Flex, Heading, Text, useDisclosure, useToast } from "@chakra-ui/react"
-import CreateGroupModal from "../components/create-group/CreateGroupModal"
+import CreateGroupModal from "../components/CreateGroupModal"
 import { FiPlus } from "react-icons/fi";
 
 import { useContext, useEffect, useState } from 'react';

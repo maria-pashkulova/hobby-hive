@@ -66,8 +66,7 @@ const EditPostModal = ({ postIdToUpdate, changeMyPostsOnDbUpdate, groupId, isOpe
             });
         } catch (error) {
             if (error.status === 401) {
-                logoutHandler(); //invalid or missing token - пр логнал си се, седял си опр време, изтича ти токена - сървъра връща unauthorized - изчистваш стейта
-                //и localStorage за да станеш неаутентикиран и за клиента и тогава редиректваш
+                logoutHandler();
                 navigate('/login');
             } else if (error.status === 403) {
                 toast({
@@ -95,8 +94,8 @@ const EditPostModal = ({ postIdToUpdate, changeMyPostsOnDbUpdate, groupId, isOpe
     }
 
     useEffect(() => {
-        //TODO use getById from postService for post data population instead of getting it from state 
-        //which is the approach i use on update user
+        //use getById from postService for post data population instead of getting it from state
+        //for up-to-date information
         postService.getById(groupId, postIdToUpdate)
             .then((currPost) => {
                 setPostText(currPost.text);

@@ -1,27 +1,24 @@
 import { Modal, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Button, ModalCloseButton, ModalBody, FormControl, FormLabel, Input, Select, useToast, Flex, CloseButton, Image, Spinner } from "@chakra-ui/react";
 
-import useForm from "../../hooks/useForm";
-import * as groupService from '../../services/groupService';
-import * as userService from '../../services/userService';
-import * as categoryService from '../../services/categoryService';
-import * as locationService from '../../services/locationService';
+import * as groupService from '../services/groupService';
 
-
+import { useContext, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useContext, useEffect, useRef, useState } from "react";
-import AuthContext from "../../contexts/authContext";
-import UserBadgeItem from "../UserBadgeItem";
-import usePreviewImage from "../../hooks/usePreviewImage";
+import useForm from "../hooks/useForm";
+import useFetchCategoriesAndLocations from "../hooks/useFetchCategoriesAndLocations";
+import usePreviewImage from "../hooks/usePreviewImage";
+
+import AuthContext from "../contexts/authContext";
+import UserBadgeItem from "./UserBadgeItem";
 import { FiImage } from "react-icons/fi";
-import SearchUser from "../SearchUser";
+import SearchUser from "./SearchUser";
 
 
 const FormKeys = {
     Name: 'name',
     Category: 'category',
     Location: 'location',
-    Description: 'description',
-    ImageUrl: 'imageUrl'
+    Description: 'description'
 }
 
 const CreateGroupModal = ({ isOpen, onClose, setRefetch, handleCurrentPageChange }) => {
@@ -29,10 +26,6 @@ const CreateGroupModal = ({ isOpen, onClose, setRefetch, handleCurrentPageChange
     const { logoutHandler } = useContext(AuthContext);
 
     const [selectedUsers, setSelectedUsers] = useState([]);
-
-    //preview the picture which user has uploaded from file system
-    const { handleImageChange, handleImageDecline, imageUrl } = usePreviewImage();
-    const imageRef = useRef(null);
 
     //Make the form controlled; 
     //uploaded group image and selected members are managed separately
@@ -43,51 +36,19 @@ const CreateGroupModal = ({ isOpen, onClose, setRefetch, handleCurrentPageChange
         [FormKeys.Location]: '',
         [FormKeys.Description]: '',
     });
-    const [categoryOptions, setCategoryOptions] = useState([]);
-    const [locationOptions, setLocationOptions] = useState([]);
+
+    //fetch categories and locations from db
+    const { categoryOptions, locationOptions, loadingCategoriesAndLocations } = useFetchCategoriesAndLocations(resetForm, onClose, true);
+
+    //preview the picture which user has uploaded from file system
+    const { imageUrl, handleImageChange, handleImageDecline } = usePreviewImage();
+    const imageRef = useRef(null);
 
 
-    const [loadingCategoriesAndLocations, setLoadingCategoriesAndLocations] = useState(true);
     const [loadingGroupCreate, setLoadingGroupCreate] = useState(false);
     const toast = useToast();
     const navigate = useNavigate();
 
-
-    useEffect(() => {
-
-        Promise.all([
-            categoryService.getCategories(),
-            locationService.getLocations()
-        ])
-            .then(([categories, locations]) => {
-                resetForm({
-                    [FormKeys.Category]: categories[0]?._id, // optional chaining -> handle case where categories might be empty
-                    [FormKeys.Location]: locations[0]?._id // optional chaining ->  handle case where locations might be empty
-                });
-                setCategoryOptions(categories);
-                setLocationOptions(locations);
-            })
-            .catch(error => {
-                if (error.status === 401) {
-                    logoutHandler(); //invalid or missing token
-                    navigate('/login');
-                } else {
-                    //case изключвам си сървъра - грешка при свързването със сървъра
-                    toast({
-                        title: 'Възникна грешка при свързване!',
-                        status: "error",
-                        duration: 5000,
-                        isClosable: true,
-                        position: "bottom",
-                    });
-
-                    onClose();
-                }
-            })
-            .finally(() => {
-                setLoadingCategoriesAndLocations(false);
-            })
-    }, []);
 
 
     const handleSelectUser = (userToAdd) => {
