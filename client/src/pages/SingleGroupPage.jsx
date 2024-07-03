@@ -27,7 +27,7 @@ const SingleGroupPage = () => {
     const groupMembersModal = useDisclosure();
 
 
-    //change members in the state when user joins or adds other users successfully
+    //change members in the state when user adds other users successfully
     const handleAddMember = (newMember) => {
         setGroup((group) => ({
             ...group,
@@ -44,7 +44,7 @@ const SingleGroupPage = () => {
     }
 
 
-    //join group functionality
+    //change members in the state when user joins successfully
     const handleJoinGroup = async () => {
         try {
             await groupService.addMember(groupId, userId);
@@ -77,7 +77,7 @@ const SingleGroupPage = () => {
         }
     }
 
-    //leave group functionality
+    //change members in the state when user leaves successfully
     const handleLeaveGroup = async () => {
 
         //client-side validation 
@@ -121,7 +121,10 @@ const SingleGroupPage = () => {
     }
 
 
-    //TODO: handle group info update
+    //handle group details update
+    const handleUpdateGroupDetails = (updatedGroup) => {
+        setGroup({ ...group, ...updatedGroup });
+    }
 
 
     //TODO: след като групата е успешно намерена - да направя заявка за нейните публикации
@@ -170,7 +173,7 @@ const SingleGroupPage = () => {
                         <Flex gap={2}>
                             <Heading mb='6' size='lg'>{group.name}</Heading>
 
-                            {isMember && (<IconButton
+                            {(userId === group.groupAdmin) && (<IconButton
                                 icon={<FiEdit />}
                                 onClick={editGroupDetailsModal.onOpen}
                             />
@@ -200,6 +203,13 @@ const SingleGroupPage = () => {
                 {editGroupDetailsModal.isOpen && <UpdateGroupModal
                     isOpen={editGroupDetailsModal.isOpen}
                     onClose={editGroupDetailsModal.onClose}
+                    groupIdToUpdate={groupId}
+                    name={group.name}
+                    category={group.category._id}
+                    location={group.location._id}
+                    description={group.description}
+                    groupImg={group.imageUrl}
+                    handleUpdateGroupDetails={handleUpdateGroupDetails}
                 />}
 
                 {/* see current and add members modal */}

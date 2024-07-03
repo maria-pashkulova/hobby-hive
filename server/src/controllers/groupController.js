@@ -61,6 +61,10 @@ router.post('/', async (req, res) => {
     const currUser = req.user;
 
     //TODO: validate user input - required fields!!!
+    if (!name || !category || !location) {
+        return res.status(400).json({ message: 'Името, категорията дейност и локацията за групата са задължителни!' })
+    }
+
 
     try {
         const createdGroup = await groupService.create(name, category, location, description, imageUrl, members, currUser);
@@ -79,16 +83,30 @@ router.post('/', async (req, res) => {
 
 });
 
-//UPDATE
-router.put('/:groupId', async (req, res) => {
+//UPDATE GROUP DETAILS
+router.patch('/:groupId', async (req, res) => {
 
-    const { name, category, location, description, members, imageUrl } = req.body;
+    const currUserId = req.user._id;
+    const groupIdToUpdate = req.params.groupId;
+    const { name, category, location, description, newImg, currImg } = req.body;
+
+    if (!name || !category || !location) {
+        return res.status(400).json({ message: 'Името, категорията дейност и локацията за групата са задължителни!' })
+    }
+
+    try {
+        const updatedGroup = await groupService.update(groupIdToUpdate, currUserId, name, category, location, description, newImg, currImg);
+
+        res.status(200).json(updatedGroup);
+
+    } catch (error) {
+        //500 status code -> ако cloudinary върне грешка
+
+        res.status(error.statusCode || 500).json({ message: error.message });
+        console.log('Error in update group details:', error.message);
+    }
 
 
-    await groupService.update(req.params.groupId, name, category, location, description, members, imageUrl);
-
-    //TODO: ако има нужда да се изпрати редактирания обект
-    res.status(204).end();
 });
 
 //DELETE

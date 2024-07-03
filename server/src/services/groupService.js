@@ -84,14 +84,8 @@ exports.getById = async (groupId) => {
     if (mongoose.Types.ObjectId.isValid(groupId)) {
         group = await Group
             .findById(groupId)
-            .populate({
-                path: 'category',
-                select: '-_id'
-            })
-            .populate({
-                path: 'location',
-                select: '-_id'
-            })
+            .populate('category')
+            .populate('location')
             .lean();
     } else {
         throw new Error('Групата не съществува!');
@@ -179,22 +173,96 @@ exports.create = async (name, category, location, description, imageUrl, members
     return newGroupWithSelectedFields;
 }
 
-exports.update = (groupId, name, category, location, description, members, imageUrl) => {
-    //TODO: add validation
-    const newGroupData = {
-        name,
-        category,
-        location,
-        description,
-        members,
-        imageUrl
-    };
+exports.update = async (groupIdToEdit, currUserId, name, category, location, description, newImg, currImg) => {
 
-    const updatedGroup = Group.findByIdAndUpdate(groupId, newGroupData);
-    return updatedGroup;
+    //1.Check if group exists
+    if (!mongoose.Types.ObjectId.isValid(groupIdToEdit)) {
+        throw new Error('Несъществуваща група!');
+    }
+    //currUserId is valid and existing user (checked in authMiddleware!)
+
+    const group = await Group.findById(groupIdToEdit).select('name category location description imageUrl groupAdmin')
+
+    if (!group) {
+        const error = new Error('Несъществуваща група!');
+        error.statusCode = 404;
+        throw error;
+    }
+
+    //2. Check if current user is group admin
+
+    if (group.groupAdmin.toString() !== currUserId) {
+        const error = new Error('Само администраторът на групата може да редактира нейните детайли!');
+        error.statusCode = 403;
+        throw error;
+    }
+
+    //3. Check for invalid category and location object ids
+    await validateCategoryAndLocation(category, location);
+
+
+    //4. Checks for updated group picture
+    //'' for groups with no image
+    // secure_url for cloudinary
+
+    let groupImage = group.imageUrl;
+
+    // Case 1: Group initially without image, user uploads a new image
+    if (!group.imageUrl && newImg) {
+        groupImage = await uploadToCloudinary(newImg, GROUP_PICS_FOLDER);
+    } else if (group.imageUrl && newImg && !currImg) {
+        //Case 2: Group has an image, user uploads a new one
+
+        //destroy current image from cloudinary
+        await destroyFromCloudinary(group.imageUrl, GROUP_PICS_FOLDER);
+
+        //user has uploaded new image - he wants to change the current picture
+        groupImage = await uploadToCloudinary(newImg, GROUP_PICS_FOLDER);
+    } else if (group.imageUrl && !newImg && !currImg) {
+        // Case 3: Group has an image, user wants to remove it
+
+        //destroy current image from cloudinary
+        await destroyFromCloudinary(group.imageUrl, GROUP_PICS_FOLDER);
+
+        groupImage = '';
+    }
+
+    //Case 4 : no group picture initially, no new image uploaded -> groupImage stays ''
+    //or :initial group picture + no picture change
+
+    //Update group with new details fields
+    //Checks to prevent unnecessary assignments
+    if (group.name !== name) {
+        group.name = name;
+    }
+    if (group.category.toString() !== category) {
+        group.category = category;
+    }
+    if (group.location.toString() !== location) {
+        group.location = location;
+    }
+    if (group.description !== description) {
+        group.description = description;
+    } if (group.imageUrl !== groupImage) {
+        group.imageUrl = groupImage;
+    }
+
+    // Save the group only if there are modifications - optimization for DB
+    if (group.isModified()) {
+        await group.save();
+    }
+
+    //Populate the updated group document for appropriate updatedGroup format for local state update
+    const populatedGroup = await Group.findById(group._id)
+        .select('name category location description imageUrl groupAdmin')
+        .populate('category')
+        .populate('location')
+        .lean();
+
+    return populatedGroup;
 }
 
-//TODO
+//TODO - or archive group?
 exports.delete = (groupId) => Group.findByIdAndDelete(groupId);
 
 
@@ -286,6 +354,7 @@ exports.removeMember = async (groupId, userIdToRemove, currUserId) => {
 
     // if member exist, check if member is a member of the group - required for him to leave!
     //find group in the db
+    //TODO: select only needed fields for optimized DB query
     const group = await Group.findById(groupId);
 
     //check if group exists
