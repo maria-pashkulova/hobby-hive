@@ -7,7 +7,7 @@ import * as locationService from '../services/locationService';
 import * as categoryService from '../services/categoryService';
 import AuthContext from '../contexts/authContext';
 
-export default function useFetchCategoriesAndLocations(resetForm, onClose, isResetNeeded) {
+export default function useFetchCategoriesAndLocations(resetForm, onClose = () => { }, isResetNeeded = false) {
     const [categoryOptions, setCategoryOptions] = useState([]);
     const [locationOptions, setLocationOptions] = useState([]);
     const [loadingCategoriesAndLocations, setLoadingCategoriesAndLocations] = useState(true);
@@ -55,6 +55,7 @@ export default function useFetchCategoriesAndLocations(resetForm, onClose, isRes
                         position: "bottom",
                     });
 
+                    //for create group and update group modals
                     onClose();
                 }
             })

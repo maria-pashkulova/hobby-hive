@@ -4,8 +4,6 @@ import { useNavigate } from "react-router-dom";
 import AuthContext from '../contexts/authContext';
 
 import * as groupService from '../services/groupService';
-import * as categoryService from '../services/categoryService';
-import * as locationService from '../services/locationService';
 
 import CardsGrid from '../components/CardsGrid';
 import { Box, Button, Flex, FormControl, Input, Select, Spinner, Text, useToast } from '@chakra-ui/react';
@@ -13,6 +11,7 @@ import useForm from '../hooks/useForm';
 
 import Pagination from '../components/Pagination';
 import Loading from '../components/Loading';
+import useFetchCategoriesAndLocations from '../hooks/useFetchCategoriesAndLocations';
 
 
 
@@ -35,9 +34,6 @@ const GroupsPage = () => {
         [FormKeys.Category]: '',
         [FormKeys.Location]: ''
     });
-
-    const [categoryOptions, setCategoryOptions] = useState([]);
-    const [locationOptions, setLocationOptions] = useState([]);
     const [groups, setGroups] = useState([]);
     const [currentPage, setCurrentPage] = useState(0);
     const [pagesCount, setPagesCount] = useState(0);
@@ -61,20 +57,7 @@ const GroupsPage = () => {
     //FILTER AND GROUPS RELATED 
 
     //Fetch static data (categories and location) on initial mount
-    useEffect(() => {
-        Promise.all([
-            categoryService.getCategories(),
-            locationService.getLocations(),
-        ])
-            .then(([categories, locations]) => {
-                setCategoryOptions(categories);
-                setLocationOptions(locations);
-            })
-            .catch(error => {
-                console.log(error);
-            });
-
-    }, []);
+    const { categoryOptions, locationOptions } = useFetchCategoriesAndLocations(resetForm);
 
 
     //Fetch paginated groups when current page changes
