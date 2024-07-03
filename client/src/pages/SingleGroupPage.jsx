@@ -257,12 +257,7 @@ const SingleGroupPage = () => {
                     )}
                 </Flex>
 
-
-                <Container my={8}>
-                    <Outlet context={[groupId, isMember]} />
-                </Container>
-
-
+                <Outlet context={[groupId, isMember]} />
 
             </>
 

@@ -4,7 +4,7 @@ import { useCallback, useContext, useEffect, useRef, useState } from "react";
 
 import * as postService from '../services/postService';
 import AuthContext from "../contexts/authContext";
-import { Box, Button, Flex, Spinner, useDisclosure, useToast } from "@chakra-ui/react";
+import { Box, Button, Container, Flex, Spinner, useDisclosure, useToast } from "@chakra-ui/react";
 import { FiPlus } from "react-icons/fi";
 import CreatePostModal from "./CreatePostModal";
 
@@ -152,68 +152,69 @@ const GroupPosts = () => {
 
 
     return (
-        <Box>
-            {isMember && (<Button
-                position='fixed'
-                bottom={10}
-                right={4}
-                d='flex'
-                size={{ base: 'sm', sm: 'md' }}
-                leftIcon={<FiPlus />}
-                onClick={onOpen}
-            >
-                Нова публикация
-            </Button>)
-            }
+        <Container my={8}>
+            <Box>
+                {isMember && (<Button
+                    position='fixed'
+                    bottom={10}
+                    right={4}
+                    d='flex'
+                    size={{ base: 'sm', sm: 'md' }}
+                    leftIcon={<FiPlus />}
+                    onClick={onOpen}
+                >
+                    Нова публикация
+                </Button>)
+                }
 
-            {
-                isOpen && <CreatePostModal
-                    isOpen={isOpen}
-                    onClose={onClose}
-                    groupId={groupId}
-                    handleAddNewCreatedPost={handleAddNewCreatedPost}
-                />
-            }
+                {
+                    isOpen && <CreatePostModal
+                        isOpen={isOpen}
+                        onClose={onClose}
+                        groupId={groupId}
+                        handleAddNewCreatedPost={handleAddNewCreatedPost}
+                    />
+                }
 
-            {
-                isInitialLoading ?
-                    (<Flex justifyContent={'center'}>
-                        <Spinner size='xl' />
-                    </Flex>)
-                    :
-                    (groupPosts.length > 0 ?
+                {
+                    isInitialLoading ?
+                        (<Flex justifyContent={'center'}>
+                            <Spinner size='xl' />
+                        </Flex>)
+                        :
+                        (groupPosts.length > 0 ?
 
-                        <>
-                            {groupPosts.map(post => (
-                                <Post
-                                    key={post._id}
-                                    text={post.text}
-                                    img={post.img}
-                                    postedByName={post._ownerId?.fullName}
-                                    postedByProfilePic={post._ownerId?.profilePic}
-                                    createdAt={post.createdAt}
-                                />
-                            ))}
-                            {hasMore && (
-                                <div ref={spinnerRef}>
-                                    {isLoadingMore && (
-                                        <Flex justifyContent={'center'}>
-                                            <Spinner />
-                                        </Flex>
-                                    )}
+                            <>
+                                {groupPosts.map(post => (
+                                    <Post
+                                        key={post._id}
+                                        text={post.text}
+                                        img={post.img}
+                                        postedByName={post._ownerId?.fullName}
+                                        postedByProfilePic={post._ownerId?.profilePic}
+                                        createdAt={post.createdAt}
+                                    />
+                                ))}
+                                {hasMore && (
+                                    <div ref={spinnerRef}>
+                                        {isLoadingMore && (
+                                            <Flex justifyContent={'center'}>
+                                                <Spinner />
+                                            </Flex>
+                                        )}
 
-                                </div>)}
-
-
-                        </> : (<p>Все още няма публикации в групата</p>)
-
-                    )
-            }
+                                    </div>)}
 
 
-        </Box >
+                            </> : (<p>Все още няма публикации в групата</p>)
+
+                        )
+                }
 
 
+            </Box >
+
+        </Container>
     )
 }
 

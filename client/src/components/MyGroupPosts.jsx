@@ -1,7 +1,7 @@
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import AuthContext from "../contexts/authContext";
-import { Box, Flex, Spinner, useToast } from "@chakra-ui/react";
+import { Box, Container, Flex, Spinner, useToast } from "@chakra-ui/react";
 import Post from "./Post";
 
 import * as postService from '../services/postService';
@@ -172,7 +172,7 @@ const MyGroupPosts = () => {
         </Flex>)
         : (myPosts.length > 0 ?
 
-            <>
+            <Container my={8}>
                 {myPosts.map(post => (
                     <Post
                         key={post._id}
@@ -198,7 +198,7 @@ const MyGroupPosts = () => {
 
                     </div>)}
 
-            </> : (<p> Все още не сте публикували в тази група.</p>)
+            </Container> : (<p> Все още не сте публикували в тази група.</p>)
 
         )
 }
