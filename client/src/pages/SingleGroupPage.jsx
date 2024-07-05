@@ -1,4 +1,4 @@
-import { Heading, Button, Container, Flex, useDisclosure, IconButton, Tooltip, AvatarGroup, Avatar, useToast, Spinner, Menu, MenuButton, MenuList, MenuItem } from "@chakra-ui/react"
+import { Heading, Button, Flex, useDisclosure, IconButton, Tooltip, AvatarGroup, Avatar, useToast, Spinner, Menu, MenuButton, MenuList, MenuItem } from "@chakra-ui/react"
 import { useContext, useEffect, useState } from "react"
 import { Link, Outlet, useNavigate, useParams } from "react-router-dom"
 import { FiEdit, FiChevronDown } from "react-icons/fi";
@@ -6,7 +6,7 @@ import { FiEdit, FiChevronDown } from "react-icons/fi";
 import * as groupService from '../services/groupService';
 
 import AuthContext from '../contexts/authContext';
-import UpdateGroupModal from "../components/UpdateGroupModal";
+import UpdateGroupModal from "../components/update-group/UpdateGroupModal";
 import GroupMembersModal from "../components/GroupMembersModal";
 
 
@@ -209,6 +209,7 @@ const SingleGroupPage = () => {
                     location={group.location._id}
                     description={group.description}
                     groupImg={group.imageUrl}
+                    activityTags={group.activityTags}
                     handleUpdateGroupDetails={handleUpdateGroupDetails}
                 />}
 

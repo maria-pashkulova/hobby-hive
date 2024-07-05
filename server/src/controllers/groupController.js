@@ -88,14 +88,14 @@ router.patch('/:groupId', async (req, res) => {
 
     const currUserId = req.user._id;
     const groupIdToUpdate = req.params.groupId;
-    const { name, category, location, description, newImg, currImg } = req.body;
+    const { name, category, location, description, updatedActivityTags, newImg, currImg } = req.body;
 
     if (!name || !category || !location) {
         return res.status(400).json({ message: 'Името, категорията дейност и локацията за групата са задължителни!' })
     }
 
     try {
-        const updatedGroup = await groupService.update(groupIdToUpdate, currUserId, name, category, location, description, newImg, currImg);
+        const updatedGroup = await groupService.update(groupIdToUpdate, currUserId, name, category, location, description, updatedActivityTags, newImg, currImg);
 
         res.status(200).json(updatedGroup);
 

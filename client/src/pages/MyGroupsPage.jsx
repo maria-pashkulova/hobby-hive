@@ -3,7 +3,7 @@ import CreateGroupModal from "../components/create-group/CreateGroupModal"
 import { FiPlus } from "react-icons/fi";
 
 import { useContext, useEffect, useState } from 'react';
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 import * as userService from '../services/userService';
 import AuthContext from "../contexts/authContext";

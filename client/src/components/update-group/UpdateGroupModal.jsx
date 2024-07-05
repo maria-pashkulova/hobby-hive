@@ -1,13 +1,14 @@
 import React, { useContext, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
-import AuthContext from '../contexts/authContext';
+import AuthContext from '../../contexts/authContext';
 import { Button, CloseButton, Flex, FormControl, FormLabel, Image, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Select, Spinner, useToast } from '@chakra-ui/react';
-import useForm from '../hooks/useForm';
-import useFetchCategoriesAndLocations from '../hooks/useFetchCategoriesAndLocations';
-import usePreviewImage from '../hooks/usePreviewImage';
+import useForm from '../../hooks/useForm';
+import useFetchCategoriesAndLocations from '../../hooks/useFetchCategoriesAndLocations';
+import usePreviewImage from '../../hooks/usePreviewImage';
 import { FiImage } from 'react-icons/fi';
 
-import * as groupService from '../services/groupService';
+import * as groupService from '../../services/groupService';
+import CreateMoreTagsInput from './CreateMoreTagsInput';
 
 const FormKeys = {
     Name: 'name',
@@ -16,12 +17,12 @@ const FormKeys = {
     Description: 'description'
 }
 
-const UpdateGroupModal = ({ isOpen, onClose, groupIdToUpdate, name, category, location, description, groupImg, handleUpdateGroupDetails }) => {
+const UpdateGroupModal = ({ isOpen, onClose, groupIdToUpdate, name, category, location, description, activityTags, groupImg, handleUpdateGroupDetails }) => {
 
     const { logoutHandler } = useContext(AuthContext);
 
     //Make the form controlled
-    //uploaded group image is managed separately
+    //uploaded group image and new activity tags are managed separately
 
     const { formValues, onChange, resetForm } = useForm({
         [FormKeys.Name]: name,
@@ -31,6 +32,12 @@ const UpdateGroupModal = ({ isOpen, onClose, groupIdToUpdate, name, category, lo
     });
 
     const [currentImg, setCurrentImg] = useState(groupImg);
+
+    const [addedActivityTags, setAddedActivityTags] = useState([]);
+    const handleAddNewTags = (newTags) => {
+        const newTagValues = newTags.map(tag => tag.value);
+        setAddedActivityTags(newTagValues);
+    }
 
     //fetch categories and locations from db
     const { categoryOptions, locationOptions, loadingCategoriesAndLocations } = useFetchCategoriesAndLocations(resetForm, onClose);
@@ -43,7 +50,6 @@ const UpdateGroupModal = ({ isOpen, onClose, groupIdToUpdate, name, category, lo
     const toast = useToast();
     const navigate = useNavigate();
 
-
     const handleFormSubmit = async (e) => {
         e.preventDefault();
         setLoadingGroupUpdate(true);
@@ -53,6 +59,7 @@ const UpdateGroupModal = ({ isOpen, onClose, groupIdToUpdate, name, category, lo
         try {
             const updatedGroup = await groupService.updateGroupDetails(groupIdToUpdate, {
                 ...formValues,
+                updatedActivityTags: [...activityTags, ...addedActivityTags], //add exiting tags and newly created ones
                 newImg: imageUrl,
                 currImg: currentImg
             });
@@ -153,6 +160,15 @@ const UpdateGroupModal = ({ isOpen, onClose, groupIdToUpdate, name, category, lo
                                         name={[FormKeys.Description]}
                                         value={formValues[FormKeys.Description]}
                                         onChange={onChange} />
+                                </FormControl>
+                                <FormControl mt={4}>
+                                    <FormLabel>Тагове за груповите дейности</FormLabel>
+
+                                    <CreateMoreTagsInput
+                                        handleAddNewTags={handleAddNewTags}
+                                        existingTags={activityTags}
+                                    />
+
                                 </FormControl>
 
                                 <FormControl mt={4}>

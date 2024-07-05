@@ -80,7 +80,8 @@ exports.checkForDuplicateUsers = (memberIds) => {
 }
 
 exports.checkForDuplicateTags = (tags) => {
-    const uniqueTags = new Set(tags);
+    const lowerCaseTags = tags.map(tag => tag.toLowerCase()); // for case in-sensitive check
+    const uniqueTags = new Set(lowerCaseTags);
 
     if (uniqueTags.size !== tags.length) {
         throw new Error('Дублиращи се тагове за групова активност');

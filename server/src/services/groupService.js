@@ -177,7 +177,7 @@ exports.create = async (name, category, location, description, imageUrl, members
     return newGroupWithSelectedFields;
 }
 
-exports.update = async (groupIdToEdit, currUserId, name, category, location, description, newImg, currImg) => {
+exports.update = async (groupIdToEdit, currUserId, name, category, location, description, updatedActivityTags, newImg, currImg) => {
 
     //1.Check if group exists
     if (!mongoose.Types.ObjectId.isValid(groupIdToEdit)) {
@@ -204,8 +204,10 @@ exports.update = async (groupIdToEdit, currUserId, name, category, location, des
     //3. Check for invalid category and location object ids
     await validateCategoryAndLocation(category, location);
 
+    //4. Check if activityTags are unique
+    checkForDuplicateTags(updatedActivityTags);
 
-    //4. Checks for updated group picture
+    //5. Checks for updated group picture
     //'' for groups with no image
     // secure_url for cloudinary
 
@@ -247,9 +249,12 @@ exports.update = async (groupIdToEdit, currUserId, name, category, location, des
     }
     if (group.description !== description) {
         group.description = description;
-    } if (group.imageUrl !== groupImage) {
+    }
+    if (group.imageUrl !== groupImage) {
         group.imageUrl = groupImage;
     }
+
+    group.activityTags = updatedActivityTags;
 
     // Save the group only if there are modifications - optimization for DB
     if (group.isModified()) {
@@ -258,7 +263,7 @@ exports.update = async (groupIdToEdit, currUserId, name, category, location, des
 
     //Populate the updated group document for appropriate updatedGroup format for local state update
     const populatedGroup = await Group.findById(group._id)
-        .select('name category location description imageUrl groupAdmin')
+        .select('name category location description imageUrl activityTags groupAdmin')
         .populate('category')
         .populate('location')
         .lean();

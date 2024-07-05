@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import CreatableSelect from 'react-select/creatable';
 
-const CreateTagsInput = ({ handleSetNewTags }) => {
+const CreateMoreTagsInput = ({ handleAddNewTags, existingTags }) => {
+
     const [tagInputValue, setTagInputValue] = useState(''); //for user input
     const [tagValues, setTagValues] = useState([]); // for all created tags
 
@@ -9,6 +10,8 @@ const CreateTagsInput = ({ handleSetNewTags }) => {
         label,
         value: label
     })
+
+    const existingTagsOptions = existingTags.map(tag => ({ label: tag, value: tag }));
 
     // handle the creation of new tags when the user presses the "Enter" key.
     const handleKeyDown = (event) => {
@@ -20,8 +23,8 @@ const CreateTagsInput = ({ handleSetNewTags }) => {
             //prevent submitting the form for creating a group
             event.preventDefault();
 
-            //prevent adding tag with the same value; case insensitive
-            const tagExists = tagValues.find(tag => tag.value.toLowerCase() === tagInputValue.toLowerCase());
+            //prevent adding tag with the same value; prevent adding an existing tag; case insensitive
+            const tagExists = tagValues.find(tag => tag.value.toLowerCase() === tagInputValue.toLowerCase()) || existingTags.find(tag => tag.toLowerCase() === tagInputValue.toLowerCase());
             if (tagExists) {
                 // If the tag exists, clear the input value and return early to prevent duplicate tags.
                 setTagInputValue('');
@@ -39,7 +42,7 @@ const CreateTagsInput = ({ handleSetNewTags }) => {
             setTagInputValue('');
 
             //Update state in CreateGroupModal parent component
-            handleSetNewTags(newTagValues);
+            handleAddNewTags(newTagValues);
 
         }
 
@@ -50,27 +53,27 @@ const CreateTagsInput = ({ handleSetNewTags }) => {
     const handleTagsChange = (newTagValues) => {
         //If all tags are removed, newTagValues will be null.
         setTagValues(newTagValues || []);
-        handleSetNewTags(newTagValues || []);
+        handleAddNewTags(newTagValues || []);
     }
 
     return (
         <CreatableSelect
             isClearable
             isMulti
-            components={
-                { DropdownIndicator: null }
-            }
-            menuIsOpen={false}
             value={tagValues}
             onChange={handleTagsChange}
             inputValue={tagInputValue}
             onInputChange={(newTagInputValue) => setTagInputValue(newTagInputValue)}
             onKeyDown={handleKeyDown}
-            placeholder="Създайте тагове за груповите дейности"
+            placeholder="Добавете тагове за групови дейности"
+            isOptionDisabled={() => true}
+            formatCreateLabel={() => "Добавете тагове"}
+            options={existingTagsOptions}
+            noOptionsMessage={() => 'Все още няма тагове за групова активност'}
         >
 
         </CreatableSelect>
     )
 }
 
-export default CreateTagsInput
+export default CreateMoreTagsInput
