@@ -31,17 +31,14 @@ router.get('/', async (req, res) => {
 
 //CREATE
 router.post('/', async (req, res) => {
-    const { title, description, city, location } = req.body;
+    const { name, description, specificLocation, time } = req.body;
     const _ownerId = req.user._id; //текущо вписания потребител е owner на event-a
     //клиента не изпраща данни за това
     const groupId = req.groupId;
 
 
     try {
-        const createdEvent = await eventService.create(title, description, city, location, groupId, _ownerId);
-
-        //attach newly created event to a single group with groupId : groupId
-        // await groupService.attachEventToGroup(groupId, createdEvent._id); (child referencing approach)
+        const createdEvent = await eventService.create(name, description, specificLocation, time, groupId, _ownerId);
 
         res.status(201).json(createdEvent);
 

@@ -1,14 +1,24 @@
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useOutletContext, useParams } from 'react-router-dom';
 import { useContext, useEffect, useState } from 'react';
 import * as eventService from '../services/eventService';
 import AuthContext from '../contexts/authContext';
+import { Box, Button, Container, useDisclosure } from '@chakra-ui/react';
+import { FiPlus } from 'react-icons/fi';
+import CreateEventModal from './CreateEventModal';
+import EventCard from './EventCard';
+
+import formatDateInTimeZone from '../lib/formatDate';
 
 const GroupEvents = () => {
 
     const navigate = useNavigate();
-    const { groupId } = useParams();
+    const [groupId, isMember] = useOutletContext();
     const { logoutHandler } = useContext(AuthContext);
+    const { isOpen, onOpen, onClose } = useDisclosure();
+
     const [groupEvents, setGroupEvents] = useState([]);
+
+    const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
     useEffect(() => {
         eventService.getGroupEvents(groupId)
@@ -32,13 +42,41 @@ const GroupEvents = () => {
     //може би тази заявка трябва да се изпълни чак след като се намери успешно група
     //ако това е възможно изобщо да хвърли грешка, то ще се хване от catch?
     return (
-        <div>
-            Group Events:
-            <div>
-                {groupEvents.map(event => <p key={event._id}>{event.title}</p>)}
+        <Box>
+            {isMember && (<Button
+                position='fixed'
+                bottom={10}
+                right={4}
+                d='flex'
+                size={{ base: 'sm', sm: 'md' }}
+                leftIcon={<FiPlus />}
+                onClick={onOpen}
+                zIndex={1}
+            >
+                Ново събитие
+            </Button>)
+            }
 
-            </div>
-        </div>
+            {
+                isOpen && <CreateEventModal
+                    isOpen={isOpen}
+                    onClose={onClose}
+                    groupId={groupId}
+                />
+            }
+
+            <Container maxW='80vw' mt={5}>
+                {groupEvents.map(event =>
+                    <EventCard
+                        key={event._id}
+                        name={event.name}
+                        description={event.description}
+                        specificLocation={event.specificLocation.name}
+                        time={formatDateInTimeZone(event.time, timeZone)}
+                        activityTags={event.activityTags}
+                    />)}
+            </Container>
+        </Box>
     )
 }
 

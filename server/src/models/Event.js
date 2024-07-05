@@ -1,7 +1,10 @@
 const mongoose = require('mongoose');
 
 const eventSchema = new mongoose.Schema({
-    name: String,
+    name: {
+        type: String,
+        required: true
+    },
     description: {
         type: String,
         maxLength: 300
@@ -30,7 +33,7 @@ const eventSchema = new mongoose.Schema({
         ref: 'User',
         required: true
     }
-});
+}, { timestamps: true });
 
 const Event = mongoose.model('Event', eventSchema);
 

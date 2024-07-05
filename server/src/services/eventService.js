@@ -13,27 +13,39 @@ exports.getAllGroupEvents = (groupId) => {
     return events;
 }
 
-//city, location, status
-exports.create = async (title, description, city, location, groupId, _ownerId) => {
+//status?
+exports.create = async (name, description, specificLocation, time, groupId, _ownerId) => {
 
     const group = await Group.findById(groupId);
 
     if (!group) {
-        const error = new Error('Несъществуваща група за създаване на публикация!');
+        const error = new Error('Несъществуваща група за създаване на събитие!');
         error.statusCode = 404;
         throw error;
     }
 
-    //TODO: проверка дали този който се опитва да създаде поста е член на групата
+    // проверка дали този който се опитва да създаде събитие е член на групата
+    const isMember = group.members.find(member => member._id.toString() === _ownerId)
 
+    if (!isMember) {
+        const error = new Error('Не сте член на групата, за да създавате събития в нея!');
+        error.statusCode = 403;
+        throw error;
+    }
+
+    //TODO : валидиране на specificLocation - задължително трябва да има name и lat, lon
+
+    //TODO: дали таговете които са зададени отговарят на таговете на текущата група и дали са валидни
+
+    //TODO: валидна дата която е преди текущото време
 
     //TODO: add validation here
     const newEventData = {
 
-        title,
+        name,
         description,
-        city,
-        location,
+        specificLocation,
+        time,
         groupId,
         _ownerId
     }
