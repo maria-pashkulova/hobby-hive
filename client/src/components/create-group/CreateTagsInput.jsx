@@ -46,11 +46,11 @@ const CreateTagsInput = ({ handleSetNewTags }) => {
     }
 
     //Handle user interaction with CreatableSelect comonent - selecting (not in this case but in general), creating or removing tags
-    //newTagValues holds all selected values or is null if there are no selected values
+    //newTagValues holds all selected values or is empty array if there are no selected values
     const handleTagsChange = (newTagValues) => {
-        //If all tags are removed, newTagValues will be null.
-        setTagValues(newTagValues || []);
-        handleSetNewTags(newTagValues || []);
+
+        setTagValues(newTagValues);
+        handleSetNewTags(newTagValues);
     }
 
     return (
