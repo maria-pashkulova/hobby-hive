@@ -13,7 +13,7 @@ export const getAll = (filterAndPagination = {}) => {
 
 export const getById = (groupId) => request.get(`${baseUrl}/${groupId}`);
 
-export const createGroup = ({ name, category, location, description, imageUrl, members }) => request.post(baseUrl, { name, category, location, description, imageUrl, members });
+export const createGroup = ({ name, category, location, description, imageUrl, members, activityTags }) => request.post(baseUrl, { name, category, location, description, imageUrl, members, activityTags });
 
 export const updateGroupDetails = (groupId, { name, category, location, description, newImg, currImg }) => request.patch(`${baseUrl}/${groupId}`, { name, category, location, description, newImg, currImg });
 

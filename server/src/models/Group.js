@@ -41,7 +41,8 @@ const groupSchema = new mongoose.Schema({
     ],
     activityTags: [{
         type: String,
-        unique: true
+        unique: true,
+        default: []
     }],
     groupAdmin: {
         type: mongoose.Schema.Types.ObjectId,

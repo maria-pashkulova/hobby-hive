@@ -1,17 +1,19 @@
 import { Modal, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Button, ModalCloseButton, ModalBody, FormControl, FormLabel, Input, Select, useToast, Flex, CloseButton, Image, Spinner } from "@chakra-ui/react";
 
-import * as groupService from '../services/groupService';
+import * as groupService from '../../services/groupService';
 
 import { useContext, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import useForm from "../hooks/useForm";
-import useFetchCategoriesAndLocations from "../hooks/useFetchCategoriesAndLocations";
-import usePreviewImage from "../hooks/usePreviewImage";
+import useForm from "../../hooks/useForm";
+import useFetchCategoriesAndLocations from "../../hooks/useFetchCategoriesAndLocations";
+import usePreviewImage from "../../hooks/usePreviewImage";
 
-import AuthContext from "../contexts/authContext";
-import UserBadgeItem from "./UserBadgeItem";
+import AuthContext from "../../contexts/authContext";
+import UserBadgeItem from "../UserBadgeItem";
 import { FiImage } from "react-icons/fi";
-import SearchUser from "./SearchUser";
+import SearchUser from "../SearchUser";
+import CreatableSelect from 'react-select/creatable';
+import CreateTagsInput from "./CreateTagsInput";
 
 
 const FormKeys = {
@@ -28,7 +30,7 @@ const CreateGroupModal = ({ isOpen, onClose, setRefetch, handleCurrentPageChange
     const [selectedUsers, setSelectedUsers] = useState([]);
 
     //Make the form controlled; 
-    //uploaded group image and selected members are managed separately
+    //uploaded group image, selected members and created activity tags are managed separately
 
     const { formValues, onChange, resetForm } = useForm({
         [FormKeys.Name]: '',
@@ -49,7 +51,11 @@ const CreateGroupModal = ({ isOpen, onClose, setRefetch, handleCurrentPageChange
     const toast = useToast();
     const navigate = useNavigate();
 
-
+    const [activityTags, setActivityTags] = useState([]);
+    const handleSetNewTags = (newTags) => {
+        const newTagValues = newTags.map(tag => tag.value);
+        setActivityTags(newTagValues);
+    }
 
     const handleSelectUser = (userToAdd) => {
 
@@ -83,7 +89,8 @@ const CreateGroupModal = ({ isOpen, onClose, setRefetch, handleCurrentPageChange
             await groupService.createGroup({
                 ...formValues,
                 imageUrl,
-                members: selectedUsers
+                members: selectedUsers,
+                activityTags
             });
 
             //Refresh the UI with newly created group on the first page
@@ -177,6 +184,10 @@ const CreateGroupModal = ({ isOpen, onClose, setRefetch, handleCurrentPageChange
                                         name={[FormKeys.Description]}
                                         value={formValues[FormKeys.Description]}
                                         onChange={onChange} />
+                                </FormControl>
+                                <FormControl mt={4}>
+                                    <FormLabel>Тагове за груповите дейности</FormLabel>
+                                    <CreateTagsInput handleSetNewTags={handleSetNewTags} />
                                 </FormControl>
                                 <FormControl mt={4}>
                                     <FormLabel mb={4}>Прикачете снимка на групата</FormLabel>

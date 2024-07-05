@@ -57,7 +57,7 @@ router.get('/:groupId', async (req, res) => {
 router.post('/', async (req, res) => {
     // console.log(req.body);
     //деструктурираме за да валидираме данните идващи от request-a
-    const { name, category, location, description, imageUrl, members } = req.body;
+    const { name, category, location, description, imageUrl, members, activityTags } = req.body;
     const currUser = req.user;
 
     //TODO: validate user input - required fields!!!
@@ -67,7 +67,7 @@ router.post('/', async (req, res) => {
 
 
     try {
-        const createdGroup = await groupService.create(name, category, location, description, imageUrl, members, currUser);
+        const createdGroup = await groupService.create(name, category, location, description, imageUrl, members, activityTags, currUser);
 
 
         res.status(201).json(createdGroup);

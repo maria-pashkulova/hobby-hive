@@ -79,6 +79,14 @@ exports.checkForDuplicateUsers = (memberIds) => {
     }
 }
 
+exports.checkForDuplicateTags = (tags) => {
+    const uniqueTags = new Set(tags);
+
+    if (uniqueTags.size !== tags.length) {
+        throw new Error('Дублиращи се тагове за групова активност');
+    }
+}
+
 //Check for valid group category and location on group create and update 
 //not needed for when filtering groups
 //We assume that category and location are required fields and both of them have

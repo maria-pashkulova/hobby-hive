@@ -5,7 +5,7 @@ const mongoose = require('mongoose');
 const GROUP_PICS_FOLDER = 'group-pics';
 const { uploadToCloudinary, destroyFromCloudinary } = require('../utils/cloudinaryUtils');
 
-const { validateAddedOtherMembers, checkForDuplicateUsers, validateCategoryAndLocation } = require('../utils/validateGroupData');
+const { validateAddedOtherMembers, checkForDuplicateUsers, checkForDuplicateTags, validateCategoryAndLocation } = require('../utils/validateGroupData');
 
 //ако една функция просто ще взима и връща promise, няма нужда да
 //awaitваме, защото на ниво контролер ще я awaitваме пак
@@ -101,10 +101,13 @@ exports.getById = async (groupId) => {
 }
 // exports.getByIdWithEvents = (groupId) => this.getById(groupId).populate('events'); (child referencing approach)
 
-exports.create = async (name, category, location, description, imageUrl, members, currUser) => {
+exports.create = async (name, category, location, description, imageUrl, members, activityTags, currUser) => {
 
     //check for invalid category and location object ids
     await validateCategoryAndLocation(category, location);
+
+    //check if activityTags are unique
+    checkForDuplicateTags(activityTags);
 
     //check for invalid format of members array
     members = await validateAddedOtherMembers(members);
@@ -146,7 +149,8 @@ exports.create = async (name, category, location, description, imageUrl, members
         description,
         imageUrl,
         groupAdmin: currUser._id,
-        members
+        members,
+        activityTags
     };
 
     //TODO: Transaction
