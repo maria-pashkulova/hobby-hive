@@ -17,13 +17,10 @@ const FormKeys = {
     Time: 'time'
 }
 
-const options = [
-    { value: 'Навън', label: 'Навън' },
-    { value: 'Състезание', label: 'Състезание' }
-]
-
 //use group id in the url for fetch request
-const CreateEventModal = ({ isOpen, onClose, groupId }) => {
+const CreateEventModal = ({ isOpen, onClose, groupId, activityTags }) => {
+
+    const tagsOptions = activityTags.map(tag => ({ label: tag, value: tag }));
 
     //Make form controlled
     //selected location and tags are managed separately
@@ -43,8 +40,10 @@ const CreateEventModal = ({ isOpen, onClose, groupId }) => {
         setSelectedLocation(location);
     }
 
-    const handleSelectedTags = (selectedOption) => {
-        console.log(selectedOption);
+    //selectedOptions parameter holds all selected values (isMulti -true) or is null if there are no selected values
+    const handleSelectedTags = (selectedOptions) => {
+        const selectedTagsValues = selectedOptions.map(tag => tag.value);
+        setSelectedTags(selectedTagsValues);
     }
 
     const handleFormSubmit = async (e) => {
@@ -57,6 +56,7 @@ const CreateEventModal = ({ isOpen, onClose, groupId }) => {
             const newEvent = await eventService.createEvent(groupId, {
                 ...formValues,
                 time: dateTimeUTC,
+                activityTags: selectedTags,
                 specificLocation: selectedLocation
             });
             onClose();
@@ -135,9 +135,11 @@ const CreateEventModal = ({ isOpen, onClose, groupId }) => {
                                 <FormLabel>Опишете дейността на събитието</FormLabel>
 
                                 <Select
-                                    options={options}
+                                    options={tagsOptions}
                                     onChange={handleSelectedTags}
                                     isMulti
+                                    placeholder="Добавете тагове за дейността на събитието"
+                                    noOptionsMessage={() => "Няма тагове за дейността на групата"}
                                 />
 
                             </FormControl>

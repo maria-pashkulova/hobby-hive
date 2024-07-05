@@ -1,5 +1,7 @@
 const Event = require('../models/Event');
 const Group = require('../models/Group');
+const { checkForDuplicateTags } = require('../utils/validateGroupData');
+const { validateEventTags } = require('../utils/validateEventData');
 
 
 exports.getAllGroupEvents = (groupId) => {
@@ -14,7 +16,7 @@ exports.getAllGroupEvents = (groupId) => {
 }
 
 //status?
-exports.create = async (name, description, specificLocation, time, groupId, _ownerId) => {
+exports.create = async (name, description, specificLocation, time, activityTags, groupId, _ownerId) => {
 
     const group = await Group.findById(groupId);
 
@@ -35,17 +37,25 @@ exports.create = async (name, description, specificLocation, time, groupId, _own
 
     //TODO : валидиране на specificLocation - задължително трябва да има name и lat, lon
 
-    //TODO: дали таговете които са зададени отговарят на таговете на текущата група и дали са валидни
+    //Check if event's activityTags are unique (client input itself)
+    checkForDuplicateTags(activityTags)
+
+    //TODO: дали таговете които са зададени отговарят на таговете на текущата група
+    if (!validateEventTags(group.activityTags, activityTags)) {
+        const error = new Error('Невалидни тагове за групова активност за текущата група!');
+        error.statusCode = 400;
+        throw error;
+    }
 
     //TODO: валидна дата която е преди текущото време
 
     //TODO: add validation here
     const newEventData = {
-
         name,
         description,
         specificLocation,
         time,
+        activityTags,
         groupId,
         _ownerId
     }

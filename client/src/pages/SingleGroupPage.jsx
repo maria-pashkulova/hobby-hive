@@ -258,7 +258,7 @@ const SingleGroupPage = () => {
                     )}
                 </Flex>
 
-                <Outlet context={[groupId, isMember]} />
+                <Outlet context={[groupId, isMember, group.activityTags]} />
 
             </>
 

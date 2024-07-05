@@ -12,7 +12,7 @@ import formatDateInTimeZone from '../lib/formatDate';
 const GroupEvents = () => {
 
     const navigate = useNavigate();
-    const [groupId, isMember] = useOutletContext();
+    const [groupId, isMember, activityTags] = useOutletContext();
     const { logoutHandler } = useContext(AuthContext);
     const { isOpen, onOpen, onClose } = useDisclosure();
 
@@ -62,19 +62,29 @@ const GroupEvents = () => {
                     isOpen={isOpen}
                     onClose={onClose}
                     groupId={groupId}
+                    activityTags={activityTags}
                 />
             }
 
             <Container maxW='80vw' mt={5}>
-                {groupEvents.map(event =>
-                    <EventCard
-                        key={event._id}
-                        name={event.name}
-                        description={event.description}
-                        specificLocation={event.specificLocation.name}
-                        time={formatDateInTimeZone(event.time, timeZone)}
-                        activityTags={event.activityTags}
-                    />)}
+                {
+                    groupEvents.length > 0 ?
+
+                        (groupEvents.map(event => (
+                            <EventCard
+                                key={event._id}
+                                name={event.name}
+                                description={event.description}
+                                specificLocation={event.specificLocation.name}
+                                time={formatDateInTimeZone(event.time, timeZone)}
+                                activityTags={event.activityTags}
+                            />))
+                        )
+
+                        : (<p>Все още няма събития в групата</p>)
+
+                }
+
             </Container>
         </Box>
     )
