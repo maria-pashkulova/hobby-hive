@@ -79,6 +79,7 @@ exports.checkForDuplicateUsers = (memberIds) => {
     }
 }
 
+//used on group create/update for tags in the client request input itself
 exports.checkForDuplicateTags = (tags) => {
     const lowerCaseTags = tags.map(tag => tag.toLowerCase()); // for case in-sensitive check
     const uniqueTags = new Set(lowerCaseTags);
@@ -87,6 +88,21 @@ exports.checkForDuplicateTags = (tags) => {
         throw new Error('Дублиращи се тагове за групова активност');
     }
 }
+
+//check for existing tags in db; case in-sensitive
+exports.checkForExistingTags = (groupDbTags, addedTags) => {
+    const lowerCaseGroupDbTags = groupDbTags.map(tag => tag.toLowerCase());
+    const lowerCaseAddedTags = addedTags.map(tag => tag.toLowerCase());
+
+    for (let addedTag of lowerCaseAddedTags) {
+        if (lowerCaseGroupDbTags.includes(addedTag)) {
+            return true //duplicate found;
+        }
+    }
+
+    return false; //No duplicates
+}
+
 
 //Check for valid group category and location on group create and update 
 //not needed for when filtering groups

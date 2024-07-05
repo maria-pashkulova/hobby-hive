@@ -59,7 +59,7 @@ const UpdateGroupModal = ({ isOpen, onClose, groupIdToUpdate, name, category, lo
         try {
             const updatedGroup = await groupService.updateGroupDetails(groupIdToUpdate, {
                 ...formValues,
-                updatedActivityTags: [...activityTags, ...addedActivityTags], //add exiting tags and newly created ones
+                addedActivityTags,
                 newImg: imageUrl,
                 currImg: currentImg
             });

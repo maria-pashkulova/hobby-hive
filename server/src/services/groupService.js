@@ -5,7 +5,7 @@ const mongoose = require('mongoose');
 const GROUP_PICS_FOLDER = 'group-pics';
 const { uploadToCloudinary, destroyFromCloudinary } = require('../utils/cloudinaryUtils');
 
-const { validateAddedOtherMembers, checkForDuplicateUsers, checkForDuplicateTags, validateCategoryAndLocation } = require('../utils/validateGroupData');
+const { validateAddedOtherMembers, checkForDuplicateUsers, checkForDuplicateTags, checkForExistingTags, validateCategoryAndLocation } = require('../utils/validateGroupData');
 
 //ако една функция просто ще взима и връща promise, няма нужда да
 //awaitваме, защото на ниво контролер ще я awaitваме пак
@@ -177,7 +177,7 @@ exports.create = async (name, category, location, description, imageUrl, members
     return newGroupWithSelectedFields;
 }
 
-exports.update = async (groupIdToEdit, currUserId, name, category, location, description, updatedActivityTags, newImg, currImg) => {
+exports.update = async (groupIdToEdit, currUserId, name, category, location, description, addedActivityTags, newImg, currImg) => {
 
     //1.Check if group exists
     if (!mongoose.Types.ObjectId.isValid(groupIdToEdit)) {
@@ -185,7 +185,7 @@ exports.update = async (groupIdToEdit, currUserId, name, category, location, des
     }
     //currUserId is valid and existing user (checked in authMiddleware!)
 
-    const group = await Group.findById(groupIdToEdit).select('name category location description imageUrl groupAdmin')
+    const group = await Group.findById(groupIdToEdit).select('name category location description imageUrl activityTags groupAdmin')
 
     if (!group) {
         const error = new Error('Несъществуваща група!');
@@ -204,10 +204,19 @@ exports.update = async (groupIdToEdit, currUserId, name, category, location, des
     //3. Check for invalid category and location object ids
     await validateCategoryAndLocation(category, location);
 
-    //4. Check if activityTags are unique
-    checkForDuplicateTags(updatedActivityTags);
+    //4. Check if addedActivityTags are unique (client input itself)
+    checkForDuplicateTags(addedActivityTags);
 
-    //5. Checks for updated group picture
+    //5. Check if addedActivityTags includes values that already exist in group's activity tags in db
+    const existingTags = group.activityTags;
+
+    if (checkForExistingTags(existingTags, addedActivityTags)) {
+        const error = new Error('Добавени са тагове, които вече същестествуват за тази група!');
+        error.statusCode = 400;
+        throw error;
+    }
+
+    //6. Checks for updated group picture
     //'' for groups with no image
     // secure_url for cloudinary
 
@@ -254,7 +263,7 @@ exports.update = async (groupIdToEdit, currUserId, name, category, location, des
         group.imageUrl = groupImage;
     }
 
-    group.activityTags = updatedActivityTags;
+    group.activityTags = [...existingTags, ...addedActivityTags];
 
     // Save the group only if there are modifications - optimization for DB
     if (group.isModified()) {
