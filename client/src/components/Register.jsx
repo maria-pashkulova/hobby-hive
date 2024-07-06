@@ -1,36 +1,32 @@
+import { useState, useContext } from 'react';
+import { Link as ReactRouterLink, useNavigate } from 'react-router-dom';
+import AuthContext from '../contexts/authContext';
+
 import {
     VStack,
-    FormControl,
-    FormLabel,
-    Input,
-    InputGroup,
-    InputRightElement,
     Button,
     Box,
     Link,
     Text,
     useToast,
-    FormErrorMessage
 } from '@chakra-ui/react';
-import { FiEye, FiEyeOff } from "react-icons/fi";
 
-import { useState, useContext } from 'react';
-import { Link as ReactRouterLink, useNavigate } from 'react-router-dom';
-
+import { Formik } from "formik";
 import { RegisterFormKeys } from '../formKeys/formKeys';
-import { useFormik } from "formik";
-
-import AuthContext from '../contexts/authContext';
 import { registerFormSchema } from '../schemas/userAuthenticationSchema';
+
+import TextInput from './input-fields/TextInput';
+import PasswordInput from './input-fields/PasswordInput';
 
 
 const Register = () => {
 
+    const [showPassword, setShowPassword] = useState(false);
     const navigate = useNavigate();
     const toast = useToast();
     const { registerSubmitHandler } = useContext(AuthContext);
 
-
+    //Controlled and validated form using Formik and Yup
     const handleFormSubmit = async (formValues) => {
 
         //make request after client side validation
@@ -74,129 +70,82 @@ const Register = () => {
         }
     }
 
-    //Controlled and validated form using Formik and Yup
-    const { values, errors, touched, isSubmitting, handleBlur, handleChange, handleSubmit } = useFormik({
-        initialValues: {
-            [RegisterFormKeys.FirstName]: '',
-            [RegisterFormKeys.LastName]: '',
-            [RegisterFormKeys.Email]: '',
-            [RegisterFormKeys.Password]: '',
-            [RegisterFormKeys.RepeatPass]: ''
-        },
-        validationSchema: registerFormSchema,
-        onSubmit: handleFormSubmit
-
-    });
-    const [showPassword, setShowPassword] = useState(false);
     const handleClick = () => setShowPassword((showPassword) => !showPassword);
 
     return (
-        <VStack as='form' spacing='5' onSubmit={handleSubmit} noValidate >
-            <FormControl id='firstName' isInvalid={errors[RegisterFormKeys.FirstName] && touched[RegisterFormKeys.FirstName]} isRequired>
-                <FormLabel>Име</FormLabel>
-                <Input
-                    type='text'
-                    name={RegisterFormKeys.FirstName}
-                    value={values[RegisterFormKeys.FirstName]}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                />
-                <FormErrorMessage>
-                    {errors[RegisterFormKeys.FirstName]}
-                </FormErrorMessage>
-            </FormControl>
-            <FormControl id='lastName' isInvalid={errors[RegisterFormKeys.LastName] && touched[RegisterFormKeys.LastName]} isRequired>
-                <FormLabel>Фамилия</FormLabel>
-                <Input
-                    type='text'
-                    name={RegisterFormKeys.LastName}
-                    value={values[RegisterFormKeys.LastName]}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                />
-                <FormErrorMessage>
-                    {errors[RegisterFormKeys.LastName]}
-                </FormErrorMessage>
-            </FormControl>
-            <FormControl id='email' isInvalid={errors[RegisterFormKeys.Email] && touched[RegisterFormKeys.Email]} isRequired>
-                <FormLabel>Имейл</FormLabel>
-                <Input
-                    type='email'
-                    name={RegisterFormKeys.Email}
-                    value={values[RegisterFormKeys.Email]}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                />
-                <FormErrorMessage>
-                    {errors[RegisterFormKeys.Email]}
-                </FormErrorMessage>
-            </FormControl>
-            <FormControl id='password' isInvalid={errors[RegisterFormKeys.Password] && touched[RegisterFormKeys.Password]} isRequired>
-                <FormLabel>Парола</FormLabel>
-                <InputGroup>
-                    <Input
+        <Formik
+            initialValues={{
+                [RegisterFormKeys.FirstName]: '',
+                [RegisterFormKeys.LastName]: '',
+                [RegisterFormKeys.Email]: '',
+                [RegisterFormKeys.Password]: '',
+                [RegisterFormKeys.RepeatPass]: ''
+            }}
+            validationSchema={registerFormSchema}
+            onSubmit={handleFormSubmit}
+        >
+
+            {({ isSubmitting, handleSubmit }) => (
+                <VStack as='form' spacing='5' onSubmit={handleSubmit}>
+                    <TextInput
+                        type='text'
+                        name={RegisterFormKeys.FirstName}
+                        placeholder='Въведете име...'
+                        label='Име'
+                    />
+                    <TextInput
+                        type='text'
+                        name={RegisterFormKeys.LastName}
+                        placeholder='Въведете фамилия...'
+                        label='Фамилия'
+                    />
+                    <TextInput
+                        type='text'
+                        name={RegisterFormKeys.Email}
+                        placeholder='Въведете имейл...'
+                        label='Имейл'
+                    />
+
+                    <PasswordInput
                         type={showPassword ? 'text' : 'password'}
                         name={RegisterFormKeys.Password}
-                        value={values[RegisterFormKeys.Password]}
-                        onChange={handleChange}
-                        onBlur={handleBlur}
+                        placeholder='Въведете парола...'
+                        label='Парола'
+                        showPassword={showPassword}
+                        handleClick={handleClick}
                     />
-                    <InputRightElement h={'full'}>
-                        <Button
-                            variant={'ghost'}
-                            size='xl'
-                            onClick={handleClick}>
-                            {showPassword ? <FiEye /> : <FiEyeOff />}
-                        </Button>
-                    </InputRightElement>
-                </InputGroup>
-                <FormErrorMessage>
-                    {errors[RegisterFormKeys.Password]}
-                </FormErrorMessage>
-            </FormControl>
-            <FormControl id='repeatPass' isInvalid={errors[RegisterFormKeys.RepeatPass] && touched[RegisterFormKeys.RepeatPass]} isRequired>
-                <FormLabel>Потвърди парола</FormLabel>
-                <InputGroup>
-                    <Input
+
+                    <PasswordInput
                         type={showPassword ? 'text' : 'password'}
                         name={RegisterFormKeys.RepeatPass}
-                        value={values[RegisterFormKeys.RepeatPass]}
-                        onChange={handleChange}
-                        onBlur={handleBlur}
+                        placeholder='Потвърдете паролата...'
+                        label='Потвърди парола'
+                        showPassword={showPassword}
+                        handleClick={handleClick}
                     />
-                    <InputRightElement h={'full'}>
-                        <Button
-                            variant={'ghost'}
-                            size='xl'
-                            onClick={handleClick}>
-                            {showPassword ? <FiEye /> : <FiEyeOff />}
-                        </Button>
-                    </InputRightElement>
-                </InputGroup>
-                <FormErrorMessage>
-                    {errors[RegisterFormKeys.RepeatPass]}
-                </FormErrorMessage>
-            </FormControl>
-            <Button
-                type='submit'
-                bg={'blue.400'}
-                w='100%'
-                color={'white'}
-                isLoading={isSubmitting}
-                loadingText='Регистрация'
-                _hover={{
-                    bg: 'blue.500',
-                }}
-            >
-                Регистрация
-            </Button>
 
-            <Box pt={6}>
-                <Text align={'center'}>
-                    Вече имате акаунт? <Link as={ReactRouterLink} to='/login' color={'blue.400'}>Вход</Link>
-                </Text>
-            </Box>
-        </VStack >
+                    <Button
+                        type='submit'
+                        bg={'blue.400'}
+                        w='100%'
+                        color={'white'}
+                        isLoading={isSubmitting}
+                        loadingText='Регистрация'
+                        _hover={{
+                            bg: 'blue.500',
+                        }}
+                    >
+                        Регистрация
+                    </Button>
+
+                    <Box pt={6}>
+                        <Text align={'center'}>
+                            Вече имате акаунт? <Link as={ReactRouterLink} to='/login' color={'blue.400'}>Вход</Link>
+                        </Text>
+                    </Box>
+                </VStack >)}
+
+        </Formik>
     )
 }
 
