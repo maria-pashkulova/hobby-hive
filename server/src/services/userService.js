@@ -187,8 +187,7 @@ exports.updateUser = async (currUserId, userIdToUpdate, firstName, lastName, ema
     //си остава с '' -> let imageUrl = user.profilePic;
 
 
-    //това защита срещу изтриване на задължителните полета ли е ? 
-    //за новите данни презаписва стойностите, а ако не е дошла стойност записва с предходните данни
+    //handling patch request
     user.firstName = firstName || user.firstName;
     user.lastName = lastName || user.lastName;
 

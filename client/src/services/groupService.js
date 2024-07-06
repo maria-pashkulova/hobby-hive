@@ -15,8 +15,8 @@ export const getById = (groupId) => request.get(`${baseUrl}/${groupId}`);
 
 export const createGroup = ({ name, category, location, description, imageUrl, members, activityTags }) => request.post(baseUrl, { name, category, location, description, imageUrl, members, activityTags });
 
-export const updateGroupDetails = (groupId, { name, category, location, description, addedActivityTags, newImg, currImg }) => request.patch(`${baseUrl}/${groupId}`, { name, category, location, description, addedActivityTags, newImg, currImg });
+export const updateGroupDetails = (groupId, { name, category, location, description, addedActivityTags, newImg, currImg }) => request.put(`${baseUrl}/${groupId}`, { name, category, location, description, addedActivityTags, newImg, currImg });
 
-export const addMember = (groupId, _id) => request.patch(`${baseUrl}/${groupId}/addMember`, { _id });
+export const addMember = (groupId, _id) => request.put(`${baseUrl}/${groupId}/addMember`, { _id });
 
-export const removeMember = (groupId, _id) => request.patch(`${baseUrl}/${groupId}/removeMember`, { _id });
+export const removeMember = (groupId, _id) => request.put(`${baseUrl}/${groupId}/removeMember`, { _id });
