@@ -26,7 +26,7 @@ exports.register = async (firstName, lastName, email, password) => {
     const duplicate = await User.findOne({ email });
     if (duplicate) {
         const error = new Error('Съществува потребител с този имейл!');
-        error.statusCode = '409' // //status 409 - conflict
+        error.statusCode = 409 //status 409 - conflict
         throw error;
     }
 

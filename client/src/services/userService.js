@@ -1,18 +1,17 @@
 import * as request from '../lib/request';
+import trimInputValues from '../utils/sanitizeUserInput'; //Sanitize user input before making a request
 
 const baseUrl = 'http://localhost:5000/users';
 
-//return promise
-//repeatPass is also sent!
+//Returns a promise
 export const register = ({ firstName, lastName, email, password }) => (
-    //TODO check if password and repeat password match - maybe here at service
 
-    request.post(`${baseUrl}/register`, {
+    request.post(`${baseUrl}/register`, trimInputValues({
         firstName,
         lastName,
         email,
         password
-    })
+    }))
 );
 
 //return promise

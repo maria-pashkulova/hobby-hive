@@ -9,87 +9,34 @@ import {
     Box,
     Link,
     Text,
-    useToast
+    useToast,
+    FormErrorMessage
 } from '@chakra-ui/react';
 import { FiEye, FiEyeOff } from "react-icons/fi";
 
 import { useState, useContext } from 'react';
 import { Link as ReactRouterLink, useNavigate } from 'react-router-dom';
 
-import useForm from "../hooks/useForm";
+import { RegisterFormKeys } from '../formKeys/formKeys';
+import { useFormik } from "formik";
 
 import AuthContext from '../contexts/authContext';
+import { registerFormSchema } from '../schemas/userAuthenticationSchema';
 
-
-const RegisterFormKeys = {
-    FirstName: 'firstName',
-    LastName: 'lastName',
-    Email: 'email',
-    Password: 'password',
-    RepeatPass: 'repeatPass'
-};
 
 const Register = () => {
 
     const navigate = useNavigate();
     const toast = useToast();
     const { registerSubmitHandler } = useContext(AuthContext);
-    const [loading, setLoading] = useState(false);
 
 
-    const { formValues: userData, onChange } = useForm({
-        [RegisterFormKeys.FirstName]: '',
-        [RegisterFormKeys.LastName]: '',
-        [RegisterFormKeys.Email]: '',
-        [RegisterFormKeys.Password]: '',
-        [RegisterFormKeys.RepeatPass]: '',
-
-    })
-
-    const [showPassword, setShowPassword] = useState(false);
-    const handleClick = () => setShowPassword((showPassword) => !showPassword);
-
-    const handleFormSubmit = async (e) => {
-        e.preventDefault();
-
-        // validate before making a request -> client side validation
-        //check for required fields
-        //check if password and repeat password match
-        //TODO: check for valid email format
-
-        if (userData[RegisterFormKeys.FirstName] === '' ||
-            userData[RegisterFormKeys.LastName] === '' ||
-            userData[RegisterFormKeys.Email] === '' ||
-            userData[RegisterFormKeys.Password] === '' ||
-            userData[RegisterFormKeys.RepeatPass] === ''
-        ) {
-            toast({
-                title: "Попълнете всички полета!",
-                status: "error",
-                duration: 3000,
-                isClosable: true,
-                position: "bottom",
-            });
-            return;
-        }
-
-        if (userData[RegisterFormKeys.Password] !== userData[RegisterFormKeys.RepeatPass]) {
-            toast({
-                title: "Паролите не съвпадат",
-                status: "error",
-                duration: 3000,
-                isClosable: true,
-                position: "bottom",
-            });
-            return;
-        }
-
+    const handleFormSubmit = async (formValues) => {
 
         //make request after client side validation
         try {
-            setLoading(true);
 
-            await registerSubmitHandler(userData);
+            await registerSubmitHandler(formValues);
             toast({
                 title: "Успешна регистрация!",
                 status: "success",
@@ -101,12 +48,10 @@ const Register = () => {
             navigate('/');
 
         } catch (error) {
-            //duplicate user error
-            //TODO: ??? - просто така съм си написала сървъра в userController 
-            //да ми връща 400 ако има липсващи полета
-            //case: непопълнени полета - въпреки че мисля че е излишно
+            //409 - user with the same email exists
+            //400- непопълнени полета - въпреки че мисля че е излишно
             //защото сложих клиентска валидация за това
-            //а тази сървърната си остава за заявки от клиенти като постман
+            //а тази сървърната си остава за заявки от клиенти като постман (освен ако клиентската не може да се прескочи)
             if (error.status === 409 || error.status === 400) {
                 toast({
                     title: error.message,
@@ -126,48 +71,75 @@ const Register = () => {
                 });
             }
 
-        } finally {
-            setLoading(false);
         }
     }
 
+    //Controlled and validated form using Formik and Yup
+    const { values, errors, touched, isSubmitting, handleBlur, handleChange, handleSubmit } = useFormik({
+        initialValues: {
+            [RegisterFormKeys.FirstName]: '',
+            [RegisterFormKeys.LastName]: '',
+            [RegisterFormKeys.Email]: '',
+            [RegisterFormKeys.Password]: '',
+            [RegisterFormKeys.RepeatPass]: ''
+        },
+        validationSchema: registerFormSchema,
+        onSubmit: handleFormSubmit
+
+    });
+    const [showPassword, setShowPassword] = useState(false);
+    const handleClick = () => setShowPassword((showPassword) => !showPassword);
+
     return (
-        <VStack as='form' spacing='5' onSubmit={handleFormSubmit} noValidate >
-            <FormControl id='firstName' isRequired>
+        <VStack as='form' spacing='5' onSubmit={handleSubmit} noValidate >
+            <FormControl id='firstName' isInvalid={errors[RegisterFormKeys.FirstName] && touched[RegisterFormKeys.FirstName]} isRequired>
                 <FormLabel>Име</FormLabel>
                 <Input
                     type='text'
-                    name='firstName'
-                    value={userData[RegisterFormKeys.FirstName]}
-                    onChange={onChange}
+                    name={RegisterFormKeys.FirstName}
+                    value={values[RegisterFormKeys.FirstName]}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
                 />
+                <FormErrorMessage>
+                    {errors[RegisterFormKeys.FirstName]}
+                </FormErrorMessage>
             </FormControl>
-            <FormControl id='lastName' isRequired>
+            <FormControl id='lastName' isInvalid={errors[RegisterFormKeys.LastName] && touched[RegisterFormKeys.LastName]} isRequired>
                 <FormLabel>Фамилия</FormLabel>
                 <Input
                     type='text'
-                    name='lastName'
-                    value={userData[RegisterFormKeys.LastName]}
-                    onChange={onChange}
+                    name={RegisterFormKeys.LastName}
+                    value={values[RegisterFormKeys.LastName]}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
                 />
+                <FormErrorMessage>
+                    {errors[RegisterFormKeys.LastName]}
+                </FormErrorMessage>
             </FormControl>
-            <FormControl id='email' isRequired>
+            <FormControl id='email' isInvalid={errors[RegisterFormKeys.Email] && touched[RegisterFormKeys.Email]} isRequired>
                 <FormLabel>Имейл</FormLabel>
                 <Input
                     type='email'
-                    name='email'
-                    value={userData[RegisterFormKeys.Email]}
-                    onChange={onChange}
+                    name={RegisterFormKeys.Email}
+                    value={values[RegisterFormKeys.Email]}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
                 />
+                <FormErrorMessage>
+                    {errors[RegisterFormKeys.Email]}
+                </FormErrorMessage>
             </FormControl>
-            <FormControl id='password' isRequired>
+            <FormControl id='password' isInvalid={errors[RegisterFormKeys.Password] && touched[RegisterFormKeys.Password]} isRequired>
                 <FormLabel>Парола</FormLabel>
                 <InputGroup>
                     <Input
                         type={showPassword ? 'text' : 'password'}
-                        name='password'
-                        value={userData[RegisterFormKeys.Password]}
-                        onChange={onChange}
+                        name={RegisterFormKeys.Password}
+                        value={values[RegisterFormKeys.Password]}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
                     />
                     <InputRightElement h={'full'}>
                         <Button
@@ -178,15 +150,19 @@ const Register = () => {
                         </Button>
                     </InputRightElement>
                 </InputGroup>
+                <FormErrorMessage>
+                    {errors[RegisterFormKeys.Password]}
+                </FormErrorMessage>
             </FormControl>
-            <FormControl id='repeatPass' isRequired>
+            <FormControl id='repeatPass' isInvalid={errors[RegisterFormKeys.RepeatPass] && touched[RegisterFormKeys.RepeatPass]} isRequired>
                 <FormLabel>Потвърди парола</FormLabel>
                 <InputGroup>
                     <Input
                         type={showPassword ? 'text' : 'password'}
-                        name='repeatPass'
-                        value={userData[RegisterFormKeys.RepeatPass]}
-                        onChange={onChange}
+                        name={RegisterFormKeys.RepeatPass}
+                        value={values[RegisterFormKeys.RepeatPass]}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
                     />
                     <InputRightElement h={'full'}>
                         <Button
@@ -197,13 +173,16 @@ const Register = () => {
                         </Button>
                     </InputRightElement>
                 </InputGroup>
+                <FormErrorMessage>
+                    {errors[RegisterFormKeys.RepeatPass]}
+                </FormErrorMessage>
             </FormControl>
             <Button
                 type='submit'
                 bg={'blue.400'}
                 w='100%'
                 color={'white'}
-                isLoading={loading}
+                isLoading={isSubmitting}
                 loadingText='Регистрация'
                 _hover={{
                     bg: 'blue.500',

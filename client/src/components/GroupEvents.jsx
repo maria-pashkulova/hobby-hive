@@ -7,7 +7,7 @@ import { FiPlus } from 'react-icons/fi';
 import CreateEventModal from './CreateEventModal';
 import EventCard from './EventCard';
 
-import formatDateInTimeZone from '../lib/formatDate';
+import formatDateInTimeZone from '../utils/formatDate';
 
 const GroupEvents = () => {
 
