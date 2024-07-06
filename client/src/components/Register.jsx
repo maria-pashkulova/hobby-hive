@@ -29,9 +29,8 @@ const Register = () => {
     //Controlled and validated form using Formik and Yup
     const handleFormSubmit = async (formValues) => {
 
-        //make request after client side validation
+        //Make request after client side validation
         try {
-
             await registerSubmitHandler(formValues);
             toast({
                 title: "Успешна регистрация!",
@@ -45,7 +44,7 @@ const Register = () => {
 
         } catch (error) {
             //409 - user with the same email exists
-            //400- непопълнени полета - въпреки че мисля че е излишно
+            //400 - непопълнени полета - въпреки че мисля че е излишно
             //защото сложих клиентска валидация за това
             //а тази сървърната си остава за заявки от клиенти като постман (освен ако клиентската не може да се прескочи)
             if (error.status === 409 || error.status === 400) {
@@ -57,7 +56,7 @@ const Register = () => {
                     position: "bottom",
                 });
             } else {
-                //case изключвам си сървъра - грешка при свързването със сървъра
+                //грешка при свързването със сървъра
                 toast({
                     title: 'Възникна грешка при свързване!',
                     status: "error",
@@ -86,7 +85,7 @@ const Register = () => {
         >
 
             {({ isSubmitting, handleSubmit }) => (
-                <VStack as='form' spacing='5' onSubmit={handleSubmit}>
+                <VStack as='form' spacing='5' onSubmit={handleSubmit} noValidate>
                     <TextInput
                         type='text'
                         name={RegisterFormKeys.FirstName}
@@ -100,7 +99,7 @@ const Register = () => {
                         label='Фамилия'
                     />
                     <TextInput
-                        type='text'
+                        type='email'
                         name={RegisterFormKeys.Email}
                         placeholder='Въведете имейл...'
                         label='Имейл'

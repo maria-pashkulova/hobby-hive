@@ -1,8 +1,13 @@
 import * as yup from "yup";
-import { RegisterFormKeys } from "../formKeys/formKeys";
+import { LoginFormKeys, RegisterFormKeys } from "../formKeys/formKeys";
 
 // min 5 characters, 1 upper case letter, 1 lower case letter, 1 numeric digit.
 const passwordRules = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{5,}$/;
+
+export const loginFormSchema = yup.object().shape({
+    [LoginFormKeys.Email]: yup.string().trim().required('Въведете имейл').email("Моля въведете валиден имейл адрес"),
+    [LoginFormKeys.Password]: yup.string().trim().required('Въведете парола!')
+});
 
 export const registerFormSchema = yup.object().shape({
     [RegisterFormKeys.FirstName]: yup.string().trim().required('Въведете име!'),

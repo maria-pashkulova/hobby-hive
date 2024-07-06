@@ -1,3 +1,9 @@
+export const LoginFormKeys = {
+    Email: 'email',
+    Password: 'password'
+}
+
+
 export const RegisterFormKeys = {
     FirstName: 'firstName',
     LastName: 'lastName',
@@ -5,3 +11,4 @@ export const RegisterFormKeys = {
     Password: 'password',
     RepeatPass: 'repeatPass'
 };
+

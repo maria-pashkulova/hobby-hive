@@ -19,11 +19,6 @@ export const AuthProvider = ({ children }) => {
     //auth - данните върнати от сървъра след успешен логин
     const [auth, setAuth] = usePersistedState('user', {});
 
-    //Вариант да не пазя токена в localStorage, а само в бисквитка
-    // => не ми се налага да изнасям токена в localStorage, за да го пратя с request-a
-    //той просто се изпраща заради  credentials:include
-
-
     //ВХОД:
     //await is needed in order to save user data in the context
     const loginSubmitHandler = async (userData) => {

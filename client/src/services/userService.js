@@ -3,6 +3,12 @@ import trimInputValues from '../utils/sanitizeUserInput'; //Sanitize user input 
 
 const baseUrl = 'http://localhost:5000/users';
 
+
+//Returns a promise
+export const login = (userData) => (
+    request.post(`${baseUrl}/login`, userData)
+);
+
 //Returns a promise
 export const register = ({ firstName, lastName, email, password }) => (
 
@@ -12,14 +18,6 @@ export const register = ({ firstName, lastName, email, password }) => (
         email,
         password
     }))
-);
-
-//return promise
-export const login = ({ email, password }) => (
-    request.post(`${baseUrl}/login`, {
-        email,
-        password
-    })
 );
 
 //return promise
