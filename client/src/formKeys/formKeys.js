@@ -12,3 +12,9 @@ export const RegisterFormKeys = {
     RepeatPass: 'repeatPass'
 };
 
+export const GroupKeys = {
+    Name: 'name',
+    Category: 'category',
+    Location: 'location',
+    Description: 'description'
+}

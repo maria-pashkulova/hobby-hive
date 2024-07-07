@@ -11,7 +11,10 @@ const groupSchema = new mongoose.Schema({
         ref: 'Category',
         required: true
     },
-    description: String,
+    description: {
+        type: String,
+        maxLength: 300
+    },
     location: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Location',

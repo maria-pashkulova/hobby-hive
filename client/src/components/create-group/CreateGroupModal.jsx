@@ -1,57 +1,45 @@
-import { Modal, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Button, ModalCloseButton, ModalBody, FormControl, FormLabel, Input, Select, useToast, Flex, CloseButton, Image, Spinner } from "@chakra-ui/react";
+import { useContext, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import AuthContext from "../../contexts/authContext";
+import { FiImage } from "react-icons/fi";
+
+import { Modal, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Button, ModalCloseButton, ModalBody, FormControl, FormLabel, Input, useToast, Flex, CloseButton, Image, Spinner } from "@chakra-ui/react";
+
+import { Form, Formik } from "formik";
+import { GroupKeys } from "../../formKeys/formKeys";
+import { groupSchema } from "../../schemas/groupSchema";
 
 import * as groupService from '../../services/groupService';
 
-import { useContext, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import useForm from "../../hooks/useForm";
 import useFetchCategoriesAndLocations from "../../hooks/useFetchCategoriesAndLocations";
 import usePreviewImage from "../../hooks/usePreviewImage";
 
-import AuthContext from "../../contexts/authContext";
+
+import TextInput from "../input-fields/TextInput";
+import CustomSelect from "../input-fields/CustomSelect";
+import TextArea from "../input-fields/TextArea";
 import UserBadgeItem from "../UserBadgeItem";
-import { FiImage } from "react-icons/fi";
 import SearchUser from "../SearchUser";
-import CreatableSelect from 'react-select/creatable';
 import CreateTagsInput from "./CreateTagsInput";
 
 
-const FormKeys = {
-    Name: 'name',
-    Category: 'category',
-    Location: 'location',
-    Description: 'description'
-}
 
 const CreateGroupModal = ({ isOpen, onClose, setRefetch, handleCurrentPageChange }) => {
 
-    const { logoutHandler } = useContext(AuthContext);
-
+    const [activityTags, setActivityTags] = useState([]);
     const [selectedUsers, setSelectedUsers] = useState([]);
 
-    //Make the form controlled; 
-    //uploaded group image, selected members and created activity tags are managed separately
-
-    const { formValues, onChange, resetForm } = useForm({
-        [FormKeys.Name]: '',
-        [FormKeys.Category]: '',
-        [FormKeys.Location]: '',
-        [FormKeys.Description]: '',
-    });
+    const toast = useToast();
+    const navigate = useNavigate();
+    const { logoutHandler } = useContext(AuthContext);
 
     //fetch categories and locations from db
-    const { categoryOptions, locationOptions, loadingCategoriesAndLocations } = useFetchCategoriesAndLocations(resetForm, onClose, true);
+    const { categoryOptions, locationOptions, loadingCategoriesAndLocations } = useFetchCategoriesAndLocations(onClose);
 
     //preview the picture which user has uploaded from file system
     const { imageUrl, handleImageChange, handleImageDecline } = usePreviewImage();
     const imageRef = useRef(null);
 
-
-    const [loadingGroupCreate, setLoadingGroupCreate] = useState(false);
-    const toast = useToast();
-    const navigate = useNavigate();
-
-    const [activityTags, setActivityTags] = useState([]);
     const handleSetNewTags = (newTags) => {
         const newTagValues = newTags.map(tag => tag.value);
         setActivityTags(newTagValues);
@@ -78,12 +66,10 @@ const CreateGroupModal = ({ isOpen, onClose, setRefetch, handleCurrentPageChange
         setSelectedUsers((selectedUsers) => selectedUsers.filter(user => user._id !== userToRemove._id));
     }
 
-    const handleFormSubmit = async (e) => {
-        e.preventDefault();
-        setLoadingGroupCreate(true);
+    //Controlled and validated form using Formik and Yup
+    //Uploaded group image, selected members and created activity tags are managed separately
 
-        //TODO: client side validation for required fields
-
+    const handleFormSubmit = async (formValues) => {
         try {
 
             await groupService.createGroup({
@@ -108,13 +94,12 @@ const CreateGroupModal = ({ isOpen, onClose, setRefetch, handleCurrentPageChange
 
         } catch (error) {
 
+            //invalid or missing token
             if (error.status === 401) {
-                logoutHandler(); //invalid or missing token - пр логнал си се, седял си опр време, изтича ти токена - сървъра връща unauthorized - изчистваш стейта
-                //и localStorage за да станеш неаутентикиран и за клиента и тогава редиректваш
+                logoutHandler();
                 navigate('/login');
             } else {
-                //case изключвам си сървъра - грешка при свързването със сървъра
-                //възможно ли е да се хвърли грешка със статус 500 от клиента ако се прескочи UI по някакъв начин
+                //грешка при свързването със сървъра
                 toast({
                     title: 'Възникна грешка при свързване!',
                     description: 'Групата не беше създадена',
@@ -124,8 +109,6 @@ const CreateGroupModal = ({ isOpen, onClose, setRefetch, handleCurrentPageChange
                     position: "bottom",
                 });
             }
-        } finally {
-            setLoadingGroupCreate(false);
         }
 
     }
@@ -147,110 +130,128 @@ const CreateGroupModal = ({ isOpen, onClose, setRefetch, handleCurrentPageChange
                             </Flex>
                         </ModalBody>)
                         :
-                        (<form onSubmit={handleFormSubmit}>
-                            <ModalBody>
+                        (
+                            <Formik
+                                initialValues={{
+                                    [GroupKeys.Name]: '',
+                                    [GroupKeys.Category]: '',
+                                    [GroupKeys.Location]: '',
+                                    [GroupKeys.Description]: ''
+                                }}
+                                validationSchema={groupSchema}
+                                onSubmit={handleFormSubmit}
 
-                                <FormControl>
-                                    <FormLabel>Име</FormLabel>
-                                    <Input
-                                        placeholder='Име на групата'
-                                        name={[FormKeys.Name]}
-                                        value={formValues[FormKeys.Name]}
-                                        onChange={onChange} />
-                                </FormControl>
+                            >
+                                {({ isSubmitting }) => (
+                                    <Form>
+                                        <ModalBody>
 
-                                <FormControl mt={4}>
-                                    <FormLabel>Категория занимания</FormLabel>
-                                    <Select name={[FormKeys.Category]} value={formValues[FormKeys.Category]} onChange={onChange}>
-                                        {categoryOptions.map((option) => (
-                                            <option key={option._id} value={option._id}>{option.name}</option>
-                                        ))}
-                                    </Select>
-                                </FormControl>
+                                            <TextInput
+                                                type='text'
+                                                name={GroupKeys.Name}
+                                                placeholder='Име на групата'
+                                                label='Име'
+                                            />
 
-                                <FormControl mt={4}>
-                                    <FormLabel>Основна локация</FormLabel>
-                                    <Select name={[FormKeys.Location]} value={formValues[FormKeys.Location]} onChange={onChange}>
-                                        {locationOptions.map((option) => (
-                                            <option key={option._id} value={option._id}>{option.name}</option>
-                                        ))}
-                                    </Select>
-                                </FormControl>
+                                            <CustomSelect
+                                                name={GroupKeys.Category}
+                                                placeholder='Изберете категория хоби дейност'
+                                                label='Категория занимания'
+                                                mt={4}
+                                            >
+                                                {categoryOptions.map((option) => (
+                                                    <option key={option._id} value={option._id}>{option.name}</option>
+                                                ))}
 
-                                <FormControl mt={4}>
-                                    <FormLabel>Описание</FormLabel>
-                                    <Input
-                                        placeholder='Описание'
-                                        name={[FormKeys.Description]}
-                                        value={formValues[FormKeys.Description]}
-                                        onChange={onChange} />
-                                </FormControl>
-                                <FormControl mt={4}>
-                                    <FormLabel>Тагове за груповите дейности</FormLabel>
-                                    <CreateTagsInput handleSetNewTags={handleSetNewTags} />
-                                </FormControl>
-                                <FormControl mt={4}>
-                                    <FormLabel mb={4}>Прикачете снимка на групата</FormLabel>
-                                    <Input
-                                        type='file'
-                                        hidden
-                                        ref={imageRef}
-                                        onChange={handleImageChange} />
-                                    <FiImage
-                                        style={{
-                                            marginLeft: '5px',
-                                            cursor: 'pointer'
-                                        }}
-                                        size={20}
-                                        onClick={() => imageRef.current.click()}
+                                            </CustomSelect >
 
-                                    />
+                                            <CustomSelect
+                                                name={GroupKeys.Location}
+                                                placeholder='Изберете основна локация на групата'
+                                                label='Основна локация'
+                                                mt={4}
+                                            >
+                                                {locationOptions.map((option) => (
+                                                    <option key={option._id} value={option._id}>{option.name}</option>
+                                                ))}
 
-                                </FormControl>
-                                {imageUrl && (
-                                    <Flex my={7} w='full' position='relative' justifyContent='center'>
-                                        <Image src={imageUrl} alt='Selected image' />
-                                        <CloseButton
-                                            onClick={handleImageDecline}
-                                            bg='gray.200'
-                                            position='absolute'
-                                            top={2}
-                                            right={2}
-                                        />
-                                    </Flex>
-                                )}
+                                            </CustomSelect >
+
+                                            <TextArea
+                                                name={GroupKeys.Description}
+                                                placeholder='Описание'
+                                                label='Описание'
+                                                mt={4}
+                                            />
+
+                                            <FormControl mt={4}>
+                                                <FormLabel>Тагове за груповите дейности</FormLabel>
+                                                <CreateTagsInput handleSetNewTags={handleSetNewTags} />
+                                            </FormControl>
+                                            <FormControl mt={4}>
+                                                <FormLabel mb={4}>Прикачете снимка на групата</FormLabel>
+                                                <Input
+                                                    type='file'
+                                                    hidden
+                                                    ref={imageRef}
+                                                    onChange={handleImageChange} />
+                                                <FiImage
+                                                    style={{
+                                                        marginLeft: '5px',
+                                                        cursor: 'pointer'
+                                                    }}
+                                                    size={20}
+                                                    onClick={() => imageRef.current.click()}
+
+                                                />
+
+                                            </FormControl>
+                                            {imageUrl && (
+                                                <Flex my={7} w='full' position='relative' justifyContent='center'>
+                                                    <Image src={imageUrl} alt='Selected image' />
+                                                    <CloseButton
+                                                        onClick={handleImageDecline}
+                                                        bg='gray.200'
+                                                        position='absolute'
+                                                        top={2}
+                                                        right={2}
+                                                    />
+                                                </Flex>
+                                            )}
 
 
-                                <SearchUser mt='4' handleFunction={handleSelectUser} />
-                                {/*  selected users */}
-                                <Flex mt={2} gap={2} py={2} flexWrap={"wrap"}>
-                                    {selectedUsers.map((user) => (
-                                        <UserBadgeItem
-                                            key={user._id}
-                                            user={user}
-                                            handleRemoveUser={() => handleRemoveUser(user)}
-                                        />
-                                    ))}
+                                            <SearchUser mt='4' handleFunction={handleSelectUser} />
+                                            {/*  selected users */}
+                                            <Flex mt={2} gap={2} py={2} flexWrap={"wrap"}>
+                                                {selectedUsers.map((user) => (
+                                                    <UserBadgeItem
+                                                        key={user._id}
+                                                        user={user}
+                                                        handleRemoveUser={() => handleRemoveUser(user)}
+                                                    />
+                                                ))}
 
-                                </Flex>
+                                            </Flex>
 
-                            </ModalBody>
+                                        </ModalBody>
 
-                            <ModalFooter>
-                                <Button
-                                    type='submit'
-                                    mr={3}
-                                    colorScheme='blue'
-                                    isLoading={loadingGroupCreate}
-                                    loadingText='Създаване'
-                                >
-                                    Създай
-                                </Button>
-                                <Button variant='ghost' onClick={onClose}>
-                                    Отмяна
-                                </Button>
-                            </ModalFooter>
-                        </form>)
+                                        <ModalFooter>
+                                            <Button
+                                                type='submit'
+                                                mr={3}
+                                                colorScheme='blue'
+                                                isLoading={isSubmitting}
+                                                loadingText='Създаване'
+                                            >
+                                                Създай
+                                            </Button>
+                                            <Button variant='ghost' onClick={onClose}>
+                                                Отмяна
+                                            </Button>
+                                        </ModalFooter>
+                                    </Form>)}
+
+                            </Formik>)
                     }
 
 

@@ -7,7 +7,7 @@ import * as locationService from '../services/locationService';
 import * as categoryService from '../services/categoryService';
 import AuthContext from '../contexts/authContext';
 
-export default function useFetchCategoriesAndLocations(resetForm, onClose = () => { }, isResetNeeded = false) {
+export default function useFetchCategoriesAndLocations(onClose = () => { }) {
     const [categoryOptions, setCategoryOptions] = useState([]);
     const [locationOptions, setLocationOptions] = useState([]);
     const [loadingCategoriesAndLocations, setLoadingCategoriesAndLocations] = useState(true);
@@ -28,17 +28,6 @@ export default function useFetchCategoriesAndLocations(resetForm, onClose = () =
 
                 setCategoryOptions(categories);
                 setLocationOptions(locations);
-
-                //Reset is needed only for Create group modal
-                //Not needed for update group modal -> pre-populated data from state
-                //Not needed for Groups page -> '' -> Всички категории / локации (default)
-                if (isResetNeeded) {
-                    resetForm({
-                        'category': categories[0]?._id, // optional chaining -> handle case where categories might be empty
-                        'location': locations[0]?._id // optional chaining ->  handle case where locations might be empty
-                    });
-                }
-
 
             })
             .catch(error => {
