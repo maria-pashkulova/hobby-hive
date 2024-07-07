@@ -6,7 +6,7 @@ const EventCard = ({ name, description, specificLocation, time, activityTags }) 
             <CardBody>
                 <Stack mt='6' spacing='3'>
                     <Heading as='h3' size='md'>{name}</Heading>
-                    <HStack spacing='3'>
+                    <HStack wrap='wrap' spacing='3'>
                         {activityTags.map((tag) => (
                             <Tag key={tag} variant='outline'>
                                 {tag}

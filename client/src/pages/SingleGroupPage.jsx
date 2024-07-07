@@ -1,4 +1,4 @@
-import { Heading, Button, Flex, useDisclosure, IconButton, Tooltip, AvatarGroup, Avatar, useToast, Spinner, Menu, MenuButton, MenuList, MenuItem } from "@chakra-ui/react"
+import { Heading, Button, Flex, useDisclosure, IconButton, Tooltip, AvatarGroup, Avatar, useToast, Spinner, Menu, MenuButton, MenuList, MenuItem, Text, Tag, VStack, Divider } from "@chakra-ui/react"
 import { useContext, useEffect, useState } from "react"
 import { Link, Outlet, useNavigate, useParams } from "react-router-dom"
 import { FiEdit, FiChevronDown } from "react-icons/fi";
@@ -167,9 +167,9 @@ const SingleGroupPage = () => {
         (
             <>
 
-                <Flex justifyContent='space-between'>
+                <Flex direction={{ base: 'column', lg: 'row' }} justifyContent='space-between'>
 
-                    <Flex flexDirection='column' gap={2} mb={6}>
+                    <Flex maxWidth={{ base: '100%', lg: '70%' }} flexDirection='column' gap={2} mb={6}>
                         <Flex gap={2}>
                             <Heading mb='6' size='lg'>{group.name}</Heading>
 
@@ -180,12 +180,23 @@ const SingleGroupPage = () => {
                             )}
 
                         </Flex>
-                        <p>{group.description}</p>
+                        <Text>{group.description}</Text>
                     </Flex>
-                    <div>
-                        <p>Категория хоби : {group.category.name}</p>
-                        <p>Локация: {group.location.name}</p>
-                        <AvatarGroup size='md' max={2} cursor='pointer' onClick={groupMembersModal.onOpen}>
+                    <Flex direction='column' gap={2} alignItems={{ base: 'left', lg: 'center' }}>
+                        <Flex direction='column' gap={2}>
+                            <Tag size='lg'
+                                variant='outline'
+                                colorScheme="blue"
+                            >
+                                Категория хоби: {group.category.name}
+                            </Tag>
+                            <Tag size='lg'
+                                variant='outline'
+                                colorScheme="blue">
+                                Локация: {group.location.name}
+                            </Tag>
+                        </Flex>
+                        <AvatarGroup mt={2} size='md' max={2} cursor='pointer' onClick={groupMembersModal.onOpen}>
                             {group.members?.map((member) => (
                                 <Avatar
                                     key={member._id}
@@ -195,9 +206,10 @@ const SingleGroupPage = () => {
                             ))}
                         </AvatarGroup>
 
-                    </div>
+                    </Flex>
 
                 </Flex>
+                <Divider my={5} />
 
                 {/* update group modal */}
                 {editGroupDetailsModal.isOpen && <UpdateGroupModal
@@ -225,7 +237,7 @@ const SingleGroupPage = () => {
                     handleRemoveMember={handleRemoveMember}
                 />}
 
-                <Flex justifyContent='space-between'>
+                <Flex direction={{ base: 'column', sm: 'row' }} gap={5} justifyContent='space-between'>
                     <Flex gap={2}>
                         {
                             isMember
