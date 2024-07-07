@@ -1,14 +1,14 @@
-import { FormControl, FormErrorMessage, FormLabel, Input } from "@chakra-ui/react"
+import { FormControl, FormErrorMessage, FormLabel, Textarea } from "@chakra-ui/react"
 import { Field, useField } from "formik"
 
 
-const TextInput = ({ label, mt = 0, ...props }) => {
+const TextArea = ({ label, mt = 0, ...props }) => {
     const [field, meta] = useField(props);
     return (
         <FormControl mt={mt} id={props.name} isInvalid={meta.error && meta.touched}>
             <FormLabel>{label}</FormLabel>
             <Field
-                as={Input}
+                as={Textarea}
                 {...props}
             />
             <FormErrorMessage>
@@ -18,4 +18,4 @@ const TextInput = ({ label, mt = 0, ...props }) => {
     )
 }
 
-export default TextInput;
+export default TextArea;
