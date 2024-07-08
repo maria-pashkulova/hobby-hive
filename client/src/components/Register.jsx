@@ -15,7 +15,7 @@ import { Formik } from "formik";
 import { RegisterFormKeys } from '../formKeys/formKeys';
 import { registerFormSchema } from '../schemas/userAuthenticationSchema';
 
-import TextInput from './input-fields/TextInput';
+import CustomInput from './input-fields/CustomInput';
 import PasswordInput from './input-fields/PasswordInput';
 
 
@@ -86,19 +86,19 @@ const Register = () => {
 
             {({ isSubmitting, handleSubmit }) => (
                 <VStack as='form' spacing='5' onSubmit={handleSubmit} noValidate>
-                    <TextInput
+                    <CustomInput
                         type='text'
                         name={RegisterFormKeys.FirstName}
                         placeholder='Въведете име...'
                         label='Име'
                     />
-                    <TextInput
+                    <CustomInput
                         type='text'
                         name={RegisterFormKeys.LastName}
                         placeholder='Въведете фамилия...'
                         label='Фамилия'
                     />
-                    <TextInput
+                    <CustomInput
                         type='email'
                         name={RegisterFormKeys.Email}
                         placeholder='Въведете имейл...'

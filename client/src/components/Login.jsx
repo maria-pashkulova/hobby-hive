@@ -15,7 +15,7 @@ import { Formik } from 'formik';
 import { LoginFormKeys } from '../formKeys/formKeys';
 import { loginFormSchema } from '../schemas/userAuthenticationSchema';
 
-import TextInput from './input-fields/TextInput';
+import CustomInput from './input-fields/CustomInput';
 import PasswordInput from './input-fields/PasswordInput';
 
 
@@ -88,7 +88,7 @@ const Login = () => {
         >
             {({ isSubmitting, handleSubmit }) => (
                 <VStack as='form' spacing='5' onSubmit={handleSubmit} noValidate>
-                    <TextInput
+                    <CustomInput
                         type='email'
                         name={LoginFormKeys.Email}
                         placeholder='Въведете имейл...'
