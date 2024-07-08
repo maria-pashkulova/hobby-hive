@@ -7,12 +7,17 @@ const eventSchema = new mongoose.Schema({
     },
     description: {
         type: String,
-        maxLength: 300
+        maxLength: 300,
+        required: true
     },
     specificLocation: {
-        name: String,
+        name: {
+            type: String,
+            required: true
+        },
         coordinates: {
-            type: [Number]
+            type: [Number],
+            required: true
         }
     },
     time: {

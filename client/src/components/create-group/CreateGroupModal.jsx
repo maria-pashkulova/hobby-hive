@@ -15,7 +15,7 @@ import useFetchCategoriesAndLocations from "../../hooks/useFetchCategoriesAndLoc
 import usePreviewImage from "../../hooks/usePreviewImage";
 
 
-import TextInput from "../input-fields/TextInput";
+import CustomInput from "../input-fields/CustomInput";
 import CustomSelect from "../input-fields/CustomSelect";
 import TextArea from "../input-fields/TextArea";
 import UserBadgeItem from "../UserBadgeItem";
@@ -146,7 +146,7 @@ const CreateGroupModal = ({ isOpen, onClose, setRefetch, handleCurrentPageChange
                                     <Form>
                                         <ModalBody>
 
-                                            <TextInput
+                                            <CustomInput
                                                 type='text'
                                                 name={GroupKeys.Name}
                                                 placeholder='Име на групата'
