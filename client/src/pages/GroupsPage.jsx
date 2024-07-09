@@ -9,17 +9,13 @@ import CardsGrid from '../components/CardsGrid';
 import { Box, Button, Flex, FormControl, Input, Select, Spinner, Text, useToast } from '@chakra-ui/react';
 import useForm from '../hooks/useForm';
 
+import { GroupKeys } from '../formKeys/formKeys';
+
+
 import Pagination from '../components/Pagination';
 import Loading from '../components/Loading';
 import useFetchCategoriesAndLocations from '../hooks/useFetchCategoriesAndLocations';
 
-
-
-const FormKeys = {
-    Name: 'name',
-    Category: 'category',
-    Location: 'location'
-}
 
 const GROUPS_PER_PAGE = 3;
 
@@ -30,9 +26,9 @@ const GroupsPage = () => {
     const { logoutHandler } = useContext(AuthContext);
 
     const { formValues, onChange, resetForm } = useForm({
-        [FormKeys.Name]: '',
-        [FormKeys.Category]: '',
-        [FormKeys.Location]: ''
+        [GroupKeys.Name]: '',
+        [GroupKeys.Category]: '',
+        [GroupKeys.Location]: ''
     });
     const [groups, setGroups] = useState([]);
     const [currentPage, setCurrentPage] = useState(0);
@@ -57,7 +53,7 @@ const GroupsPage = () => {
     //FILTER AND GROUPS RELATED 
 
     //Fetch static data (categories and location) on initial mount
-    const { categoryOptions, locationOptions } = useFetchCategoriesAndLocations(resetForm);
+    const { categoryOptions, locationOptions } = useFetchCategoriesAndLocations();
 
 
     //Fetch paginated groups when current page changes
@@ -142,9 +138,9 @@ const GroupsPage = () => {
         const hasFormValuesChanged = Object.values(formValues).some(filterField => filterField !== '');
         if (hasFormValuesChanged) {
             resetForm({
-                [FormKeys.Name]: '',
-                [FormKeys.Category]: '',
-                [FormKeys.Location]: ''
+                [GroupKeys.Name]: '',
+                [GroupKeys.Category]: '',
+                [GroupKeys.Location]: ''
             });
         }
 
@@ -185,13 +181,13 @@ const GroupsPage = () => {
                             <FormControl>
                                 <Input
                                     placeholder='Потърсете група...'
-                                    name={[FormKeys.Name]}
-                                    value={formValues[FormKeys.Name]}
+                                    name={[GroupKeys.Name]}
+                                    value={formValues[GroupKeys.Name]}
                                     onChange={onChange}
                                 />
                             </FormControl>
                             <FormControl>
-                                <Select name={[FormKeys.Category]} value={formValues[FormKeys.Category]} onChange={onChange}>
+                                <Select name={[GroupKeys.Category]} value={formValues[GroupKeys.Category]} onChange={onChange}>
                                     <option value=''>Всички категории</option>
                                     {categoryOptions.map((option) => (
                                         <option key={option._id} value={option._id}>{option.name}</option>
@@ -199,7 +195,7 @@ const GroupsPage = () => {
                                 </Select>
                             </FormControl>
                             <FormControl>
-                                <Select name={[FormKeys.Location]} value={formValues[FormKeys.Location]} onChange={onChange}>
+                                <Select name={[GroupKeys.Location]} value={formValues[GroupKeys.Location]} onChange={onChange}>
                                     <option value=''>Всички локации</option>
                                     {locationOptions.map((option) => (
                                         <option key={option._id} value={option._id}>{option.name}</option>

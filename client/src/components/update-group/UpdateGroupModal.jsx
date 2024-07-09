@@ -7,15 +7,10 @@ import useFetchCategoriesAndLocations from '../../hooks/useFetchCategoriesAndLoc
 import usePreviewImage from '../../hooks/usePreviewImage';
 import { FiImage } from 'react-icons/fi';
 
+import { GroupKeys } from "../../formKeys/formKeys";
 import * as groupService from '../../services/groupService';
 import CreateMoreTagsInput from './CreateMoreTagsInput';
 
-const FormKeys = {
-    Name: 'name',
-    Category: 'category',
-    Location: 'location',
-    Description: 'description'
-}
 
 const UpdateGroupModal = ({ isOpen, onClose, groupIdToUpdate, name, category, location, description, activityTags, groupImg, handleUpdateGroupDetails }) => {
 
@@ -24,11 +19,11 @@ const UpdateGroupModal = ({ isOpen, onClose, groupIdToUpdate, name, category, lo
     //Make the form controlled
     //uploaded group image and new activity tags are managed separately
 
-    const { formValues, onChange, resetForm } = useForm({
-        [FormKeys.Name]: name,
-        [FormKeys.Category]: category,
-        [FormKeys.Location]: location,
-        [FormKeys.Description]: description,
+    const { formValues, onChange } = useForm({
+        [GroupKeys.Name]: name,
+        [GroupKeys.Category]: category,
+        [GroupKeys.Location]: location,
+        [GroupKeys.Description]: description,
     });
 
     const [currentImg, setCurrentImg] = useState(groupImg);
@@ -40,7 +35,7 @@ const UpdateGroupModal = ({ isOpen, onClose, groupIdToUpdate, name, category, lo
     }
 
     //fetch categories and locations from db
-    const { categoryOptions, locationOptions, loadingCategoriesAndLocations } = useFetchCategoriesAndLocations(resetForm, onClose);
+    const { categoryOptions, locationOptions, loadingCategoriesAndLocations } = useFetchCategoriesAndLocations(onClose);
     //preview the picture which user has uploaded from file system
     const { imageUrl, handleImageChange, handleImageDecline } = usePreviewImage();
     const imageRef = useRef(null);
@@ -130,14 +125,14 @@ const UpdateGroupModal = ({ isOpen, onClose, groupIdToUpdate, name, category, lo
                                     <FormLabel>Име</FormLabel>
                                     <Input
                                         placeholder='Име на групата'
-                                        name={[FormKeys.Name]}
-                                        value={formValues[FormKeys.Name]}
+                                        name={[GroupKeys.Name]}
+                                        value={formValues[GroupKeys.Name]}
                                         onChange={onChange} />
                                 </FormControl>
 
                                 <FormControl mt={4}>
                                     <FormLabel>Категория занимания</FormLabel>
-                                    <Select name={[FormKeys.Category]} value={formValues[FormKeys.Category]} onChange={onChange}>
+                                    <Select name={[GroupKeys.Category]} value={formValues[GroupKeys.Category]} onChange={onChange}>
                                         {categoryOptions.map((option) => (
                                             <option key={option._id} value={option._id}>{option.name}</option>
                                         ))}
@@ -146,7 +141,7 @@ const UpdateGroupModal = ({ isOpen, onClose, groupIdToUpdate, name, category, lo
 
                                 <FormControl mt={4}>
                                     <FormLabel>Основна локация</FormLabel>
-                                    <Select name={[FormKeys.Location]} value={formValues[FormKeys.Location]} onChange={onChange}>
+                                    <Select name={[GroupKeys.Location]} value={formValues[GroupKeys.Location]} onChange={onChange}>
                                         {locationOptions.map((option) => (
                                             <option key={option._id} value={option._id}>{option.name}</option>
                                         ))}
@@ -157,8 +152,8 @@ const UpdateGroupModal = ({ isOpen, onClose, groupIdToUpdate, name, category, lo
                                     <FormLabel>Описание</FormLabel>
                                     <Input
                                         placeholder='Описание'
-                                        name={[FormKeys.Description]}
-                                        value={formValues[FormKeys.Description]}
+                                        name={[GroupKeys.Description]}
+                                        value={formValues[GroupKeys.Description]}
                                         onChange={onChange} />
                                 </FormControl>
                                 <FormControl mt={4}>
