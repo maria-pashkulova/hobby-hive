@@ -99,7 +99,16 @@ exports.getById = async (groupId) => {
     return group;
 
 }
-// exports.getByIdWithEvents = (groupId) => this.getById(groupId).populate('events'); (child referencing approach)
+
+//used in groupMiddleware only
+exports.getByIdToValidate = (groupId) => {
+    const group = Group
+        .findById(groupId)
+        .select('_id members._id groupAdmin')
+        .lean();
+
+    return group;
+}
 
 exports.create = async (name, category, location, description, imageUrl, members, activityTags, currUser) => {
 

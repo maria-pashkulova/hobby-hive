@@ -3,9 +3,13 @@ const router = require('express').Router();
 //други routers:
 const eventController = require('./eventController');
 const postController = require('./postController');
+const chatController = require('./chatController');
+
 
 //middlewares
 const getGroup = require('../middlewares/groupMiddleware');
+const isMemberMiddleware = require('../middlewares/isMemberMiddleware');
+const isAdminMiddleware = require('../middlewares/isAdminMiddleware');
 
 const groupService = require('../services/groupService');
 
@@ -169,6 +173,10 @@ router.use('/:groupId/posts', getGroup, postController);
 
 //GROUP EVENTS
 router.use('/:groupId/events', getGroup, eventController);
+
+//GROUP CHAT
+
+router.use('/:groupId/chat', getGroup, isMemberMiddleware, chatController);
 
 
 
