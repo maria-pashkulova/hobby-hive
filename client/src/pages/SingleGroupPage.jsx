@@ -1,4 +1,4 @@
-import { Heading, Button, Flex, useDisclosure, IconButton, Tooltip, AvatarGroup, Avatar, useToast, Spinner, Menu, MenuButton, MenuList, MenuItem, Text, Tag, VStack, Divider } from "@chakra-ui/react"
+import { Heading, Button, Flex, useDisclosure, IconButton, Tooltip, AvatarGroup, Avatar, useToast, Spinner, Menu, MenuButton, MenuList, MenuItem, Text, Tag, VStack, Divider, useBreakpointValue } from "@chakra-ui/react"
 import { useContext, useEffect, useState } from "react"
 import { Link, Outlet, useNavigate, useParams } from "react-router-dom"
 import { FiEdit, FiChevronDown } from "react-icons/fi";
@@ -9,6 +9,11 @@ import AuthContext from '../contexts/authContext';
 import UpdateGroupModal from "../components/update-group/UpdateGroupModal";
 import GroupMembersModal from "../components/GroupMembersModal";
 
+import io from 'socket.io-client';
+const ENDPOINT = 'http://localhost:5000';
+
+//the socket has an on method and an emit method just like on the server
+let socket;
 
 const SingleGroupPage = () => {
 
@@ -25,6 +30,9 @@ const SingleGroupPage = () => {
 
     const editGroupDetailsModal = useDisclosure();
     const groupMembersModal = useDisclosure();
+
+    const showIcon = useBreakpointValue({ base: false, sm: true });
+
 
 
     //change members in the state when user adds other users successfully
@@ -157,6 +165,27 @@ const SingleGroupPage = () => {
 
     }, []);
 
+    useEffect(() => {
+        socket = io(ENDPOINT, {
+            auth: {
+                secret: 'This is a secret'
+            },
+            query: {
+                meaningOfLife: 42
+            }
+        });
+        socket.on('welcome', data => {
+            console.log(data);
+
+            //once welcome is emitted from the server, we run this callback
+            socket.emit('thankYou', [4, 5, 6]) //send event back to the server
+        })
+
+        socket.on('newClient', data => {
+            console.log('Message to all clients: A new socket has joined: ', data);
+        })
+    }, []);
+
     return loading ?
         (
             <Flex justifyContent={'center'}>
@@ -238,11 +267,14 @@ const SingleGroupPage = () => {
                 />}
 
                 <Flex direction={{ base: 'column', sm: 'row' }} gap={5} justifyContent='space-between'>
-                    <Flex gap={2}>
+                    <Flex
+                        gap={2}
+                        flexWrap={'wrap'}
+                    >
                         {
                             isMember
                                 ? (<Menu>
-                                    <MenuButton bgColor={"yellow.400"} as={Button} rightIcon={<FiChevronDown />} >
+                                    <MenuButton bgColor={"yellow.400"} as={Button} rightIcon={showIcon ? <FiChevronDown /> : null} >
                                         Публикации
                                     </MenuButton>
                                     <MenuList>
@@ -262,6 +294,12 @@ const SingleGroupPage = () => {
                                         <Button bgColor={"yellow.400"} onClick={handleJoinGroup} >Присъединяване</Button>
                                     </Tooltip>
                                 )
+                        }
+
+
+
+                        {
+                            isMember && (<Button width={{ base: '100%', sm: 'auto' }} bgColor={"yellow.400"} as={Link} to={`/groups/${groupId}/chat`}>Групов чат</Button>)
                         }
 
                     </Flex>
