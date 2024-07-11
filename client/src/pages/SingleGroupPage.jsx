@@ -9,11 +9,6 @@ import AuthContext from '../contexts/authContext';
 import UpdateGroupModal from "../components/update-group/UpdateGroupModal";
 import GroupMembersModal from "../components/GroupMembersModal";
 
-import io from 'socket.io-client';
-const ENDPOINT = 'http://localhost:5000';
-
-//the socket has an on method and an emit method just like on the server
-let socket;
 
 const SingleGroupPage = () => {
 
@@ -163,27 +158,6 @@ const SingleGroupPage = () => {
                 setLoading(false);
             })
 
-    }, []);
-
-    useEffect(() => {
-        socket = io(ENDPOINT, {
-            auth: {
-                secret: 'This is a secret'
-            },
-            query: {
-                meaningOfLife: 42
-            }
-        });
-        socket.on('welcome', data => {
-            console.log(data);
-
-            //once welcome is emitted from the server, we run this callback
-            socket.emit('thankYou', [4, 5, 6]) //send event back to the server
-        })
-
-        socket.on('newClient', data => {
-            console.log('Message to all clients: A new socket has joined: ', data);
-        })
     }, []);
 
     return loading ?

@@ -6,7 +6,7 @@ import { useNavigate, useOutletContext } from "react-router-dom";
 import AuthContext from "../contexts/authContext";
 
 
-const MessageInput = () => {
+const MessageInput = ({ handleNewMessages, socket }) => {
 
     const [groupId] = useOutletContext();
 
@@ -29,8 +29,10 @@ const MessageInput = () => {
 
             try {
                 const messageSent = await chatService.sendMessage(groupId, { content: newMessage });
+
+                socket.emit('new message', messageSent)
                 //update the local state immediately
-                //setMessages((prevMessages) => [...prevMessages, messageSent])
+                handleNewMessages(messageSent);
 
             } catch (error) {
                 if (error.status === 401) {

@@ -8,21 +8,49 @@ import AuthContext from "../../contexts/authContext";
 import './GroupChat.css';
 import ScrollableChat from "./ScrollableChat";
 
+import io from 'socket.io-client';
+const ENDPOINT = 'http://localhost:5000';
 
+//the socket has an on method and an emit method just like on the server
+let socket;
 
 const GroupChat = () => {
     const [groupId] = useOutletContext();
     const toast = useToast();
     const navigate = useNavigate();
-    const { logoutHandler } = useContext(AuthContext);
+    const { logoutHandler, userId } = useContext(AuthContext);
 
     const [messages, setMessages] = useState([]);
     const [loadingMessages, setLoadingMessages] = useState(true);
+    const [socketConnected, setSocketConnected] = useState(false);
 
+    const handleNewMessages = (messageSent) => {
+        setMessages((prevMessages) => [...prevMessages, messageSent])
+    }
+
+
+    //Create a new socket connection (tcp connection) on component mount
+    useEffect(() => {
+
+        socket = io(ENDPOINT);
+        socket.emit('setup', userId);
+        socket.on('connect', () => setSocketConnected(true))
+
+        // Cleanup function to run when the component unmounts
+        return () => {
+            socket.disconnect();
+        };
+
+    }, []);
+
+    //Get all group messages 
     useEffect(() => {
 
         chatService.getGroupChat(groupId)
-            .then(setMessages)
+            .then((groupMessages) => {
+                setMessages(groupMessages);
+                socket?.emit('join chat', groupId);
+            })
             .catch(error => {
                 if (error.status === 401) {
                     logoutHandler(); //invalid or missing token
@@ -43,6 +71,31 @@ const GroupChat = () => {
 
 
     }, []);
+
+
+    //Receive new message
+    //no dependency array - this useEffect should be executed every time the state (messages) updates - tutorial
+    useEffect(() => {
+
+        const handleMessageReceived = (newMessageReceived) => {
+            if (groupId !== newMessageReceived.groupId._id) {
+                // Give notification
+            } else {
+                //setMessages([...messages, newMessageReceived]);
+                //problematic without cleanup; works ok with or withoup dependancy array
+                setMessages((prevMessages) => [...prevMessages, newMessageReceived]);
+            }
+        };
+
+        socket?.on('message received', handleMessageReceived)
+
+
+        //Cleanup the event listener on component unmount or when groupId / socket changes
+        return () => {
+            socket?.off('message received', handleMessageReceived);
+        };
+    }, [socket, groupId])
+
 
     return (
         <Container
@@ -91,7 +144,7 @@ const GroupChat = () => {
 
             </Flex>
 
-            <MessageInput />
+            <MessageInput handleNewMessages={handleNewMessages} socket={socket} />
 
         </Container>
     )

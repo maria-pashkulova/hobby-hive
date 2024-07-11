@@ -10,6 +10,7 @@ exports.getAllGroupEvents = (groupId) => {
     //     end: { $lte: end.toDate() }
     // })
 
+    //TODO: check if group id is valid and if the current user is a member 
     const events = Event.find({ groupId }).lean();
 
     return events;

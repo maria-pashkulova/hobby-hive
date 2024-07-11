@@ -23,6 +23,11 @@ exports.createMessage = async (sender, content, groupId) => {
         .populate({
             path: 'sender',
             select: 'firstName lastName profilePic'
+        })
+    newMessage = await newMessage
+        .populate({
+            path: 'groupId',
+            select: ('members._id')
         });
 
     return newMessage;
