@@ -18,6 +18,7 @@ import GroupEvents from './components/GroupEvents.jsx';
 import GroupPosts from './components/GroupPosts.jsx';
 import UpdateProfilePage from './pages/UpdateProfilePage.jsx';
 import MyGroupPosts from './components/MyGroupPosts.jsx';
+import GroupChat from './components/group-chat/GroupChat.jsx';
 
 
 
@@ -38,6 +39,7 @@ function App() {
               <Route index element={<GroupPosts />} />
               <Route path='my-posts' element={<MyGroupPosts />} />
               <Route path='events' element={<GroupEvents />} />
+              <Route path='chat' element={<GroupChat />} />
             </Route>
             <Route path={'/logout'} element={<Logout />} />
           </Route >

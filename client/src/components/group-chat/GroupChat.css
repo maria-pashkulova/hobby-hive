@@ -1,0 +1,23 @@
+/* Scrollable feed from react-scrollable-feed librar is flex container 
+so each message is flex item and it can use alignSelf property 
+alignSelf value depends on if message is sent from the current logged in user
+or another user in the group
+*/
+.scrollable-feed {
+    display: flex;
+    flex-direction: column;
+
+    /* 
+    if messages cannot fit in the set fixed height of 400px 
+     vertical scroll is created
+    if messages fit in 400px height there is no scroll
+    App.css -> scrollbar display none 
+                */
+    overflow-y: auto;
+    height: 100%;
+    /* TODO: Note: If scrollbar-color and scrollbar-width are supported and have any value other than auto set,
+     they will override ::-webkit-scrollbar-* styling. 
+     See Adding a fallback for scrollbar styles for more details. */
+
+    scrollbar-width: none;
+}
