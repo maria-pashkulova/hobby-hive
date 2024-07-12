@@ -37,6 +37,7 @@ const expressServer = app.listen(process.env.PORT, () => console.log('Server is 
 
 //#Sockets
 const { Server } = require('socket.io'); //named export usage
+const userContext = new Map();
 
 //io is the socket.io server
 const io = new Server(expressServer, {
@@ -53,7 +54,7 @@ const io = new Server(expressServer, {
 
 //on listens for events, emit() sends events out
 io.on('connect', (socket) => {
-    // console.log(socket.handshake);
+    // console.log(socket.handshake); -> cookies
     // console.log(socket.id, 'has joined our server');
 
     //this will take the user data from the FE
@@ -62,16 +63,38 @@ io.on('connect', (socket) => {
         //this will create a room for the current user
         //the room will be exculsive for that particular user only
         socket.join(currUserId);
-        socket.emit('connected')
+        console.log(`Socket ${socket.id} logged in or re-opened browser window before token expiration`);
+
     })
 
     //this will take the room id from the FE
-    socket.on('join chat', (room) => {
-        //create a room with the id of the room
-        //when a user click on Group chat this should create a new room with thaht particular
+    //Handle user going on Group chat page
+    socket.on('join chat', (groupId) => {
+
+        if (!userContext.has(socket.id)) {
+            userContext.set(socket.id, { currentGroup: null });
+        }
+
+        const userInfo = userContext.get(socket.id);
+        userInfo.currentGroup = groupId;
+
+        //create a room with the id of the group
+        //when a user click on Group chat this should create a new room with that particular
         //user and other user as well. When other users join it is going to add them to this room
-        socket.join(room);
-        console.log('User Joined Room: ' + room);
+        socket.join(groupId);
+        console.log(`Socket ${socket.id} went to Group chat for group:  ${groupId}`);
+    })
+
+
+    // Handle user leaving a Group chat page
+    socket.on('leave group chat', (groupId) => {
+        const userInfo = userContext.get(socket.id);
+        if (userInfo) {
+            userInfo.currentGroup = null;
+        }
+
+        socket.leave(groupId);
+        console.log(`Socket ${socket.id} left Group chat: ${groupId}`);
     })
 
     //creates a new socket
@@ -79,33 +102,39 @@ io.on('connect', (socket) => {
     socket.on('new message', (newMessageReceived) => {
         const groupInfo = newMessageReceived.groupId;
 
-        // //for devs only
-        // if (!chat.users) return console.log('chat.users is not defined');
+        // Send the new message to users currently viewing the chat
+        socket.to(groupInfo._id).emit('message received', newMessageReceived);
 
-        //send the new message for each user in the current room except for the user
-        //who has just sent it
+        // Notify individual group members which are logged in
+        //and are not currently viewing group chat page
         groupInfo.members.forEach((member) => {
-            if (member._id === newMessageReceived.sender._id) return;
+            if (member._id !== newMessageReceived.sender._id) {
 
-            socket.in(member._id).emit('message received', newMessageReceived);
+                //get sockets in room with current members id
+                //if current member is not logged in, membersSockets is an empty array
+                const memberSockets = Array.from(io.sockets.sockets.values())
+                    .filter(s => s.rooms.has(member._id));
 
-        })
+                const isMemberViewingChat = memberSockets.some(s => {
+                    const userInfo = userContext.get(s.id);
+
+                    //userInfo has a value if user is viewing the chat page
+                    // userInfo.currentGroup === groupInfo._id - check if user is viewing the current group's chat or another one
+                    return userInfo && userInfo.currentGroup === groupInfo._id;
+                });
+
+                if (!isMemberViewingChat) {
+                    socket.to(member._id).emit('message notification', `message notification from ${groupInfo.name}`);
+                }
+
+            }
+        });
 
     })
 
-    //emit sends events specifically to the socket that has just connected
-    //first argument of emit is the event name - any name is ok, except for : https://socket.io/docs/v4/emit-cheatsheet/
-    //second argument - the data we want to send over
-    //socket.emit will emit to THIS one socket
-    // socket.emit('welcome', [1, 2, 3]); // push an event to the client
+    socket.on('disconnect', () => {
+        userContext.delete(socket.id);
+        console.log(socket.id + ' logged out or closed browser window');
+    })
 
-    //io.emit will emit to ALL sockes connected to the server
-    //any time someone connects we send out a message to everyone
-    //socket.id is the id of the socket that just joined
-    //Docs: emits an event to all connected clients in the main namespace
-    // io.emit('newClient', `${socket.id} just joined`);
-
-    // socket.on('thankYou', data => {
-    //     console.log('message from client: ', data);
-    // })
 })
