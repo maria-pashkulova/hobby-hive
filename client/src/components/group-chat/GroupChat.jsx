@@ -1,4 +1,4 @@
-import { Container, Divider, Flex, Skeleton, SkeletonCircle, Text, useToast } from "@chakra-ui/react"
+import { Container, Flex, Skeleton, SkeletonCircle, useToast } from "@chakra-ui/react"
 import MessageInput from "../MessageInput"
 import { useContext, useEffect, useState } from "react";
 
@@ -8,8 +8,8 @@ import AuthContext from "../../contexts/authContext";
 import './GroupChat.css';
 import ScrollableChat from "./ScrollableChat";
 
-import io from 'socket.io-client';
-const ENDPOINT = 'http://localhost:5000';
+// import io from 'socket.io-client';
+// const ENDPOINT = 'http://localhost:5000';
 
 //the socket has an on method and an emit method just like on the server
 let socket;
@@ -18,36 +18,22 @@ const GroupChat = () => {
     const [groupId] = useOutletContext();
     const toast = useToast();
     const navigate = useNavigate();
-    const { logoutHandler, userId } = useContext(AuthContext);
+    const { logoutHandler, socket } = useContext(AuthContext);
 
     const [messages, setMessages] = useState([]);
     const [loadingMessages, setLoadingMessages] = useState(true);
-    const [socketConnected, setSocketConnected] = useState(false);
+    // const [socketConnected, setSocketConnected] = useState(false);
 
     const handleNewMessages = (messageSent) => {
         setMessages((prevMessages) => [...prevMessages, messageSent])
     }
-
-
-    //Create a new socket connection (tcp connection) on component mount
-    useEffect(() => {
-
-        socket = io(ENDPOINT);
-        socket.emit('setup', userId);
-        socket.on('connect', () => setSocketConnected(true))
-
-        // Cleanup function to run when the component unmounts
-        return () => {
-            socket.disconnect();
-        };
-
-    }, []);
 
     //Get all group messages 
     useEffect(() => {
 
         chatService.getGroupChat(groupId)
             .then((groupMessages) => {
+                //if user has access to group messages he is 100% authenticated and is a member of group
                 setMessages(groupMessages);
                 socket?.emit('join chat', groupId);
             })
@@ -55,7 +41,11 @@ const GroupChat = () => {
                 if (error.status === 401) {
                     logoutHandler(); //invalid or missing token
                     navigate('/login');
-                } else {
+                } if (error.status === 403) {
+                    navigate(`/groups/${groupId}`);
+                }
+
+                else {
                     toast({
                         title: error.message,
                         status: "error",
@@ -70,21 +60,21 @@ const GroupChat = () => {
             })
 
 
+        // Cleanup function to run when the component unmounts
+        return () => {
+            socket.emit('leave group chat', groupId);
+        };
+
     }, []);
 
 
     //Receive new message
-    //no dependency array - this useEffect should be executed every time the state (messages) updates - tutorial
     useEffect(() => {
 
         const handleMessageReceived = (newMessageReceived) => {
-            if (groupId !== newMessageReceived.groupId._id) {
-                // Give notification
-            } else {
-                //setMessages([...messages, newMessageReceived]);
-                //problematic without cleanup; works ok with or withoup dependancy array
-                setMessages((prevMessages) => [...prevMessages, newMessageReceived]);
-            }
+
+            setMessages((prevMessages) => [...prevMessages, newMessageReceived]);
+
         };
 
         socket?.on('message received', handleMessageReceived)
@@ -95,6 +85,7 @@ const GroupChat = () => {
             socket?.off('message received', handleMessageReceived);
         };
     }, [socket, groupId])
+
 
 
     return (
