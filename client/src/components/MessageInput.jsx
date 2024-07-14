@@ -6,7 +6,7 @@ import { useNavigate, useOutletContext } from "react-router-dom";
 import AuthContext from "../contexts/authContext";
 
 
-const MessageInput = ({ handleNewMessages, socket }) => {
+const MessageInput = ({ handleNewMessages }) => {
 
     const [groupId] = useOutletContext();
 
@@ -20,7 +20,7 @@ const MessageInput = ({ handleNewMessages, socket }) => {
 
     const toast = useToast();
     const navigate = useNavigate();
-    const { logoutHandler } = useContext(AuthContext);
+    const { logoutHandler, socket } = useContext(AuthContext);
 
     const sendMessage = async (e) => {
         if (e.key === 'Enter' && newMessage) {

@@ -135,7 +135,7 @@ const GroupChat = () => {
 
             </Flex>
 
-            <MessageInput handleNewMessages={handleNewMessages} socket={socket} />
+            <MessageInput handleNewMessages={handleNewMessages} />
 
         </Container>
     )
