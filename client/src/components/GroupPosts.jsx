@@ -78,7 +78,7 @@ const GroupPosts = () => {
                     setFetchPostsAgain(false);
                 }
             })
-    }, [fetchPostsAgain]);
+    }, [fetchPostsAgain, groupId]);
 
     //Handle additional posts retrieval
     const fetchMorePosts = useCallback(async () => {

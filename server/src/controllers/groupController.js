@@ -42,8 +42,6 @@ router.get('/:groupId', async (req, res) => {
 
     try {
 
-        //ако въведа несъществуващо id се хврърля Mongoose грешка
-        //и приложението (server) спира да работи?
         const group = await groupService.getById(req.params.groupId);
 
         res.json(group);

@@ -65,7 +65,7 @@ const GroupChat = () => {
             socket.emit('leave group chat', groupId);
         };
 
-    }, []);
+    }, [groupId]);
 
 
     //Receive new message

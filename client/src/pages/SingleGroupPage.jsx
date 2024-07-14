@@ -158,7 +158,7 @@ const SingleGroupPage = () => {
                 setLoading(false);
             })
 
-    }, []);
+    }, [groupId]);
 
     return loading ?
         (
