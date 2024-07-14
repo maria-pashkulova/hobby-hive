@@ -3,6 +3,7 @@ import AuthContext from "../contexts/authContext";
 
 export default function useNotifications() {
     const [notifications, setNotifications] = useState([]);
+    const [notificationsCount, setNotificationsCount] = useState(0);
     const { socket } = useContext(AuthContext);
 
     // Receive message notification
@@ -17,8 +18,9 @@ export default function useNotifications() {
                 const hasGroupMessageNotification = prevNotifications
                     .some((currNotification) => currNotification.fromGroup === notification.fromGroup);
 
-                //If not, add the new notification
+                //If not, add the new notification; increment notifications count
                 if (!hasGroupMessageNotification) {
+                    setNotificationsCount((prevCount) => prevCount + 1)
                     return [notification, ...prevNotifications]
                 }
 
@@ -43,10 +45,15 @@ export default function useNotifications() {
 
     }
 
+    const handleHideNotificationIndicator = () => {
+        setNotificationsCount(0);
+    }
+
 
     return {
         notifications,
+        notificationsCount,
+        handleHideNotificationIndicator,
         handleMarkNotificationAsRead
-
     }
 }

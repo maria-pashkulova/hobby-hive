@@ -1,8 +1,8 @@
-import { Flex, Heading, IconButton, Box, Text, HStack, Avatar, Menu, MenuButton, MenuList, MenuItem, MenuDivider } from '@chakra-ui/react';
+import { Flex, Heading, IconButton, Box, Text, HStack, Avatar, Menu, MenuButton, MenuList, MenuItem, MenuDivider, Badge } from '@chakra-ui/react';
 
-import { FiMenu, FiChevronDown, FiBell } from "react-icons/fi";
+import { FiMenu, FiChevronDown, FiBell, FiX } from "react-icons/fi";
 import { Link } from 'react-router-dom';
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import AuthContext from '../../contexts/authContext';
 
 import useNotifications from '../../hooks/useNotifications';
@@ -11,7 +11,7 @@ import useNotifications from '../../hooks/useNotifications';
 const Header = ({ onOpen }) => {
 
     const { fullName, profilePic, userId } = useContext(AuthContext);
-    const { notifications, handleMarkNotificationAsRead } = useNotifications();
+    const { notifications, notificationsCount, handleHideNotificationIndicator, handleMarkNotificationAsRead } = useNotifications();
     const avatarKey = profilePic ? 'withImage' : 'withoutImage';
 
     return (
@@ -42,8 +42,6 @@ const Header = ({ onOpen }) => {
             {/* notifications bell and avatar*/}
 
             <HStack spacing={{ base: '1', md: '3' }}>
-                {/* TODO - put Menu dropdown for notifications */}
-
                 <Menu>
                     <MenuButton
                         p={2}
@@ -51,8 +49,23 @@ const Header = ({ onOpen }) => {
                         m={2}
                         _hover={{
                             background: 'gray.100',
-                        }}>
+                        }}
+                        position='relative'
+                        onClick={handleHideNotificationIndicator}
+                    >
+                        {notificationsCount !== 0 &&
+                            <Badge
+                                position='absolute'
+                                top="-10px"
+                                colorScheme="red"
+                                icon={<FiX />}
+                            >
+                                {notificationsCount}
+                            </Badge>
+
+                        }
                         <FiBell />
+
                     </MenuButton>
                     <MenuList>
                         {!notifications.length ?
