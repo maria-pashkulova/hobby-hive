@@ -5,10 +5,13 @@ import { Link } from 'react-router-dom';
 import { useContext } from 'react';
 import AuthContext from '../../contexts/authContext';
 
+import useNotifications from '../../hooks/useNotifications';
+
 
 const Header = ({ onOpen }) => {
 
     const { fullName, profilePic, userId } = useContext(AuthContext);
+    const { notifications, handleMarkNotificationAsRead } = useNotifications();
     const avatarKey = profilePic ? 'withImage' : 'withoutImage';
 
     return (
@@ -40,12 +43,40 @@ const Header = ({ onOpen }) => {
 
             <HStack spacing={{ base: '1', md: '3' }}>
                 {/* TODO - put Menu dropdown for notifications */}
-                <IconButton
-                    size="lg"
-                    variant="ghost"
-                    aria-label="open menu"
-                    icon={<FiBell />}
-                />
+
+                <Menu>
+                    <MenuButton
+                        p={2}
+                        borderRadius={4}
+                        m={2}
+                        _hover={{
+                            background: 'gray.100',
+                        }}>
+                        <FiBell />
+                    </MenuButton>
+                    <MenuList>
+                        {!notifications.length ?
+                            (<MenuItem>Нямате нови известия</MenuItem>)
+                            :
+                            notifications.map((notification) =>
+                            (<MenuItem
+                                as={Link}
+                                to={`/groups/${notification.fromGroup}/chat`}
+                                key={notification.uniqueIdentifier}
+                                onClick={() => {
+                                    handleMarkNotificationAsRead(notification.uniqueIdentifier);
+                                }}
+                            >
+
+                                {notification.notificationTitle}
+                            </MenuItem>)
+
+                            )
+                        }
+
+                    </MenuList>
+
+                </Menu>
                 <Menu>
                     <MenuButton py={2}>
                         <HStack >

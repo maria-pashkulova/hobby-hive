@@ -1,3 +1,5 @@
+//Used for styling chat UI
+
 export const isSameSender = (messages, m, i, userId) => {
     return (
         i < messages.length - 1 &&

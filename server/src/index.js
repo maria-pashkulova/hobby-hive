@@ -124,7 +124,11 @@ io.on('connect', (socket) => {
                 });
 
                 if (!isMemberViewingChat) {
-                    socket.to(member._id).emit('message notification', `message notification from ${groupInfo.name}`);
+                    socket.to(member._id).emit('message notification', {
+                        notificationTitle: `Ново съобщение в група: ${groupInfo.name}`,
+                        uniqueIdentifier: newMessageReceived._id, //used only for React unique key 
+                        fromGroup: groupInfo._id
+                    });
                 }
 
             }
@@ -134,6 +138,7 @@ io.on('connect', (socket) => {
 
     socket.on('disconnect', () => {
         userContext.delete(socket.id);
+        //the socket leaves all the rooms he joined (socket.join()) automatically
         console.log(socket.id + ' logged out or closed browser window');
     })
 
