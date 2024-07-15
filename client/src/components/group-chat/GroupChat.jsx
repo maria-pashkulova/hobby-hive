@@ -3,26 +3,25 @@ import MessageInput from "../MessageInput"
 import { useContext, useEffect, useState } from "react";
 
 import * as chatService from '../../services/chatService';
-import { useNavigate, useOutletContext } from "react-router-dom";
+import { Navigate, useNavigate, useOutletContext } from "react-router-dom";
 import AuthContext from "../../contexts/authContext";
 import './GroupChat.css';
 import ScrollableChat from "./ScrollableChat";
 
-// import io from 'socket.io-client';
-// const ENDPOINT = 'http://localhost:5000';
-
-//the socket has an on method and an emit method just like on the server
-let socket;
 
 const GroupChat = () => {
-    const [groupId] = useOutletContext();
+    const [groupId, isMember] = useOutletContext();
     const toast = useToast();
     const navigate = useNavigate();
     const { logoutHandler, socket } = useContext(AuthContext);
 
     const [messages, setMessages] = useState([]);
     const [loadingMessages, setLoadingMessages] = useState(true);
-    // const [socketConnected, setSocketConnected] = useState(false);
+
+    if (!isMember) {
+        return <Navigate to={`/groups/${groupId}`} />
+    }
+
 
     const handleNewMessages = (messageSent) => {
         setMessages((prevMessages) => [...prevMessages, messageSent])
