@@ -1,24 +1,28 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+
 import { Routes, Route } from 'react-router-dom';
+import { AuthProvider } from './contexts/authContext.jsx';
+
 import './App.css'
+
 import GuestLayout from './layouts/GuestLayout.jsx';
-import GroupsPage from './pages/GroupsPage';
 import AuthLayout from './layouts/AuthLayout.jsx';
+import ProtectedRouteMembers from './components/protected-route/ProtectedRouteMembers.jsx';
+
+import GroupsPage from './pages/GroupsPage';
 import MyGroupsPage from './pages/MyGroupsPage';
 import SingleGroupPage from './pages/SingleGroupPage';
 import Login from './components/Login.jsx';
 import Register from './components/Register.jsx';
 import Logout from './components/Logout';
 
-import { AuthProvider } from './contexts/authContext.jsx';
-import NotFoundPage from './components/NotFoundPage.jsx';
 import GroupEvents from './components/GroupEvents.jsx';
 import GroupPosts from './components/GroupPosts.jsx';
 import UpdateProfilePage from './pages/UpdateProfilePage.jsx';
 import MyGroupPosts from './components/MyGroupPosts.jsx';
 import GroupChat from './components/group-chat/GroupChat.jsx';
+import NotFoundPage from './components/NotFoundPage.jsx';
+
 
 
 
@@ -38,8 +42,10 @@ function App() {
             <Route path='/groups/:groupId' element={<SingleGroupPage />} >
               <Route index element={<GroupPosts />} />
               <Route path='my-posts' element={<MyGroupPosts />} />
-              <Route path='events' element={<GroupEvents />} />
-              <Route path='chat' element={<GroupChat />} />
+              <Route element={<ProtectedRouteMembers />}>
+                <Route path='events' element={<GroupEvents />} />
+                <Route path='chat' element={<GroupChat />} />
+              </Route>
             </Route>
             <Route path={'/logout'} element={<Logout />} />
           </Route >

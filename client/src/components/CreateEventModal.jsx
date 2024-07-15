@@ -2,7 +2,7 @@ import { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AuthContext from "../contexts/authContext";
 
-import { Button, FormControl, FormLabel, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Textarea, useToast } from "@chakra-ui/react"
+import { Button, FormControl, FormLabel, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Textarea, useToast } from "@chakra-ui/react"
 
 import { Form, Formik } from "formik";
 import { EventKeys } from "../formKeys/formKeys";
@@ -65,7 +65,7 @@ const CreateEventModal = ({ isOpen, onClose, groupId, activityTags }) => {
                     <ModalCloseButton />
                     <Formik
                         initialValues={{
-                            [EventKeys.Name]: '',
+                            [EventKeys.Title]: '',
                             [EventKeys.Description]: '',
                             [EventKeys.Time]: '',
                             [EventKeys.SpecificLocation]: {},
@@ -79,7 +79,7 @@ const CreateEventModal = ({ isOpen, onClose, groupId, activityTags }) => {
                                 <ModalBody>
                                     <CustomInput
                                         type='text'
-                                        name={EventKeys.Name}
+                                        name={EventKeys.Title}
                                         placeholder='Име на събитието'
                                         label='Име'
                                     />

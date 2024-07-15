@@ -18,11 +18,6 @@ const GroupChat = () => {
     const [messages, setMessages] = useState([]);
     const [loadingMessages, setLoadingMessages] = useState(true);
 
-    if (!isMember) {
-        return <Navigate to={`/groups/${groupId}`} />
-    }
-
-
     const handleNewMessages = (messageSent) => {
         setMessages((prevMessages) => [...prevMessages, messageSent])
     }
