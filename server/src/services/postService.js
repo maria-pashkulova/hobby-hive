@@ -96,21 +96,8 @@ exports.createPost = async (text, img, _ownerId, groupId) => {
 
     const group = await Group.findById(groupId);
 
-    if (!group) {
-        const error = new Error('Несъществуваща група за създаване на публикация!');
-        error.statusCode = 404;
-        throw error;
-    }
-
-    // проверка дали този който се опитва да създаде поста е член на групата
-
-    const isMember = group.members.find(member => member._id.toString() === _ownerId)
-
-    if (!isMember) {
-        const error = new Error('Не сте член на групата, за да създавате публикации в нея!');
-        error.statusCode = 403;
-        throw error;
-    }
+    //groupMiddleware guarantees that the group exists
+    //isMemberMiddleware guarantees that the current user is a member of the group he is trying to create post in
 
     if (img) {
         //if user uploaded a pic we upload it to cloudinary

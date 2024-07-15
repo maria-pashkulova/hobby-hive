@@ -10,7 +10,6 @@ exports.getAllGroupEvents = (groupId) => {
     //     end: { $lte: end.toDate() }
     // })
 
-    //TODO: check if group id is valid and if the current user is a member 
     const events = Event.find({ groupId }).lean();
 
     return events;
@@ -21,20 +20,7 @@ exports.create = async (name, description, specificLocation, time, activityTags,
 
     const group = await Group.findById(groupId);
 
-    if (!group) {
-        const error = new Error('Несъществуваща група за създаване на събитие!');
-        error.statusCode = 404;
-        throw error;
-    }
-
-    // проверка дали този който се опитва да създаде събитие е член на групата
-    const isMember = group.members.find(member => member._id.toString() === _ownerId)
-
-    if (!isMember) {
-        const error = new Error('Не сте член на групата, за да създавате събития в нея!');
-        error.statusCode = 403;
-        throw error;
-    }
+    //Group exists and current user is a member of the group - guaranteed by middlewaresp
 
     //TODO : валидиране на specificLocation - задължително трябва да има name и lat, lon
 

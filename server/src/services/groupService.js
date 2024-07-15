@@ -77,24 +77,13 @@ exports.getAll = async (name, category, location, page, limit) => {
 
 //findById is a Mongoose method - we use it instead monogodb's findOne()
 exports.getById = async (groupId) => {
-    let group;
 
-    //оптимизация -> не се правят заявки с невалидни objectId,
-    //а директно се хвърля грешка
-    if (mongoose.Types.ObjectId.isValid(groupId)) {
-        group = await Group
-            .findById(groupId)
-            .populate('category')
-            .populate('location')
-            .lean();
-    } else {
-        throw new Error('Групата не съществува!');
-    }
-
-    //валиден стринг objectId, но несъществуващ
-    if (!group) {
-        throw new Error('Групата не съществува!');
-    };
+    //groupId is valid - checked in groupMiddleware
+    const group = await Group
+        .findById(groupId)
+        .populate('category')
+        .populate('location')
+        .lean();
 
     return group;
 
@@ -186,25 +175,16 @@ exports.create = async (name, category, location, description, imageUrl, members
     return newGroupWithSelectedFields;
 }
 
-exports.update = async (groupIdToEdit, currUserId, name, category, location, description, addedActivityTags, newImg, currImg) => {
+exports.update = async (groupIdToUpdate, isCurrUserGroupAdmin, name, category, location, description, addedActivityTags, newImg, currImg) => {
 
-    //1.Check if group exists
-    if (!mongoose.Types.ObjectId.isValid(groupIdToEdit)) {
-        throw new Error('Несъществуваща група!');
-    }
+    //groupIdToEdit is valid - checked in groupMiddleware
     //currUserId is valid and existing user (checked in authMiddleware!)
 
-    const group = await Group.findById(groupIdToEdit).select('name category location description imageUrl activityTags groupAdmin')
-
-    if (!group) {
-        const error = new Error('Несъществуваща група!');
-        error.statusCode = 404;
-        throw error;
-    }
+    const group = await Group.findById(groupIdToUpdate).select('name category location description imageUrl activityTags groupAdmin')
 
     //2. Check if current user is group admin
 
-    if (group.groupAdmin.toString() !== currUserId) {
+    if (!isCurrUserGroupAdmin) {
         const error = new Error('Само администраторът на групата може да редактира нейните детайли!');
         error.statusCode = 403;
         throw error;
@@ -289,13 +269,10 @@ exports.update = async (groupIdToEdit, currUserId, name, category, location, des
     return populatedGroup;
 }
 
-//TODO - or archive group?
-exports.delete = (groupId) => Group.findByIdAndDelete(groupId);
-
 
 //JOIN GROUP / ADD ANOTHER MEMBER TO A GROUP
 exports.addMember = async (groupId, userIdToAdd, currUserId) => {
-    if (!mongoose.Types.ObjectId.isValid(userIdToAdd) || !mongoose.Types.ObjectId.isValid(groupId)) {
+    if (!mongoose.Types.ObjectId.isValid(userIdToAdd)) {
         throw new Error('Неуспешно добавяне на член!');
     }
 
@@ -309,15 +286,10 @@ exports.addMember = async (groupId, userIdToAdd, currUserId) => {
     }
 
     // if member exist, check if member is already in the group
-    //find group in the db
-    const group = await Group.findById(groupId);
+    //find group in the db 
+    //groupId is valid - checked in groupMiddleware
 
-    //check if group exists
-    if (!group) {
-        const error = new Error('Не съществува такава група!');
-        error.statusCode = 404;
-        throw error;
-    }
+    const group = await Group.findById(groupId);
 
     //опит за добавяне на друг потребител - изисква се текущия потребител да бъде член на групата
     if (userIdToAdd !== currUserId) {
@@ -364,9 +336,9 @@ exports.addMember = async (groupId, userIdToAdd, currUserId) => {
 
 //LEAVE A GROUP
 //REMOVE ANOTHER MEMBER FROM A GROUP - само администратора на групата може да премахва потребители от групата
-exports.removeMember = async (groupId, userIdToRemove, currUserId) => {
+exports.removeMember = async (groupId, userIdToRemove, currUserId, isCurrUserGroupAdmin) => {
 
-    if (!mongoose.Types.ObjectId.isValid(userIdToRemove) || !mongoose.Types.ObjectId.isValid(groupId)) {
+    if (!mongoose.Types.ObjectId.isValid(userIdToRemove)) {
         throw new Error('Неуспешно премахване на член!');
     }
 
@@ -381,17 +353,9 @@ exports.removeMember = async (groupId, userIdToRemove, currUserId) => {
 
     // if member exist, check if member is a member of the group - required for him to leave!
     //find group in the db
+    //groupId - checked in groupMiddleware
     //TODO: select only needed fields for optimized DB query
     const group = await Group.findById(groupId);
-
-    //check if group exists
-    if (!group) {
-        const error = new Error('Не съществува такава група!');
-        error.statusCode = 404;
-        throw error;
-    }
-
-    const isCurrUserGroupAdmin = group.groupAdmin.toString() === currUserId;
 
     //опит за премахване на друг потребител
     if (userIdToRemove !== currUserId && !isCurrUserGroupAdmin) {

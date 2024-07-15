@@ -38,7 +38,7 @@ router.get('/', async (req, res) => {
 });
 
 
-router.get('/:groupId', async (req, res) => {
+router.get('/:groupId', getGroup, async (req, res) => {
 
     try {
 
@@ -86,10 +86,10 @@ router.post('/', async (req, res) => {
 });
 
 //UPDATE GROUP DETAILS
-router.put('/:groupId', async (req, res) => {
+router.put('/:groupId', getGroup, isAdminMiddleware, async (req, res) => {
 
-    const currUserId = req.user._id;
     const groupIdToUpdate = req.params.groupId;
+    const isCurrUserGroupAdmin = req.isAdmin;
     const { name, category, location, description, addedActivityTags, newImg, currImg } = req.body;
 
     if (!name || !category || !location) {
@@ -97,7 +97,7 @@ router.put('/:groupId', async (req, res) => {
     }
 
     try {
-        const updatedGroup = await groupService.update(groupIdToUpdate, currUserId, name, category, location, description, addedActivityTags, newImg, currImg);
+        const updatedGroup = await groupService.update(groupIdToUpdate, isCurrUserGroupAdmin, name, category, location, description, addedActivityTags, newImg, currImg);
 
         res.status(200).json(updatedGroup);
 
@@ -111,17 +111,9 @@ router.put('/:groupId', async (req, res) => {
 
 });
 
-//DELETE
-router.delete('/:groupId', async (req, res) => {
-
-    await groupService.delete(req.params.groupId);
-    res.status(204).end();
-});
-
-
 //JOIN GROUP / ADD ANOTHER MEMBER TO A GROUP
 
-router.put('/:groupId/addMember', async (req, res) => {
+router.put('/:groupId/addMember', getGroup, async (req, res) => {
     const groupId = req.params.groupId;
     //текущо вписания потребител
     const currUserId = req.user._id;
@@ -141,15 +133,16 @@ router.put('/:groupId/addMember', async (req, res) => {
 });
 
 //REMOVE MEMBER FROM A GROUP - само администратора на групата може да премахва потребители от групата
-router.put('/:groupId/removeMember', async (req, res) => {
+router.put('/:groupId/removeMember', getGroup, isAdminMiddleware, async (req, res) => {
     const groupId = req.params.groupId;
+    const isCurrUserGroupAdmin = req.isAdmin;
     //текущо вписания потребител
     const currUserId = req.user._id;
     //_id - id на потребителят, който желаем да премахнем
     const { _id } = req.body;
 
     try {
-        await groupService.removeMember(groupId, _id, currUserId);
+        await groupService.removeMember(groupId, _id, currUserId, isCurrUserGroupAdmin);
         res.status(200).json({
             message: 'Успешно премахнахте член от групата.'
         })
@@ -168,12 +161,12 @@ router.put('/:groupId/removeMember', async (req, res) => {
 router.use('/:groupId/posts', getGroup, postController);
 
 
+//Only group members have access to group events and chat -> isMemberMiddleware
 
 //GROUP EVENTS
-router.use('/:groupId/events', getGroup, eventController);
+router.use('/:groupId/events', getGroup, isMemberMiddleware, eventController);
 
 //GROUP CHAT
-
 router.use('/:groupId/chat', getGroup, isMemberMiddleware, chatController);
 
 
