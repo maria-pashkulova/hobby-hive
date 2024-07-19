@@ -1,13 +1,12 @@
-import { useNavigate, useOutletContext, useParams } from 'react-router-dom';
+import { Navigate, useNavigate, useOutletContext, useParams } from 'react-router-dom';
 import { useContext, useEffect, useState } from 'react';
 import * as eventService from '../services/eventService';
 import AuthContext from '../contexts/authContext';
-import { Box, Button, Container, useDisclosure } from '@chakra-ui/react';
-import { FiPlus } from 'react-icons/fi';
+import { useDisclosure } from '@chakra-ui/react';
 import CreateEventModal from './CreateEventModal';
-import EventCard from './EventCard';
 
-import formatDateInTimeZone from '../utils/formatDate';
+
+import GroupEventsCalendar from './eventCalendar/GroupEventsCalendar';
 
 const GroupEvents = () => {
 
@@ -17,8 +16,7 @@ const GroupEvents = () => {
     const { isOpen, onOpen, onClose } = useDisclosure();
 
     const [groupEvents, setGroupEvents] = useState([]);
-
-    const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const [selectedDate, setSelectedDate] = useState('');
 
     useEffect(() => {
         eventService.getGroupEvents(groupId)
@@ -39,23 +37,17 @@ const GroupEvents = () => {
 
     }, [groupId]);
 
+    // Handler to update selected date and open modal
+    const handleDateClick = (date) => {
+        setSelectedDate(date);
+        onOpen();
+    };
+
     //може би тази заявка трябва да се изпълни чак след като се намери успешно група
     //ако това е възможно изобщо да хвърли грешка, то ще се хване от catch?
     return (
-        <Box>
-            {isMember && (<Button
-                position='fixed'
-                bottom={10}
-                right={4}
-                d='flex'
-                size={{ base: 'sm', sm: 'md' }}
-                leftIcon={<FiPlus />}
-                onClick={onOpen}
-                zIndex={1}
-            >
-                Ново събитие
-            </Button>)
-            }
+        <>
+
 
             {
                 isOpen && <CreateEventModal
@@ -63,30 +55,16 @@ const GroupEvents = () => {
                     onClose={onClose}
                     groupId={groupId}
                     activityTags={activityTags}
+                    selectedDate={selectedDate}
                 />
             }
 
-            <Container maxW='80vw' mt={5}>
-                {
-                    groupEvents.length > 0 ?
+            <GroupEventsCalendar
+                groupEvents={groupEvents}
+                onDateClick={handleDateClick}
+            />
+        </>
 
-                        (groupEvents.map(event => (
-                            <EventCard
-                                key={event._id}
-                                name={event.name}
-                                description={event.description}
-                                specificLocation={event.specificLocation.name}
-                                time={formatDateInTimeZone(event.time, timeZone)}
-                                activityTags={event.activityTags}
-                            />))
-                        )
-
-                        : (<p>Все още няма събития в групата</p>)
-
-                }
-
-            </Container>
-        </Box>
     )
 }
 

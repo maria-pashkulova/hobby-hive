@@ -1,3 +1,4 @@
+//used for event cards; no needed in fullcalendar it formats it automatically according to locale prop of FullCalendar
 
 const formatDateInTimezone = (utcDateString, timeZone) => {
     const date = new Date(utcDateString); // Parse UTC date string-  create a JavaScript Date object from the UTC date string 
