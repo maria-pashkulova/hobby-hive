@@ -55,7 +55,7 @@ const MessageInput = ({ handleNewMessages }) => {
     const handleTyping = (e) => {
         setNewMessage(e.target.value);
 
-        //typing indicator logic
+        //TODO add typing indicator logic
 
     }
 

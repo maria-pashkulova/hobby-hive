@@ -1,7 +1,8 @@
 import { Box, Circle, Divider, Text } from "@chakra-ui/react";
 import { FiMapPin } from "react-icons/fi";
+import { getLocationData } from '../utils/getLocationData';
 
-const LocationItem = ({ name, selectLocation }) => {
+const LocationItem = ({ location, selectLocation }) => {
     return (
         <>
             <Box
@@ -17,7 +18,7 @@ const LocationItem = ({ name, selectLocation }) => {
                 <Circle size='40px' bg='tomato' color='white'>
                     <FiMapPin />
                 </Circle>
-                <Text>{name}</Text>
+                <Text>{getLocationData(location)}</Text>
 
             </Box>
             <Divider />
