@@ -20,10 +20,11 @@ export const GroupKeys = {
 }
 
 export const EventKeys = {
-    Name: 'name',
+    Title: 'title',
     Description: 'description',
     Location: 'specificLocation',
-    Time: 'time',
+    StartDateTime: 'start',
+    EndDateTime: 'end',
     SpecificLocation: 'specificLocation',
     ActivityTags: 'activityTags'
 }

@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const eventSchema = new mongoose.Schema({
-    name: {
+    title: {
         type: String,
         required: true
     },
@@ -13,14 +13,18 @@ const eventSchema = new mongoose.Schema({
     specificLocation: {
         name: {
             type: String,
-            required: true
+            default: 'Не е зададена локация за събитието'
         },
         coordinates: {
             type: [Number],
-            required: true
+            default: [],
         }
     },
-    time: {
+    start: {
+        type: Date,
+        required: true
+    },
+    end: {
         type: Date,
         required: true
     },

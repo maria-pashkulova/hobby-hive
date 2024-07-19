@@ -16,7 +16,7 @@ exports.getAllGroupEvents = (groupId) => {
 }
 
 //status?
-exports.create = async (name, description, specificLocation, time, activityTags, groupId, _ownerId) => {
+exports.create = async (title, description, specificLocation, start, end, activityTags, groupId, _ownerId) => {
 
     const group = await Group.findById(groupId);
 
@@ -38,10 +38,11 @@ exports.create = async (name, description, specificLocation, time, activityTags,
 
     //TODO: add validation here
     const newEventData = {
-        name,
+        title,
         description,
         specificLocation,
-        time,
+        start,
+        end,
         activityTags,
         groupId,
         _ownerId

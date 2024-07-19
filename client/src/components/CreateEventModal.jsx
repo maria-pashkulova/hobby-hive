@@ -2,7 +2,7 @@ import { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AuthContext from "../contexts/authContext";
 
-import { Button, FormControl, FormLabel, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Textarea, useToast } from "@chakra-ui/react"
+import { Button, FormControl, FormLabel, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, useToast } from "@chakra-ui/react"
 
 import { Form, Formik } from "formik";
 import { EventKeys } from "../formKeys/formKeys";
@@ -16,7 +16,7 @@ import CustomInput from "./input-fields/CustomInput";
 import TextArea from "./input-fields/TextArea";
 
 
-const CreateEventModal = ({ isOpen, onClose, groupId, activityTags }) => {
+const CreateEventModal = ({ isOpen, onClose, groupId, activityTags, selectedDate }) => {
 
     const tagsOptions = activityTags.map(tag => ({ label: tag, value: tag }));
 
@@ -24,12 +24,17 @@ const CreateEventModal = ({ isOpen, onClose, groupId, activityTags }) => {
     const navigate = useNavigate();
     const { logoutHandler } = useContext(AuthContext);
 
+
     //Controlled and validated form using Formik and Yup
     const handleFormSubmit = async (formValues) => {
-
         try {
             const newEvent = await eventService.createEvent(groupId, formValues);
+
+            //TODO: socket.emit('new event', newEvent); -> notify group members for new event
+            //TODO: receive handler to update localStatefrom GroupEvents.jsx 
+
             onClose();
+
             toast({
                 title: "Успешно създадохте събитие!",
                 status: "success",
@@ -50,7 +55,9 @@ const CreateEventModal = ({ isOpen, onClose, groupId, activityTags }) => {
                     position: "bottom",
                 });
             }
+
         }
+
 
     }
 
@@ -67,7 +74,8 @@ const CreateEventModal = ({ isOpen, onClose, groupId, activityTags }) => {
                         initialValues={{
                             [EventKeys.Title]: '',
                             [EventKeys.Description]: '',
-                            [EventKeys.Time]: '',
+                            [EventKeys.StartDateTime]: selectedDate,
+                            [EventKeys.EndDateTime]: '',
                             [EventKeys.SpecificLocation]: {},
                             [EventKeys.ActivityTags]: []
                         }}
@@ -75,7 +83,7 @@ const CreateEventModal = ({ isOpen, onClose, groupId, activityTags }) => {
                         onSubmit={handleFormSubmit}
                     >
                         {({ isSubmitting, setFieldValue }) => (
-                            <Form>
+                            <Form noValidate>
                                 <ModalBody>
                                     <CustomInput
                                         type='text'
@@ -95,8 +103,15 @@ const CreateEventModal = ({ isOpen, onClose, groupId, activityTags }) => {
 
                                     <CustomInput
                                         type='datetime-local'
-                                        name={EventKeys.Time}
-                                        label='Дата и час'
+                                        name={EventKeys.StartDateTime}
+                                        label='Кога започва събитието'
+                                        mt={4}
+                                    />
+
+                                    <CustomInput
+                                        type='datetime-local'
+                                        name={EventKeys.EndDateTime}
+                                        label='Кога приключва събитието'
                                         mt={4}
                                     />
 
@@ -130,6 +145,7 @@ const CreateEventModal = ({ isOpen, onClose, groupId, activityTags }) => {
                                         Отмяна
                                     </Button>
                                 </ModalFooter>
+
                             </Form>
                         )}
 
