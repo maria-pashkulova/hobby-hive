@@ -6,6 +6,7 @@ import { useState } from "react";
 import { useFormikContext } from "formik";
 import { EventKeys } from "../formKeys/formKeys";
 import { getLocationData } from '../utils/getLocationData';
+import checkIsObjectEmpty from "../utils/checkIsObjectEmpty";
 
 const OPENSTREET_MAP_BASE_URL = 'https://nominatim.openstreetmap.org/search?';
 
@@ -18,7 +19,7 @@ const SearchLocation = () => {
     const [loadingSearchOpenstreetApi, setLoadingSearchOpenstreetApi] = useState(false);
     const toast = useToast();
 
-    const { values, setFieldValue } = useFormikContext();
+    const { values, setFieldValue, errors } = useFormikContext();
 
 
     const handleSearchLocation = () => {
@@ -67,12 +68,12 @@ const SearchLocation = () => {
 
     //Form's filed specificLocation is set only if user selects an option from Openstreet map results
     const handleSelectLocation = (location) => {
-        //location.address.county - use for validation
         const locationData = getLocationData(location);
 
         //TODO: regionCity: location.address.county -- use openstreet map for reverse geocoding -> (lat,lon) to get location's county
         setFieldValue(EventKeys.SpecificLocation, {
             name: locationData,
+            locationRegionCity: location.address.county, //used for FE valion with Yup
             coordinates: [Number(location.lat), Number(location.lon)]
         });
 
@@ -97,7 +98,7 @@ const SearchLocation = () => {
         if (value === '') {
 
             //reset specificLocation only if it is not an empty object (a user has selected location, not just typing and deleting chars)
-            if (Object.keys(values[EventKeys.SpecificLocation]).length > 0) {
+            if (!checkIsObjectEmpty(values[EventKeys.SpecificLocation])) {
                 setFieldValue(EventKeys.SpecificLocation, {}); // Reset specificLocation field when search input is cleared
             }
 
@@ -110,7 +111,7 @@ const SearchLocation = () => {
 
     return (
         <>
-            <FormControl my={4} isInvalid={requiredSearchValueErr}>
+            <FormControl my={4} isInvalid={errors[EventKeys.SpecificLocation] || requiredSearchValueErr}>
                 <FormLabel>Потърси локация</FormLabel>
                 <FormHelperText mb={4} color={'teal.600'}>
                     * В случай че не намирате желаната от Вас локация, дайте детайли за нея в описанието на събитието.
@@ -134,8 +135,10 @@ const SearchLocation = () => {
 
                 </InputGroup>
 
-                <FormErrorMessage>Въведете локация за търсене</FormErrorMessage>
-
+                {requiredSearchValueErr && <FormErrorMessage>Въведете локация за търсене</FormErrorMessage>}
+                <FormErrorMessage>
+                    {errors[EventKeys.SpecificLocation]}
+                </FormErrorMessage>
             </FormControl >
 
 

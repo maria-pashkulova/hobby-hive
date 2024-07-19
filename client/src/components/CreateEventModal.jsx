@@ -16,7 +16,7 @@ import CustomInput from "./input-fields/CustomInput";
 import TextArea from "./input-fields/TextArea";
 
 
-const CreateEventModal = ({ isOpen, onClose, groupId, activityTags, selectedDate }) => {
+const CreateEventModal = ({ isOpen, onClose, groupId, groupRegionCity, activityTags, selectedDate }) => {
 
     const tagsOptions = activityTags.map(tag => ({ label: tag, value: tag }));
 
@@ -79,7 +79,7 @@ const CreateEventModal = ({ isOpen, onClose, groupId, activityTags, selectedDate
                             [EventKeys.SpecificLocation]: {},
                             [EventKeys.ActivityTags]: []
                         }}
-                        validationSchema={eventSchema}
+                        validationSchema={eventSchema(groupRegionCity)}
                         onSubmit={handleFormSubmit}
                     >
                         {({ isSubmitting, setFieldValue }) => (

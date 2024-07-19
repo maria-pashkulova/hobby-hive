@@ -4,14 +4,12 @@ import * as eventService from '../services/eventService';
 import AuthContext from '../contexts/authContext';
 import { useDisclosure } from '@chakra-ui/react';
 import CreateEventModal from './CreateEventModal';
-
-
 import GroupEventsCalendar from './eventCalendar/GroupEventsCalendar';
 
 const GroupEvents = () => {
 
     const navigate = useNavigate();
-    const [groupId, isMember, activityTags] = useOutletContext();
+    const [groupId, isMember, activityTags, groupRegionCity] = useOutletContext();
     const { logoutHandler } = useContext(AuthContext);
     const { isOpen, onOpen, onClose } = useDisclosure();
 
@@ -54,6 +52,7 @@ const GroupEvents = () => {
                     isOpen={isOpen}
                     onClose={onClose}
                     groupId={groupId}
+                    groupRegionCity={groupRegionCity}
                     activityTags={activityTags}
                     selectedDate={selectedDate}
                 />

@@ -1,10 +1,12 @@
 import * as yup from "yup";
 import { EventKeys } from "../formKeys/formKeys";
 import { isSameDay } from "date-fns";
+import checkIsObjectEmpty from "../utils/checkIsObjectEmpty";
+import normalizeRegionName from "../utils/normalizeRegionName";
 
 const MINIMUM_EVENT_DURATION_MINUTES = 30;
 
-export const eventSchema = yup.object().shape({
+export const eventSchema = (groupRegionCity) => yup.object().shape({
     [EventKeys.Title]: yup.string().trim().required('Името на събитието е задължително!'),
     [EventKeys.Description]: yup.string().trim().required('Опишете дейността на събитието!').max(300, 'Описанието е твърде дълго!'),
     [EventKeys.StartDateTime]: yup
@@ -49,6 +51,17 @@ export const eventSchema = yup.object().shape({
                 }
 
                 return true; //if the event will take multiple days return true
+            }
+        ),
+    [EventKeys.SpecificLocation]: yup
+        .object()
+        .test(
+            'validate-location-region-city',
+            `Локацията трябва да бъде в област ${groupRegionCity}`,
+            function (specificLocation) {
+                if (checkIsObjectEmpty(specificLocation)) return true;
+
+                return normalizeRegionName(specificLocation.locationRegionCity) === groupRegionCity;
             }
         )
 });
