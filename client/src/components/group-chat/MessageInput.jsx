@@ -1,9 +1,9 @@
 import { FormControl, Input, InputGroup, InputRightElement, useBreakpointValue, useToast } from "@chakra-ui/react"
 import { useContext, useState } from "react";
 import { FiSend } from "react-icons/fi";
-import * as chatService from '../services/chatService';
+import * as chatService from '../../services/chatService';
 import { useNavigate, useOutletContext } from "react-router-dom";
-import AuthContext from "../contexts/authContext";
+import AuthContext from "../../contexts/authContext";
 
 
 const MessageInput = ({ handleNewMessages }) => {

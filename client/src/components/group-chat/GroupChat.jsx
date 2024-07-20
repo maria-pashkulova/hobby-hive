@@ -1,5 +1,5 @@
 import { Container, Flex, Skeleton, SkeletonCircle, useToast } from "@chakra-ui/react"
-import MessageInput from "../MessageInput"
+import MessageInput from "./MessageInput"
 import { useContext, useEffect, useState } from "react";
 
 import * as chatService from '../../services/chatService';
@@ -18,6 +18,8 @@ const GroupChat = () => {
     const [messages, setMessages] = useState([]);
     const [loadingMessages, setLoadingMessages] = useState(true);
 
+
+    //Add new message to the local state of the user who sends a message
     const handleNewMessages = (messageSent) => {
         setMessages((prevMessages) => [...prevMessages, messageSent])
     }
@@ -54,7 +56,7 @@ const GroupChat = () => {
             })
 
 
-        // Cleanup function to run when the component unmounts
+        // Cleanup function to run when the component unmounts or groupId changes
         return () => {
             socket.emit('leave group chat', groupId);
         };
@@ -62,7 +64,7 @@ const GroupChat = () => {
     }, [groupId]);
 
 
-    //Receive new message
+    //Receive new message (for all group members currently viewing the chat in which a message was sent (except the member who has sent it))
     useEffect(() => {
 
         const handleMessageReceived = (newMessageReceived) => {
@@ -74,7 +76,7 @@ const GroupChat = () => {
         socket?.on('message received', handleMessageReceived)
 
 
-        //Cleanup the event listener on component unmount or when groupId / socket changes
+        //Cleanup the event listener on component unmount or when groupId / socket changes and use effect is triggered again
         return () => {
             socket?.off('message received', handleMessageReceived);
         };
