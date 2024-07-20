@@ -10,33 +10,46 @@ export default function useNotifications() {
     useEffect(() => {
 
         //*hook with state dependencies -> use functional update form of setState() to avoid stale state closure problem!
-        const handleMessageNotification = (notification) => {
+        const handleNotification = (notification) => {
 
             setNotifications((prevNotifications) => {
-                /* If there is no message notification for a particular group by now, then display the message notification 
-                           - update state and trigger UI changes in Header (Bell icon)*/
-                const hasGroupMessageNotification = prevNotifications
-                    .some((currNotification) => currNotification.fromGroup === notification.fromGroup);
 
-                //If not, add the new notification; increment notifications count
-                if (!hasGroupMessageNotification) {
+                // Check if the notification is for a message or an event
+                const isMessageNotification = notification.type === 'message';
+                const isEventNotification = notification.type === 'event';
+
+                if (isMessageNotification) {
+                    /* If there is no message notification for a particular group by now, then display the message notification 
+                             - update state and trigger UI changes in Header (Bell icon)*/
+                    const hasGroupMessageNotification = prevNotifications
+                        .some((currNotification) => currNotification.type === 'message' && currNotification.fromGroup === notification.fromGroup);
+
+                    //If not, add the new notification; increment notifications count
+                    if (!hasGroupMessageNotification) {
+                        setNotificationsCount((prevCount) => prevCount + 1)
+                        return [notification, ...prevNotifications]
+                    }
+
+                } else if (isEventNotification) {
                     setNotificationsCount((prevCount) => prevCount + 1)
-                    return [notification, ...prevNotifications]
+                    return [notification, ...prevNotifications];
                 }
 
-                //Otherwise, return the previous notifications unchanged
+                //Otherwise, return the previous notifications unchanged - notification type is message and there already is a message notification from the current group
                 return prevNotifications;
 
             });
 
         };
 
-        socket?.on('message notification', handleMessageNotification);
+        socket?.on('message notification', handleNotification);
+        socket?.on('new event notification', handleNotification)
 
         return () => {
-            socket?.off('message notification', handleMessageNotification);
+            socket?.off('message notification', handleNotification);
+            socket?.off('new event notification', handleNotification);
         };
-    }, [socket]);
+    }, [socket]); //socket changes between the time Header component is rendered for the first time (socket is null -> authContext.js) and the tcp connection is established 
 
 
     const handleMarkNotificationAsRead = (notificationToRemoveId) => {

@@ -67,7 +67,7 @@ io.on('connect', (socket) => {
 
     })
 
-    //this will take the room id from the FE
+    //this will take the room id from the FE (groupId)
     //Handle user going on Group chat page
     socket.on('join chat', (groupId) => {
 
@@ -97,12 +97,11 @@ io.on('connect', (socket) => {
         console.log(`Socket ${socket.id} left Group chat: ${groupId}`);
     })
 
-    //creates a new socket
     //Send the newly created message to each user in the group
     socket.on('new message', (newMessageReceived) => {
         const groupInfo = newMessageReceived.groupId;
 
-        // Send the new message to users currently viewing the chat
+        // Send the new message to users currently viewing the chat (except the user who has sent the message)
         socket.to(groupInfo._id).emit('message received', newMessageReceived);
 
         // Notify individual group members which are logged in
@@ -126,15 +125,50 @@ io.on('connect', (socket) => {
                 if (!isMemberViewingChat) {
                     socket.to(member._id).emit('message notification', {
                         notificationTitle: `Ново съобщение в група: ${groupInfo.name}`,
-                        uniqueIdentifier: newMessageReceived._id, //used only for React unique key 
-                        fromGroup: groupInfo._id
+                        uniqueIdentifier: `message-${newMessageReceived._id}`, //used only for React unique key 
+                        fromGroup: groupInfo._id,
+                        type: 'message'
                     });
                 }
 
             }
         });
 
+    });
+
+    socket.on('visit event calendar', (groupId) => {
+        socket.join(`events-${groupId}`)
+    });
+
+    socket.on('leave event calendar', (groupId) => {
+        socket.leave(`events-${groupId}`);
     })
+
+    //за всички освен създателя на събитието (този от който идва new message event-a)
+    //да изпрати нотификация
+    socket.on('new event', (newEventData) => {
+        const groupInfo = newEventData.groupId;
+
+        //Notify individual group members which are logged in
+        //for the new event - no matter if they are currently viewing the group event calendar or not (in which the new event was created by another user)
+
+        groupInfo.members.forEach((member) => {
+            //don't send notification to the user who created the event
+            if (member._id !== newEventData._ownerId) {
+                socket.to(member._id).emit('new event notification', {
+                    notificationTitle: `Ново събитие в група: ${groupInfo.name}`,
+                    uniqueIdentifier: `event-${newEventData._id}`, //used only for React unique key
+                    fromGroup: groupInfo._id,
+                    type: 'event'
+                })
+            }
+        });
+
+        // Send the new event data to users currently viewing the group event calendar(in which the new event was created by another user)
+        //EXCEPT the user who has created the event
+        socket.to(`events-${groupInfo._id}`).emit('update event calendar', newEventData);
+
+    });
 
     socket.on('disconnect', () => {
         userContext.delete(socket.id);

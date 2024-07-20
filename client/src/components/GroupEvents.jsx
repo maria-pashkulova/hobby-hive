@@ -10,7 +10,7 @@ const GroupEvents = () => {
 
     const navigate = useNavigate();
     const [groupId, isMember, activityTags, groupRegionCity] = useOutletContext();
-    const { logoutHandler } = useContext(AuthContext);
+    const { logoutHandler, socket } = useContext(AuthContext);
     const { isOpen, onOpen, onClose } = useDisclosure();
 
     const [groupEvents, setGroupEvents] = useState([]);
@@ -18,7 +18,10 @@ const GroupEvents = () => {
 
     useEffect(() => {
         eventService.getGroupEvents(groupId)
-            .then(setGroupEvents)
+            .then((groupEvents) => {
+                setGroupEvents(groupEvents);
+                socket?.emit('visit event calendar', groupId);
+            })
             .catch(error => {
 
                 if (error.status === 401) {
@@ -33,6 +36,10 @@ const GroupEvents = () => {
                 }
             });
 
+        return () => {
+            socket.emit('leave event calendar', groupId);
+        }
+
     }, [groupId]);
 
     // Handler to update selected date and open modal
@@ -40,6 +47,28 @@ const GroupEvents = () => {
         setSelectedDate(date);
         onOpen();
     };
+
+    //Add new event to the local state of the event creator
+    const handleAddNewEvent = (newEvent) => {
+        setGroupEvents((prevGroupEvents) => [...prevGroupEvents, newEvent]);
+    }
+
+    //Update group event states
+    //for the users currently viewing the calendar in which a new event was created so that
+    //they can see it immediately (no re-fetch needed)
+    useEffect(() => {
+        const handleUpdateEvents = (newEvent) => {
+            setGroupEvents((prevGroupEvents) => [...prevGroupEvents, newEvent]);
+        };
+
+        socket?.on('update event calendar', handleUpdateEvents);
+
+        //Cleanup the event listener on component unmount or when groupId / socket changes and use effect is triggered again
+        return () => {
+            socket?.off('update event calendar', handleUpdateEvents);
+        }
+    }, [socket, groupId]);
+
 
     //може би тази заявка трябва да се изпълни чак след като се намери успешно група
     //ако това е възможно изобщо да хвърли грешка, то ще се хване от catch?
@@ -55,6 +84,7 @@ const GroupEvents = () => {
                     groupRegionCity={groupRegionCity}
                     activityTags={activityTags}
                     selectedDate={selectedDate}
+                    handleAddNewEvent={handleAddNewEvent}
                 />
             }
 

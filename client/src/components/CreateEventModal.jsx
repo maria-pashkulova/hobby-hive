@@ -16,13 +16,13 @@ import CustomInput from "./input-fields/CustomInput";
 import TextArea from "./input-fields/TextArea";
 
 
-const CreateEventModal = ({ isOpen, onClose, groupId, groupRegionCity, activityTags, selectedDate }) => {
+const CreateEventModal = ({ isOpen, onClose, groupId, groupRegionCity, activityTags, selectedDate, handleAddNewEvent }) => {
 
     const tagsOptions = activityTags.map(tag => ({ label: tag, value: tag }));
 
     const toast = useToast();
     const navigate = useNavigate();
-    const { logoutHandler } = useContext(AuthContext);
+    const { logoutHandler, socket } = useContext(AuthContext);
 
 
     //Controlled and validated form using Formik and Yup
@@ -30,9 +30,11 @@ const CreateEventModal = ({ isOpen, onClose, groupId, groupRegionCity, activityT
         try {
             const newEvent = await eventService.createEvent(groupId, formValues);
 
-            //TODO: socket.emit('new event', newEvent); -> notify group members for new event
-            //TODO: receive handler to update localStatefrom GroupEvents.jsx 
+            //notify other group members for new event
+            socket.emit('new event', newEvent);
 
+            //use handler to update local state from GroupEvents.jsx 
+            handleAddNewEvent(newEvent);
             onClose();
 
             toast({

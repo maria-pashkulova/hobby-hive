@@ -5,6 +5,7 @@ const { validateEventTags } = require('../utils/validateEventData');
 
 
 exports.getAllGroupEvents = (groupId) => {
+    //get events for current displayed month
     // const events = Event.find({
     //     start: { $gte: start.toDate() },
     //     end: { $lte: end.toDate() }
@@ -47,7 +48,15 @@ exports.create = async (title, description, specificLocation, start, end, activi
         groupId,
         _ownerId
     }
-    const newEvent = Event.create(newEventData);
+
+    let newEvent = await Event.create(newEventData);
+
+    //Populated group info is needed for notifications
+    newEvent = await newEvent
+        .populate({
+            path: 'groupId',
+            select: 'name members._id'
+        });
 
     return newEvent;
 
