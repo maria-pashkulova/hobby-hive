@@ -5,7 +5,7 @@ export const getLocationData = (location) => {
         address.road ? `${address.road} ${address.house_number || ''}`.trim() : '',
         address.suburb,
         address.borough,
-        address.county
+        address.state
     ]
 
     // Filter out any undefined parts or '' (address road) (missing from Openstreet map returned location)
