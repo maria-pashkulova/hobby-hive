@@ -109,8 +109,12 @@ io.on('connect', (socket) => {
         groupInfo.members.forEach((member) => {
             if (member._id !== newMessageReceived.sender._id) {
 
-                //get sockets in room with current members id
-                //if current member is not logged in, membersSockets is an empty array
+                //Determine conncection status: it identifies if the member is connected to the server
+                //by looking for a socket that has joined a room with the member's ID
+                //which ensures that only connected members receive notifications
+                //AND gets sockets in room with current member's id - only 1 if a user has open 1 tab from 1 device
+                //and multiple sockets if user has open multiple tabs / app from multiple devices 
+
                 const memberSockets = Array.from(io.sockets.sockets.values())
                     .filter(s => s.rooms.has(member._id));
 
@@ -153,7 +157,7 @@ io.on('connect', (socket) => {
         //for the new event - no matter if they are currently viewing the group event calendar or not (in which the new event was created by another user)
 
         groupInfo.members.forEach((member) => {
-            //don't send notification to the user who created the event
+            //does not send notification to the user who created the event
             if (member._id !== newEventData._ownerId) {
                 socket.to(member._id).emit('new event notification', {
                     notificationTitle: `Ново събитие в група: ${groupInfo.name}`,
