@@ -36,8 +36,8 @@ app.use(routes);
 const expressServer = app.listen(process.env.PORT, () => console.log('Server is running on port 5000'));
 
 //#Sockets
-const { Server } = require('socket.io'); //named export usage
-const userContext = new Map();
+const { Server } = require('socket.io');
+const userSockets = new Map(); //keep track of all sockets in a room with user Id to handle case in which a user has opened multiple tabs or app in multiple devices
 
 //io is the socket.io server
 const io = new Server(expressServer, {
@@ -60,9 +60,21 @@ io.on('connect', (socket) => {
     //this will take the user data from the FE
     //the FE will send some data and will join a room
     socket.on('setup', (currUserId) => {
+
+        //Attach user id to socket object
+        socket.userId = currUserId;
+
         //this will create a room for the current user
         //the room will be exculsive for that particular user only
+        //it is possible multiple sockets to join the room with the user id - multiple tabs/devices
         socket.join(currUserId);
+
+        if (!userSockets.has(currUserId)) {
+            userSockets.set(currUserId, []);
+        }
+
+        userSockets.get(currUserId).push(socket);
+
         console.log(`Socket ${socket.id} logged in or re-opened browser window before token expiration`);
 
     })
@@ -71,28 +83,22 @@ io.on('connect', (socket) => {
     //Handle user going on Group chat page
     socket.on('join chat', (groupId) => {
 
-        if (!userContext.has(socket.id)) {
-            userContext.set(socket.id, { currentGroup: null });
-        }
+        //Attach group id of the group chat that this socket is currently viewing
+        socket.currentGroupChat = groupId;
 
-        const userInfo = userContext.get(socket.id);
-        userInfo.currentGroup = groupId;
-
-        //create a room with the id of the group
+        //Create a room with the id of the group
         //when a user click on Group chat this should create a new room with that particular
         //user and other user as well. When other users join it is going to add them to this room
         socket.join(groupId);
+
         console.log(`Socket ${socket.id} went to Group chat for group:  ${groupId}`);
     })
 
 
     // Handle user leaving a Group chat page
     socket.on('leave group chat', (groupId) => {
-        const userInfo = userContext.get(socket.id);
-        if (userInfo) {
-            userInfo.currentGroup = null;
-        }
 
+        socket.currentGroupChat = null;
         socket.leave(groupId);
         console.log(`Socket ${socket.id} left Group chat: ${groupId}`);
     })
@@ -112,19 +118,14 @@ io.on('connect', (socket) => {
                 //Determine conncection status: it identifies if the member is connected to the server
                 //by looking for a socket that has joined a room with the member's ID
                 //which ensures that only connected members receive notifications
-                //AND gets sockets in room with current member's id - only 1 if a user has open 1 tab from 1 device
+                //AND gets sockets in room with current member's id - only 1 if a user has open 1 tab from 1 device -> array with 1 socket instance
                 //and multiple sockets if user has open multiple tabs / app from multiple devices 
 
-                const memberSockets = Array.from(io.sockets.sockets.values())
-                    .filter(s => s.rooms.has(member._id));
+                const memberSockets = userSockets.get(member._id) || [];
 
-                const isMemberViewingChat = memberSockets.some(s => {
-                    const userInfo = userContext.get(s.id);
-
-                    //userInfo has a value if user is viewing the chat page
-                    // userInfo.currentGroup === groupInfo._id - check if user is viewing the current group's chat or another one
-                    return userInfo && userInfo.currentGroup === groupInfo._id;
-                });
+                //if a user has opened multiple tabs and is viewing the chat in at least one of them, no notification will be sent to any of their tabs
+                // memberSockets.length > 0 ensures that a group member is currently logged in
+                const isMemberViewingChat = memberSockets.length > 0 ? memberSockets.some(socket => socket.currentGroupChat === groupInfo._id) : true;
 
                 if (!isMemberViewingChat) {
                     socket.to(member._id).emit('message notification', {
@@ -148,8 +149,7 @@ io.on('connect', (socket) => {
         socket.leave(`events-${groupId}`);
     })
 
-    //за всички освен създателя на събитието (този от който идва new message event-a)
-    //да изпрати нотификация
+
     socket.on('new event', (newEventData) => {
         const groupInfo = newEventData.groupId;
 
@@ -157,25 +157,39 @@ io.on('connect', (socket) => {
         //for the new event - no matter if they are currently viewing the group event calendar or not (in which the new event was created by another user)
 
         groupInfo.members.forEach((member) => {
-            //does not send notification to the user who created the event
+            // Skip sending a notification to the user who created the event
             if (member._id !== newEventData._ownerId) {
-                socket.to(member._id).emit('new event notification', {
-                    notificationTitle: `Ново събитие в група: ${groupInfo.name}`,
-                    uniqueIdentifier: `event-${newEventData._id}`, //used only for React unique key
-                    fromGroup: groupInfo._id,
-                    type: 'event'
-                })
+
+                // Get the list of sockets for the current member or an empty array if the member has no sockets (he is not logged in)
+                const memberSockets = userSockets.get(member._id) || [];
+
+                //if current group member is logged in, send him a notification
+                if (memberSockets.length > 0) {
+                    socket.to(member._id).emit('new event notification', {
+                        notificationTitle: `Ново събитие в група: ${groupInfo.name}`,
+                        uniqueIdentifier: `event-${newEventData._id}`, //used only for React unique key
+                        fromGroup: groupInfo._id,
+                        type: 'event'
+                    })
+                }
             }
         });
 
         // Send the new event data to users currently viewing the group event calendar(in which the new event was created by another user)
-        //EXCEPT the user who has created the event
+        //socket.to(...) excludes the user who created the event
         socket.to(`events-${groupInfo._id}`).emit('update event calendar', newEventData);
 
     });
 
     socket.on('disconnect', () => {
-        userContext.delete(socket.id);
+        if (socket.userId) {
+            const sockets = userSockets.get(socket.userId) || [];
+            userSockets.set(socket.userId, sockets.filter(s => s.id !== socket.id));
+
+            if (userSockets.get(socket.userId).length === 0) {
+                userSockets.delete(socket.userId);
+            }
+        }
         //the socket leaves all the rooms he joined (socket.join()) automatically
         console.log(socket.id + ' logged out or closed browser window');
     })
