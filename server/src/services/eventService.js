@@ -4,14 +4,38 @@ const { checkForDuplicateTags } = require('../utils/validateGroupData');
 const { validateEventTags } = require('../utils/validateEventData');
 
 
-exports.getAllGroupEvents = (groupId) => {
-    //get events for current displayed month
-    // const events = Event.find({
-    //     start: { $gte: start.toDate() },
-    //     end: { $lte: end.toDate() }
-    // })
+exports.getAllGroupEvents = (groupId, startISO, endISO) => {
 
-    const events = Event.find({ groupId }).lean();
+    let query = { groupId }
+
+    if (startISO && endISO) {
+        query = {
+            groupId,
+            $or: [
+                {
+                    //Events fully within the range
+                    start: { $gte: startISO },
+                    end: { $lte: endISO }
+                },
+                {
+                    //Events starting before the range but ending within it
+                    start: { $lt: startISO },
+                    end: { $gte: startISO }
+                },
+                {
+                    //Events starting within the range but ending after it:
+                    start: { $lte: endISO },
+                    end: { $gt: endISO }
+                },
+                {
+                    //Events starting before and ending after the range, and spanning the entire range
+                    start: { $lte: startISO },
+                    end: { $gte: endISO }
+                }
+            ]
+        }
+    }
+    const events = Event.find(query).lean();
 
     return events;
 }

@@ -9,7 +9,7 @@ import './GroupEventsCalendar.css';
 import EventInCalendarDateBox from './EventInCalendarDateBox';
 
 
-const GroupEventsCalendar = ({ groupEvents, onDateClick, onEventClick }) => {
+const GroupEventsCalendar = ({ groupEvents, onDateClick, onEventClick, fetchEventsForRange }) => {
 
 
     const dayClickAction = (dateClickInfo) => {
@@ -33,6 +33,14 @@ const GroupEventsCalendar = ({ groupEvents, onDateClick, onEventClick }) => {
     const eventClickAction = (eventInfo) => {
         // console.log(eventInfo);
         onEventClick(eventInfo.event);
+    }
+
+    const handleDatesSet = (datesInfo) => {
+        //console.log(datesInfo);
+
+        //end date is exclusive - for example visible days incuding 11.08 -> end : 12.08
+        const { start, end } = datesInfo;
+        fetchEventsForRange(start, end);
     }
 
     return (
@@ -65,9 +73,9 @@ const GroupEventsCalendar = ({ groupEvents, onDateClick, onEventClick }) => {
                 }}
 
                 eventContent={renderEventContent}
-
                 dateClick={dayClickAction}
                 eventClick={eventClickAction}
+                datesSet={handleDatesSet}
             />
         </Box>
     )

@@ -12,7 +12,6 @@ const EventDetails = ({ event }) => {
         <Flex
             borderRadius='20px'
             bg={'gray.100'}
-            maxWidth={{ base: '90vw', md: '80vw', lg: '50vw' }}
             direction='column'>
             <Box p='20px'>
                 <Flex w='100%' mb='10px'>
@@ -69,10 +68,10 @@ const EventDetails = ({ event }) => {
             <Flex
                 w='100%'
                 p='20px'
-                borderBottomLeftRadius='inherit'
-                borderBottomRightRadius='inherit'
                 height='100%'
-                direction='column'>
+                direction='column'
+                gap={8}
+            >
                 <Text
                     fontSize='sm'
                     color='gray.500'
@@ -82,8 +81,11 @@ const EventDetails = ({ event }) => {
                     mb='auto'>
                     {description}
                 </Text>
-                <Flex>
-                    <Flex me='25px'>
+                <Flex
+                    flexDirection={{ base: 'column', md: 'row' }}
+                    gap={{ base: '15px', md: '25px' }}
+                >
+                    <Flex>
                         <Icon
                             as={FiCalendar}
                             w='20px' h='20px' me='6px' color='green.400' />

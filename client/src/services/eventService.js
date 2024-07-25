@@ -2,7 +2,12 @@ import * as request from '../lib/request';
 
 const baseUrl = 'http://localhost:5000/groups';
 
-export const getGroupEvents = (groupId) => request.get(`${baseUrl}/${groupId}/events`);
+//to do add ranges when you change the API logic
+export const getGroupEvents = (groupId, startDate, endDate) => {
+
+    return request.get(`${baseUrl}/${groupId}/events?start=${startDate.toISOString()}&end=${endDate.toISOString()}`);
+
+}
 
 export const createEvent = (groupId, { title, description, specificLocation, start, end, activityTags }) => {
 

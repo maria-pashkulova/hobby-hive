@@ -24,7 +24,15 @@ const GroupEvents = () => {
 
 
     useEffect(() => {
-        eventService.getGroupEvents(groupId)
+
+        return () => {
+            socket.emit('leave event calendar', groupId);
+        }
+
+    }, [groupId]);
+
+    const fetchEventsForRange = (startDate, endDate) => {
+        eventService.getGroupEvents(groupId, startDate, endDate)
             .then((groupEvents) => {
                 setGroupEvents(groupEvents);
                 socket?.emit('visit event calendar', groupId);
@@ -43,11 +51,7 @@ const GroupEvents = () => {
                 }
             });
 
-        return () => {
-            socket.emit('leave event calendar', groupId);
-        }
-
-    }, [groupId]);
+    }
 
     // Handler to update selected date and open modal
     const handleDateClick = (date) => {
@@ -104,6 +108,7 @@ const GroupEvents = () => {
                 groupEvents={groupEvents}
                 onDateClick={handleDateClick}
                 onEventClick={handleEventClick}
+                fetchEventsForRange={fetchEventsForRange}
             />
 
             {
@@ -111,7 +116,6 @@ const GroupEvents = () => {
                     isOpen={showEventDetailsModal.isOpen}
                     onClose={showEventDetailsModal.onClose}
                     eventDetailsObj={selectedEventDetails}
-
                 />
             }
 
