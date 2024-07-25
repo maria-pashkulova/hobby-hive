@@ -5,16 +5,23 @@ import AuthContext from '../contexts/authContext';
 import { useDisclosure } from '@chakra-ui/react';
 import CreateEventModal from './CreateEventModal';
 import GroupEventsCalendar from './eventCalendar/GroupEventsCalendar';
+import EventDetailsModal from './eventCalendar/EventDetailsModal';
 
 const GroupEvents = () => {
 
     const navigate = useNavigate();
     const [groupId, isMember, activityTags, groupRegionCity] = useOutletContext();
     const { logoutHandler, socket } = useContext(AuthContext);
-    const { isOpen, onOpen, onClose } = useDisclosure();
 
+
+    const createEventModal = useDisclosure();
+    const showEventDetailsModal = useDisclosure();
+
+    //All group events; TODO: pagination -> display only events in current month
     const [groupEvents, setGroupEvents] = useState([]);
     const [selectedDate, setSelectedDate] = useState('');
+    const [selectedEventDetails, setSelectedEventDetails] = useState({});
+
 
     useEffect(() => {
         eventService.getGroupEvents(groupId)
@@ -45,8 +52,13 @@ const GroupEvents = () => {
     // Handler to update selected date and open modal
     const handleDateClick = (date) => {
         setSelectedDate(date);
-        onOpen();
+        createEventModal.onOpen();
     };
+
+    const handleEventClick = (eventDetailsObj) => {
+        setSelectedEventDetails(eventDetailsObj);
+        showEventDetailsModal.onOpen();
+    }
 
     //Add new event to the local state of the event creator
     const handleAddNewEvent = (newEvent) => {
@@ -77,9 +89,9 @@ const GroupEvents = () => {
 
 
             {
-                isOpen && <CreateEventModal
-                    isOpen={isOpen}
-                    onClose={onClose}
+                createEventModal.isOpen && <CreateEventModal
+                    isOpen={createEventModal.isOpen}
+                    onClose={createEventModal.onClose}
                     groupId={groupId}
                     groupRegionCity={groupRegionCity}
                     activityTags={activityTags}
@@ -91,7 +103,19 @@ const GroupEvents = () => {
             <GroupEventsCalendar
                 groupEvents={groupEvents}
                 onDateClick={handleDateClick}
+                onEventClick={handleEventClick}
             />
+
+            {
+                showEventDetailsModal.isOpen && <EventDetailsModal
+                    isOpen={showEventDetailsModal.isOpen}
+                    onClose={showEventDetailsModal.onClose}
+                    eventDetailsObj={selectedEventDetails}
+
+                />
+            }
+
+
         </>
 
     )
