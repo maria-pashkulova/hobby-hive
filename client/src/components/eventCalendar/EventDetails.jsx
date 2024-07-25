@@ -1,7 +1,7 @@
 import { Avatar, AvatarGroup, Box, Button, Flex, HStack, Icon, Image, Tag, Text } from '@chakra-ui/react';
 import React from 'react'
 import { FiMoreHorizontal, FiCalendar, FiMapPin } from "react-icons/fi";
-import { formatEventHours } from '../../utils/formatEventDisplay';
+import { formatEventTime } from '../../utils/formatEventDisplay';
 
 const EventDetails = ({ event }) => {
     const { title, start, end, extendedProps } = event;
@@ -12,8 +12,7 @@ const EventDetails = ({ event }) => {
         <Flex
             borderRadius='20px'
             bg={'gray.100'}
-            h='345px'
-            w={{ base: "515px", md: "545px" }}
+            maxWidth={{ base: '90vw', md: '80vw', lg: '50vw' }}
             direction='column'>
             <Box p='20px'>
                 <Flex w='100%' mb='10px'>
@@ -89,9 +88,8 @@ const EventDetails = ({ event }) => {
                             as={FiCalendar}
                             w='20px' h='20px' me='6px' color='green.400' />
                         <Text
-                            // color={mainText}
                             fontSize='sm' my='auto' fontWeight='500'>
-                            {formatEventHours(start)} ч. - {formatEventHours(end)} ч.
+                            {formatEventTime(start, end)}
                         </Text>
                     </Flex>
                     <Flex>

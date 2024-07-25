@@ -3,7 +3,6 @@ import React from 'react'
 import EventDetails from './EventDetails'
 
 const EventDetailsModal = ({ isOpen, onClose, eventDetailsObj }) => {
-    console.log(eventDetailsObj);
     return (
         <Modal isOpen={isOpen} onClose={onClose}>
             <ModalOverlay />

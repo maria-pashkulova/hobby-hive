@@ -1,6 +1,6 @@
 import { Heading, Text, VStack } from '@chakra-ui/react'
 import React from 'react'
-import { formatEventHours } from '../../utils/formatEventDisplay';
+import { formatEventTime } from '../../utils/formatEventDisplay';
 
 
 const EventInCalendarDateBox = ({ event }) => {
@@ -15,7 +15,7 @@ const EventInCalendarDateBox = ({ event }) => {
             alignItems='flex-start'
         >
             <Heading as={'h5'} size='sm'>{title}</Heading>
-            <Text>{formatEventHours(start)} ч. - {formatEventHours(end)} ч.</Text>
+            <Text>{formatEventTime(start, end)}</Text>
             {/* <Text>{specificLocation}</Text> */}
         </VStack>
     )
