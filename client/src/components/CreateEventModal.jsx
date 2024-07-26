@@ -14,9 +14,10 @@ import Select from 'react-select';
 import SearchLocation from "./SearchLocation";
 import CustomInput from "./input-fields/CustomInput";
 import TextArea from "./input-fields/TextArea";
+import { checkForOverlappingEvents } from "../utils/checkForOverlappingEvents";
 
 
-const CreateEventModal = ({ isOpen, onClose, groupId, groupRegionCity, activityTags, selectedDate, handleAddNewEvent }) => {
+const CreateEventModal = ({ isOpen, onClose, groupId, groupRegionCity, activityTags, selectedDate, handleAddNewEvent, existingEvents }) => {
 
     const tagsOptions = activityTags.map(tag => ({ label: tag, value: tag }));
 
@@ -26,7 +27,28 @@ const CreateEventModal = ({ isOpen, onClose, groupId, groupRegionCity, activityT
 
 
     //Controlled and validated form using Formik and Yup
-    const handleFormSubmit = async (formValues) => {
+    const handleFormSubmit = async (formValues, actions) => {
+
+        const newEventStart = new Date(formValues[EventKeys.StartDateTime]);
+        const newEventEnd = new Date(formValues[EventKeys.EndDateTime]);
+        const newEventLocation = formValues[EventKeys.SpecificLocation];
+        const newEventTitle = formValues[EventKeys.Title];
+
+        if (checkForOverlappingEvents(existingEvents, newEventStart, newEventEnd, newEventLocation, newEventTitle)) {
+
+            actions.setSubmitting(false);
+            toast({
+                title: "Вече съществува събитие по същото време и на същото място! Променете заглавието и детайлите, за да бъде запазено събитието",
+                status: "error",
+                duration: 5000,
+                isClosable: true,
+                position: "bottom",
+            });
+            return;
+        }
+
+
+
         try {
             const newEvent = await eventService.createEvent(groupId, formValues);
 

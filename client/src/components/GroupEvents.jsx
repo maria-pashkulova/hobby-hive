@@ -17,7 +17,7 @@ const GroupEvents = () => {
     const createEventModal = useDisclosure();
     const showEventDetailsModal = useDisclosure();
 
-    //All group events; TODO: pagination -> display only events in current month
+    //Group events in current visible date range
     const [groupEvents, setGroupEvents] = useState([]);
     const [selectedDate, setSelectedDate] = useState('');
     const [selectedEventDetails, setSelectedEventDetails] = useState({});
@@ -101,6 +101,7 @@ const GroupEvents = () => {
                     activityTags={activityTags}
                     selectedDate={selectedDate}
                     handleAddNewEvent={handleAddNewEvent}
+                    existingEvents={groupEvents} // Pass existing events as a prop
                 />
             }
 

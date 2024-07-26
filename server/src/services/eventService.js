@@ -26,11 +26,6 @@ exports.getAllGroupEvents = (groupId, startISO, endISO) => {
                     //Events starting within the range but ending after it:
                     start: { $lte: endISO },
                     end: { $gt: endISO }
-                },
-                {
-                    //Events starting before and ending after the range, and spanning the entire range
-                    start: { $lte: startISO },
-                    end: { $gte: endISO }
                 }
             ]
         }
