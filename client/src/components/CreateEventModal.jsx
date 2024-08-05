@@ -106,7 +106,7 @@ const CreateEventModal = ({ isOpen, onClose, groupId, groupRegionCity, activityT
                         validationSchema={eventSchema(groupRegionCity)}
                         onSubmit={handleFormSubmit}
                     >
-                        {({ isSubmitting }) => (
+                        {({ isSubmitting, setFieldValue }) => (
                             <Form noValidate>
                                 <ModalBody>
                                     <CustomInput
