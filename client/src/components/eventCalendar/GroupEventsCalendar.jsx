@@ -55,9 +55,11 @@ const GroupEventsCalendar = ({ groupEvents, onDateClick, onEventClick, fetchEven
                     center: 'title',
                     right: 'dayGridMonth'
                 }}
+                eventDisplay='block'
                 events={groupEvents.map(event => ({
                     id: event._id,
                     title: event.title,
+                    color: event.color || '#3788d8',
                     start: event.start,
                     end: event.end,
                     description: event.description,

@@ -35,14 +35,17 @@ exports.getAllGroupEvents = (groupId, startISO, endISO) => {
     return events;
 }
 
-//status?
-exports.create = async (title, description, specificLocation, start, end, activityTags, groupId, _ownerId) => {
+
+exports.create = async (title, color, description, specificLocation, start, end, activityTags, groupId, _ownerId) => {
 
     const group = await Group.findById(groupId);
 
-    //Group exists and current user is a member of the group - guaranteed by middlewaresp
+    //Group exists and current user is a member of the group - guaranteed by middlewares
 
-    //TODO : валидиране на specificLocation - задължително трябва да има name и lat, lon
+    //TODO: validate existing color
+
+    //TODO : валидиране на specificLocation - задължително трябва да има name и lat, lon и да бъде в рамките на областния град, 
+    //зададен като основна локация за групата
 
     //Check if event's activityTags are unique (client input itself)
     checkForDuplicateTags(activityTags)
@@ -59,6 +62,7 @@ exports.create = async (title, description, specificLocation, start, end, activi
     //TODO: add validation here
     const newEventData = {
         title,
+        color,
         description,
         specificLocation,
         start,

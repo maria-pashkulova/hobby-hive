@@ -21,6 +21,7 @@ export const GroupKeys = {
 
 export const EventKeys = {
     Title: 'title',
+    Color: 'color',
     Description: 'description',
     Location: 'specificLocation',
     StartDateTime: 'start',

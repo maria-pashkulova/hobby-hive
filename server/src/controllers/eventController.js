@@ -25,14 +25,14 @@ router.get('/', async (req, res) => {
 
 //CREATE
 router.post('/', async (req, res) => {
-    const { title, description, specificLocation, start, end, activityTags } = req.body;
+    const { title, color, description, specificLocation, start, end, activityTags } = req.body;
     const _ownerId = req.user._id; //текущо вписания потребител е owner на event-a
     //клиента не изпраща данни за това
     const groupId = req.groupId;
 
 
     try {
-        const createdEvent = await eventService.create(title, description, specificLocation, start, end, activityTags, groupId, _ownerId);
+        const createdEvent = await eventService.create(title, color, description, specificLocation, start, end, activityTags, groupId, _ownerId);
 
         res.status(201).json(createdEvent);
 

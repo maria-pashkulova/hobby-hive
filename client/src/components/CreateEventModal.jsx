@@ -16,7 +16,6 @@ import CustomInput from "./input-fields/CustomInput";
 import TextArea from "./input-fields/TextArea";
 import { checkForOverlappingEvents } from "../utils/checkForOverlappingEvents";
 
-
 const CreateEventModal = ({ isOpen, onClose, groupId, groupRegionCity, activityTags, selectedDate, handleAddNewEvent, existingEvents }) => {
 
     const tagsOptions = activityTags.map(tag => ({ label: tag, value: tag }));
@@ -97,6 +96,7 @@ const CreateEventModal = ({ isOpen, onClose, groupId, groupRegionCity, activityT
                     <Formik
                         initialValues={{
                             [EventKeys.Title]: '',
+                            [EventKeys.Color]: '#3788d8', //default color for color picker control
                             [EventKeys.Description]: '',
                             [EventKeys.StartDateTime]: selectedDate,
                             [EventKeys.EndDateTime]: '',
@@ -106,7 +106,7 @@ const CreateEventModal = ({ isOpen, onClose, groupId, groupRegionCity, activityT
                         validationSchema={eventSchema(groupRegionCity)}
                         onSubmit={handleFormSubmit}
                     >
-                        {({ isSubmitting, setFieldValue }) => (
+                        {({ isSubmitting }) => (
                             <Form noValidate>
                                 <ModalBody>
                                     <CustomInput
@@ -115,7 +115,13 @@ const CreateEventModal = ({ isOpen, onClose, groupId, groupRegionCity, activityT
                                         placeholder='Име на събитието'
                                         label='Име'
                                     />
-
+                                    <CustomInput
+                                        type='color'
+                                        name={EventKeys.Color}
+                                        label='Изберете цвят за обозначение на събитието в календара'
+                                        maxWidth='20%'
+                                        mt={4}
+                                    />
                                     <TextArea
                                         name={EventKeys.Description}
                                         placeholder='Описание за групово събитие...'
