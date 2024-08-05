@@ -42,7 +42,13 @@ exports.create = async (title, color, description, specificLocation, start, end,
 
     //Group exists and current user is a member of the group - guaranteed by middlewares
 
-    //TODO: validate existing color
+    //Check if there is an event in current group calendar with the same color
+    const existingEvent = await Event.findOne({ color, groupId });
+    if (!!existingEvent) {
+        const error = new Error('В груповия календар съществува събитие, обозначено с посочения цвят. Изберете друг цвят!');
+        error.statusCode = 400;
+        throw error;
+    }
 
     //TODO : валидиране на specificLocation - задължително трябва да има name и lat, lon и да бъде в рамките на областния град, 
     //зададен като основна локация за групата

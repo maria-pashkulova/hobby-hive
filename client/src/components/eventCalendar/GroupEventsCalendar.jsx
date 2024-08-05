@@ -59,7 +59,7 @@ const GroupEventsCalendar = ({ groupEvents, onDateClick, onEventClick, fetchEven
                 events={groupEvents.map(event => ({
                     id: event._id,
                     title: event.title,
-                    color: event.color || '#3788d8',
+                    color: event.color, //if event has no color, or color value is invalid a default blue color is set by FullCalendar
                     start: event.start,
                     end: event.end,
                     description: event.description,

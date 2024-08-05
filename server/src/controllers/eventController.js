@@ -37,6 +37,7 @@ router.post('/', async (req, res) => {
         res.status(201).json(createdEvent);
 
     } catch (error) {
+        //errors with name ValidationError will be returned with status code 500
         res.status(error.statusCode || 500).json({ message: error.message });
         console.log('Error in create event:', error.message);
     }

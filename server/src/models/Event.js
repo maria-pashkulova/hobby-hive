@@ -3,12 +3,12 @@ const mongoose = require('mongoose');
 const eventSchema = new mongoose.Schema({
     title: {
         type: String,
-        required: true
+        required: [true, 'Името на събитието е задължително!']
     },
     description: {
         type: String,
         maxLength: 300,
-        required: true
+        required: [true, 'Описанието на събитието е задължително!']
     },
     specificLocation: {
         name: {
@@ -22,11 +22,11 @@ const eventSchema = new mongoose.Schema({
     },
     start: {
         type: Date,
-        required: true
+        required: [true, 'Началната дата на събитието е задължителна!']
     },
     end: {
         type: Date,
-        required: true
+        required: [true, 'Крайната дата на събитието е задължителна!']
     },
     activityTags: {
         type: [String],
@@ -43,7 +43,8 @@ const eventSchema = new mongoose.Schema({
         required: true
     },
     color: {
-        type: String
+        type: String,
+        required: [true, 'Изберете цвят за обозначаване на събитието']
     }
 }, { timestamps: true });
 
