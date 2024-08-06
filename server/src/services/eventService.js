@@ -30,7 +30,10 @@ exports.getAllGroupEvents = (groupId, startISO, endISO) => {
             ]
         }
     }
-    const events = Event.find(query).lean();
+    const events = Event
+        .find(query)
+        .select('_id title color start end groupId _ownerId specificLocation ')
+        .lean();
 
     return events;
 }
