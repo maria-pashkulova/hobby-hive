@@ -2,12 +2,16 @@ import * as request from '../lib/request';
 
 const baseUrl = 'http://localhost:5000/groups';
 
-//to do add ranges when you change the API logic
+//Get all events in the currently viewed date range
 export const getGroupEvents = (groupId, startDate, endDate) => {
 
     return request.get(`${baseUrl}/${groupId}/events?start=${startDate.toISOString()}&end=${endDate.toISOString()}`);
 
 }
+
+//Get event details
+
+export const getById = (groupId, eventId) => request.get(`${baseUrl}/${groupId}/events/${eventId}`);
 
 export const createEvent = (groupId, { title, color, description, specificLocation, start, end, activityTags }) => {
 

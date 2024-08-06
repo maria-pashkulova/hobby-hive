@@ -47,10 +47,8 @@ router.get('/:groupId', getGroup, async (req, res) => {
         res.json(group);
 
     } catch (error) {
-
-        //грешка ако върне null - аз я хвърлям
-        //Mongoose грешка - ако е подаден невалиден стринг който да се кастне към objectID
-        res.status(404).json({ message: error.message });
+        //We are sure group exists because it is fetched in group middleware
+        res.status(500).json({ message: 'Сървърна грешка' });
     }
 
 });

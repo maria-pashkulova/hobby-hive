@@ -2,6 +2,9 @@ const router = require('express').Router();
 
 const eventService = require('../services/eventService');
 
+//middlewares 
+const getEvent = require('../middlewares/eventMiddleware');
+
 
 //GET ALL events for visible date range on calendar
 
@@ -20,6 +23,22 @@ router.get('/', async (req, res) => {
         console.log('Error in get group events:', error.message);
     }
 
+})
+
+//GET EVENT DETAILS
+router.get('/:eventId', getEvent, async (req, res) => {
+
+    const fetchedEvent = req.event;
+    try {
+
+        const event = await eventService.getByIdWithMembers(fetchedEvent);
+        res.json(event);
+
+    } catch (error) {
+        //we are sure event exists because it is fetched in event middleware
+        res.status(500).json({ message: 'Сървърна грешка' });
+
+    }
 })
 
 

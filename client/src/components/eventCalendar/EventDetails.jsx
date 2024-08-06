@@ -4,8 +4,8 @@ import { FiMoreHorizontal, FiCalendar, FiMapPin } from "react-icons/fi";
 import { formatEventTime } from '../../utils/formatEventDisplay';
 
 const EventDetails = ({ event }) => {
-    const { title, start, end, extendedProps } = event;
-    const { description, specificLocation, activityTags } = extendedProps;
+
+    const { title, start, end, description, specificLocation, activityTags, membersGoing } = event;
 
 
     return (
@@ -38,32 +38,13 @@ const EventDetails = ({ event }) => {
                     </Button>
                 </Flex>
                 <HStack wrap='wrap' spacing='3'>
-                    {activityTags.map((tag) => (
+                    {activityTags?.map((tag) => (
                         <Tag key={tag} variant='outline'>
                             {tag}
                         </Tag>
                     ))}
 
                 </HStack>
-
-                {/*  Присъстващи: ? */}
-                {/* <Box> */}
-                {/* <AvatarGroup
-                        size='sm'
-                        max={4}
-                        // color={iconColor}
-                        fontSize='9px'
-                        fontWeight='700'>
-                        <Avatar src='https://i.ibb.co/CmxNdhQ/avatar1.png' />
-                        <Avatar src='https://i.ibb.co/cFWc59B/avatar2.png' />
-                        <Avatar src='https://i.ibb.co/vLQJVFy/avatar3.png' />
-                        <Avatar src='https://i.ibb.co/8mcrvQk/avatar4.png' />
-                        <Avatar src='https://i.ibb.co/CmxNdhQ/avatar1.png' />
-                        <Avatar src='https://i.ibb.co/cFWc59B/avatar2.png' />
-                        <Avatar src='https://i.ibb.co/vLQJVFy/avatar3.png' />
-                        <Avatar src='https://i.ibb.co/8mcrvQk/avatar4.png' />
-                    </AvatarGroup> */}
-                {/* </Box> */}
             </Box >
             <Flex
                 w='100%'
@@ -84,6 +65,7 @@ const EventDetails = ({ event }) => {
                 <Flex
                     flexDirection={{ base: 'column', md: 'row' }}
                     gap={{ base: '15px', md: '25px' }}
+                    alignItems={{ base: 'flex-start', md: 'center' }}
                 >
                     <Flex>
                         <Icon
@@ -104,9 +86,25 @@ const EventDetails = ({ event }) => {
                         />
                         <Text
                             fontSize='sm' my='auto' fontWeight='500'>
-                            {specificLocation}
+                            {specificLocation.name}
                         </Text>
                     </Flex>
+                    {/*  Присъстващи:  */}
+                    <Box>
+                        <AvatarGroup
+                            size='sm'
+                            max={4}
+                            cursor='pointer'
+                        >
+                            {membersGoing.map((member) => (
+                                <Avatar
+                                    key={member._id}
+                                    name={member.fullName}
+                                    src={member.profilePic}
+                                />
+                            ))}
+                        </AvatarGroup>
+                    </Box>
                 </Flex>
             </Flex>
         </Flex >

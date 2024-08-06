@@ -35,6 +35,27 @@ exports.getAllGroupEvents = (groupId, startISO, endISO) => {
     return events;
 }
 
+exports.getByIdWithMembers = async (event) => {
+    // event is valid -> checked in eventMiddleware
+    //added event details to request object
+
+    const eventWithMembers = await event
+        .populate({
+            path: 'membersGoing',
+            select: 'firstName lastName email profilePic'
+        });
+
+    return eventWithMembers;
+
+}
+
+//used in eventMiddleware only
+exports.getByIdToValidate = (eventId) => {
+    const event = Event
+        .findById(eventId)
+
+    return event;
+}
 
 exports.create = async (title, color, description, specificLocation, start, end, activityTags, groupId, _ownerId) => {
 
@@ -65,7 +86,7 @@ exports.create = async (title, color, description, specificLocation, start, end,
 
     //TODO: валидна дата която е преди текущото време
 
-    //TODO: add validation here
+
     const newEventData = {
         title,
         color,
@@ -75,7 +96,8 @@ exports.create = async (title, color, description, specificLocation, start, end,
         end,
         activityTags,
         groupId,
-        _ownerId
+        _ownerId,
+        membersGoing: [_ownerId] // Add the event creator to membersGoing by default upon event creation
     }
 
     let newEvent = await Event.create(newEventData);

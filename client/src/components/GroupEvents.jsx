@@ -66,7 +66,11 @@ const GroupEvents = () => {
 
     //Add new event to the local state of the event creator
     const handleAddNewEvent = (newEvent) => {
-        setGroupEvents((prevGroupEvents) => [...prevGroupEvents, newEvent]);
+        //unify newEvent with other events format (because groupId field of newEvent is populated because of notifications)
+        //Extract groupId from newly created event and override it in newEventWithGroupIdOnly object
+        const { _id: groupId } = newEvent.groupId;
+        const newEventWithGroupIdOnly = { ...newEvent, groupId };
+        setGroupEvents((prevGroupEvents) => [...prevGroupEvents, newEventWithGroupIdOnly]);
     }
 
     //Update group event states
@@ -74,7 +78,11 @@ const GroupEvents = () => {
     //they can see it immediately (no re-fetch needed)
     useEffect(() => {
         const handleUpdateEvents = (newEvent) => {
-            setGroupEvents((prevGroupEvents) => [...prevGroupEvents, newEvent]);
+            //unify newEvent with other events format (because groupId field of newEvent is populated because of notifications)
+            //Extract groupId from newly created event and override it in newEventWithGroupIdOnly object
+            const { _id: groupId } = newEvent.groupId;
+            const newEventWithGroupIdOnly = { ...newEvent, groupId };
+            setGroupEvents((prevGroupEvents) => [...prevGroupEvents, newEventWithGroupIdOnly]);
         };
 
         socket?.on('update event calendar', handleUpdateEvents);
@@ -90,7 +98,6 @@ const GroupEvents = () => {
     //ако това е възможно изобщо да хвърли грешка, то ще се хване от catch?
     return (
         <>
-
 
             {
                 createEventModal.isOpen && <CreateEventModal

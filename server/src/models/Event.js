@@ -5,6 +5,10 @@ const eventSchema = new mongoose.Schema({
         type: String,
         required: [true, 'Името на събитието е задължително!']
     },
+    color: {
+        type: String,
+        required: [true, 'Изберете цвят за обозначаване на събитието']
+    },
     description: {
         type: String,
         maxLength: 300,
@@ -42,10 +46,11 @@ const eventSchema = new mongoose.Schema({
         ref: 'User',
         required: true
     },
-    color: {
-        type: String,
-        required: [true, 'Изберете цвят за обозначаване на събитието']
-    }
+    membersGoing: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+    }]
+
 }, { timestamps: true });
 
 const Event = mongoose.model('Event', eventSchema);

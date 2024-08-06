@@ -31,7 +31,7 @@ const GroupEventsCalendar = ({ groupEvents, onDateClick, onEventClick, fetchEven
     }
 
     const eventClickAction = (eventInfo) => {
-        // console.log(eventInfo);
+        //eventInfo includes fields from FullCalendar -> event prop we defined and other defaut fields
         onEventClick(eventInfo.event);
     }
 
@@ -55,16 +55,15 @@ const GroupEventsCalendar = ({ groupEvents, onDateClick, onEventClick, fetchEven
                     center: 'title',
                     right: 'dayGridMonth'
                 }}
+                //All events have solid background
                 eventDisplay='block'
+                // add event info - title,color,start,end (Fullcalendar expects these certain prop names) + extendedProps
                 events={groupEvents.map(event => ({
                     id: event._id,
                     title: event.title,
                     color: event.color, //if event has no color, or color value is invalid a default blue color is set by FullCalendar
                     start: event.start,
                     end: event.end,
-                    description: event.description,
-                    specificLocation: event.specificLocation.name,
-                    activityTags: event.activityTags,
                     groupId: event.groupId,
                     ownerId: event._ownerId
                 }))}
