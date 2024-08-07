@@ -10,7 +10,6 @@ export const getGroupEvents = (groupId, startDate, endDate) => {
 }
 
 //Get event details
-
 export const getById = (groupId, eventId) => request.get(`${baseUrl}/${groupId}/events/${eventId}`);
 
 export const createEvent = (groupId, { title, color, description, specificLocation, start, end, activityTags }) => {
@@ -22,3 +21,9 @@ export const createEvent = (groupId, { title, color, description, specificLocati
     return request.post(`${baseUrl}/${groupId}/events`, { title, color, description, specificLocation, start: startDateTimeUTC, end: endDateTimeUTC, activityTags });
 
 }
+
+//Attend an event
+export const markAttendance = (groupId, eventId) => request.put(`${baseUrl}/${groupId}/events/${eventId}/markAttendance`);
+
+export const revokeAttendance = (groupId, eventId) => request.put(`${baseUrl}/${groupId}/events/${eventId}/revokeAttendance`);
+

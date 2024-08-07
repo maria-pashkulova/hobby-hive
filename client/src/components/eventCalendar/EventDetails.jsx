@@ -1,11 +1,12 @@
 import { Avatar, AvatarGroup, Box, Button, Flex, HStack, Icon, Image, Tag, Text } from '@chakra-ui/react';
 import React from 'react'
-import { FiMoreHorizontal, FiCalendar, FiMapPin } from "react-icons/fi";
+import { FiCalendar, FiMapPin } from "react-icons/fi";
 import { formatEventTime } from '../../utils/formatEventDisplay';
+import EventButtons from './EventButtons';
 
-const EventDetails = ({ event }) => {
+const EventDetails = ({ event, isCurrUserAttending, handleAddMemberGoing, handleRemoveMemberGoing }) => {
 
-    const { title, start, end, description, specificLocation, activityTags, membersGoing } = event;
+    const { _id, title, start, end, description, specificLocation, activityTags, membersGoing, groupId, _ownerId } = event;
 
 
     return (
@@ -14,28 +15,28 @@ const EventDetails = ({ event }) => {
             bg={'gray.100'}
             direction='column'>
             <Box p='20px'>
-                <Flex w='100%' mb='10px'>
+                <Flex
+                    w='100%'
+                    mb='10px'
+                    justifyContent={'space-between'}>
                     <Text fontWeight='600'
                         color={'gray.800'}
-                        w='100%' fontSize='2xl'>
+                        fontSize='2xl'>
                         {title}
                     </Text>
-                    <Button
-                        w='38px'
-                        h='38px'
-                        align='center'
-                        justify='center'
-                        borderRadius='12px'
-                        me='12px'
-                    >
 
-                        <Icon
-                            w='24px'
-                            h='24px'
-                            as={FiMoreHorizontal}
-                            color={'gray.700'}
+                    {/* Event buttons for larger screens */}
+                    <Flex
+                        display={{ base: 'none', md: 'flex' }}
+                    >
+                        <EventButtons
+                            isCurrUserAttending={isCurrUserAttending}
+                            groupId={groupId}
+                            eventId={_id}
+                            handleAddMemberGoing={handleAddMemberGoing}
+                            handleRemoveMemberGoing={handleRemoveMemberGoing}
                         />
-                    </Button>
+                    </Flex>
                 </Flex>
                 <HStack wrap='wrap' spacing='3'>
                     {activityTags?.map((tag) => (
@@ -105,6 +106,19 @@ const EventDetails = ({ event }) => {
                             ))}
                         </AvatarGroup>
                     </Box>
+                </Flex>
+
+                {/* Event buttons for smaller screens */}
+                <Flex
+                    display={{ base: 'flex', md: 'none' }}
+                >
+                    <EventButtons
+                        isCurrUserAttending={isCurrUserAttending}
+                        groupId={groupId}
+                        eventId={_id}
+                        handleAddMemberGoing={handleAddMemberGoing}
+                        handleRemoveMemberGoing={handleRemoveMemberGoing}
+                    />
                 </Flex>
             </Flex>
         </Flex >

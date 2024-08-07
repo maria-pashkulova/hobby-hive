@@ -11,9 +11,10 @@ const EventDetailsModal = ({ isOpen, onClose, eventDetailsObj }) => {
 
     const { groupId, id } = eventDetailsObj;
     const [particularEvent, setParticularEvent] = useState({});
+    const [isAttending, setIsAttending] = useState(false);
     const [loading, setLoading] = useState(true);
 
-    const { logoutHandler } = useContext(AuthContext);
+    const { logoutHandler, userId } = useContext(AuthContext);
     const navigate = useNavigate();
 
 
@@ -24,7 +25,12 @@ const EventDetailsModal = ({ isOpen, onClose, eventDetailsObj }) => {
     useEffect(() => {
         eventService.getById(groupId, id)
             .then((currEvent) => {
+
                 setParticularEvent(currEvent);
+
+                //currEvent.membersGoing is populated with members data!!!
+                const currMembersGoingIds = currEvent.membersGoing.map(member => member._id);
+                setIsAttending(currMembersGoingIds.includes(userId));
             })
             .catch(error => {
 
@@ -43,6 +49,31 @@ const EventDetailsModal = ({ isOpen, onClose, eventDetailsObj }) => {
                 setLoading(false);
             })
     }, [groupId, id]) // although this component will unmount to display another event details, add id (event id) and group Id in dependency array just in case
+
+
+    //change membersGoing to an event in the state when user joins an event
+    const handleAddMemberGoing = (newMemberGoing) => {
+        setParticularEvent((event) => ({
+            ...event,
+            membersGoing: [...event.membersGoing, newMemberGoing]
+        }))
+
+        //change state isAttending
+        setIsAttending(true);
+    }
+
+    //change membersGoing to an event in the state when user revokes attendance on event
+    const handleRemoveMemberGoing = (memberToRemoveFromGoingId) => {
+        setParticularEvent((event) => ({
+            ...event,
+            membersGoing: event.membersGoing.filter(currMemberGoing => currMemberGoing._id !== memberToRemoveFromGoingId)
+        }));
+
+        //change state isAttending
+        setIsAttending(false);
+    }
+
+
     return (
         <Modal isOpen={isOpen} onClose={onClose}
 
@@ -61,7 +92,12 @@ const EventDetailsModal = ({ isOpen, onClose, eventDetailsObj }) => {
                         ) :
                         (eventDetailsObj &&
                             <Box width="100%" height="100%">
-                                <EventDetails event={particularEvent} />
+                                <EventDetails
+                                    event={particularEvent}
+                                    isCurrUserAttending={isAttending}
+                                    handleAddMemberGoing={handleAddMemberGoing}
+                                    handleRemoveMemberGoing={handleRemoveMemberGoing}
+                                />
                             </Box>
                         )
 

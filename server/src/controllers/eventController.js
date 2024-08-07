@@ -66,7 +66,7 @@ router.post('/', async (req, res) => {
 
 //MARK ATTENDANCE
 //groupMiddleware and isMemberMiddleware middlewares have already been executed by far
-router.put('/:eventId/attend', getEventForAttendance, async (req, res) => {
+router.put('/:eventId/markAttendance', getEventForAttendance, async (req, res) => {
 
     const fetchedEvent = req.event; //Mongoose document!
     const currUserId = req.user._id;
@@ -85,8 +85,8 @@ router.put('/:eventId/attend', getEventForAttendance, async (req, res) => {
 });
 
 
-//DECLINE ATTENDANCE
-router.put('/:eventId/declineAttend', getEventForAttendance, async (req, res) => {
+//REVOKE ATTENDANCE
+router.put('/:eventId/revokeAttendance', getEventForAttendance, async (req, res) => {
     const fetchedEvent = req.event; //Mongoose document!
     const currUserId = req.user._id;
 
