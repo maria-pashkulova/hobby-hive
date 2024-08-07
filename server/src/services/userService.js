@@ -3,7 +3,7 @@ const jwt = require('../lib/jwt');
 const User = require('../models/User');
 const Group = require('../models/Group');
 const mongoose = require('mongoose');
-
+const escapeRegExp = require('../utils/escapeRegExp');
 const { uploadToCloudinary, destroyFromCloudinary } = require('../utils/cloudinaryUtils');
 const PROFILE_PICS_FOLDER = 'user-profile-pics';
 
@@ -70,6 +70,8 @@ exports.login = async (email, password) => {
 }
 
 exports.getAll = async (search, currUserId) => {
+    // Escape special characters in the search string
+    const escapedSearch = escapeRegExp(search);
 
     const users = await User.aggregate([
         {
@@ -85,10 +87,10 @@ exports.getAll = async (search, currUserId) => {
         {
             $match: {
                 $or: [
-                    { firstName: { $regex: search, $options: 'i' } },
-                    { lastName: { $regex: search, $options: 'i' } },
-                    { email: { $regex: search, $options: 'i' } },
-                    { fullName: { $regex: search, $options: 'i' } }
+                    { firstName: { $regex: escapedSearch, $options: 'i' } },
+                    { lastName: { $regex: escapedSearch, $options: 'i' } },
+                    { email: { $regex: escapedSearch, $options: 'i' } },
+                    { fullName: { $regex: escapedSearch, $options: 'i' } }
                 ]
             }
         },

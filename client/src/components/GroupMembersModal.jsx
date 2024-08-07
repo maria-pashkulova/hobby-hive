@@ -92,7 +92,6 @@ const GroupMembersModal = ({ isOpen, onClose, groupMembers, groupAdmin, isMember
 
     }
 
-
     return (
         <>
             <Modal isOpen={isOpen} onClose={onClose}>

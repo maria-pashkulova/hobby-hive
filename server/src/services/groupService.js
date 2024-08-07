@@ -1,6 +1,8 @@
 const Group = require('../models/Group');
 const User = require('../models/User');
 const mongoose = require('mongoose');
+const escapeRegExp = require('../utils/escapeRegExp');
+
 
 const GROUP_PICS_FOLDER = 'group-pics';
 const { uploadToCloudinary, destroyFromCloudinary } = require('../utils/cloudinaryUtils');
@@ -23,7 +25,8 @@ exports.getAll = async (name, category, location, page, limit) => {
     if (name || category || location) {
 
         if (name) {
-            matchStage.name = { $regex: name, $options: 'i' } //case-insensitive search
+            const escapedName = escapeRegExp(name);
+            matchStage.name = { $regex: escapedName, $options: 'i' } //case-insensitive search
         }
         if (category) {
             // Convert category to ObjectId - error ocurrs without converting

@@ -86,9 +86,12 @@ router.get('/', auth, async (req, res) => {
     const { search } = req.query;
     const currUserId = req.user._id;
 
-    const users = await userService.getAll(search, currUserId);
-
-    res.json(users);
+    try {
+        const users = await userService.getAll(search, currUserId);
+        res.json(users);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
 
 });
 
