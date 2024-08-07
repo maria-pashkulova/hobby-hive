@@ -4,6 +4,7 @@ const eventService = require('../services/eventService');
 
 //middlewares 
 const getEvent = require('../middlewares/eventMiddleware');
+const getEventForAttendance = require('../middlewares/eventMiddlewareForAttendance');
 
 
 //GET ALL events for visible date range on calendar
@@ -42,7 +43,7 @@ router.get('/:eventId', getEvent, async (req, res) => {
 })
 
 
-//CREATE
+//CREATE EVENT
 router.post('/', async (req, res) => {
     const { title, color, description, specificLocation, start, end, activityTags } = req.body;
     const _ownerId = req.user._id; //текущо вписания потребител е owner на event-a
@@ -61,6 +62,44 @@ router.post('/', async (req, res) => {
         console.log('Error in create event:', error.message);
     }
 
+});
+
+//MARK ATTENDANCE
+//groupMiddleware and isMemberMiddleware middlewares have already been executed by far
+router.put('/:eventId/attend', getEventForAttendance, async (req, res) => {
+
+    const fetchedEvent = req.event; //Mongoose document!
+    const currUserId = req.user._id;
+
+    try {
+        await eventService.markAsGoing(currUserId, fetchedEvent);
+        res.status(200).json({
+            message: 'Успешно отбелязахте своето присъствие!'
+        })
+    } catch (error) {
+        res.status(error.statusCode || 500).json({
+            message: error.message,
+        });
+    }
+
+});
+
+
+//DECLINE ATTENDANCE
+router.put('/:eventId/declineAttend', getEventForAttendance, async (req, res) => {
+    const fetchedEvent = req.event; //Mongoose document!
+    const currUserId = req.user._id;
+
+    try {
+        await eventService.markAsAbsent(currUserId, fetchedEvent);
+        res.status(200).json({
+            message: 'Успешно премахнахте своето присъствие!'
+        })
+    } catch (error) {
+        res.status(error.statusCode || 500).json({
+            message: error.message,
+        });
+    }
 });
 
 

@@ -1,6 +1,9 @@
 const router = require('express').Router();
 
 const userService = require('../services/userService');
+const eventService = require('../services/eventService');
+
+//middlewares
 const auth = require('../middlewares/authenticationMiddleware');
 
 router.post('/login', async (req, res) => {
@@ -90,7 +93,7 @@ router.get('/', auth, async (req, res) => {
 });
 
 
-//задължително преди долния път
+//задължително преди долния път, съдържащ /:userId
 //a parametric path inserted just before a literal one takes the precedence over the literal one.
 router.get('/my-groups', auth, async (req, res) => {
 
@@ -118,6 +121,24 @@ router.get('/my-details', auth, async (req, res) => {
 
 })
 
+//GET ALL events for visible date range on calendar FOR CURRENT LOGGED IN USER
+//- the events he has created (automatically marked as Attending) + all the events other users created and he marked himself as going
+//MY CALENDAR: 
+
+router.get('/my-calendar', auth, async (req, res) => {
+
+    const currUserId = req.user._id;
+    const { start, end } = req.query;
+
+    try {
+        const userEvents = await eventService.getUserAttendingEventsInRange(currUserId, start, end);
+        res.json(userEvents);
+
+    } catch (error) {
+        res.status(500).json({ message: 'Сървърна грешка!' });
+    }
+})
+
 
 //оставям :userId да се взима от параметрите за да се запази
 //Uniform interface (REST)
@@ -140,6 +161,8 @@ router.put('/:userId', auth, async (req, res) => {
         console.log('Error in update user:', error.message);
     }
 });
+
+
 
 
 module.exports = router;

@@ -52,12 +52,64 @@ exports.getByIdWithMembers = async (event) => {
 
 }
 
-//used in eventMiddleware only
+// ----------Used for validations only-----------
+//used in eventMiddleware only - for : event details, update event, my calendar
 exports.getByIdToValidate = (eventId) => {
     const event = Event
         .findById(eventId)
 
     return event;
+}
+
+//used to validate event and get its membersGoing field for attend and declineAttend functionality
+exports.getByIdToValidateForAttendance = (eventId) => {
+    const event = Event
+        .findById(eventId)
+        .select('membersGoing');
+
+    return event;
+
+}
+
+// -------------------------------------
+
+//My calendar functionality
+exports.getUserAttendingEventsInRange = (currUserId, startISO, endISO) => {
+    let query = { membersGoing: currUserId }
+    if (startISO && endISO) {
+        query = {
+            membersGoing: currUserId,
+            $or: [
+                {
+                    //Events fully within the range
+                    start: { $gte: startISO },
+                    end: { $lte: endISO }
+                },
+                {
+                    //Events starting before the range but ending within it
+                    start: { $lt: startISO },
+                    end: { $gte: startISO }
+                },
+                {
+                    //Events starting within the range but ending after it:
+                    start: { $lte: endISO },
+                    end: { $gt: endISO }
+                }
+            ]
+        };
+    }
+
+    const events = Event
+        .find(query)
+        .select('_id title color start end groupId _ownerId specificLocation ')
+        .populate({
+            path: 'groupId',
+            select: 'name'
+        }) //show group name with events
+        .lean();
+
+    return events;
+
 }
 
 exports.create = async (title, color, description, specificLocation, start, end, activityTags, groupId, _ownerId) => {
@@ -113,5 +165,53 @@ exports.create = async (title, color, description, specificLocation, start, end,
         });
 
     return newEvent;
+
+}
+
+//MARK ATTENDANCE RELATED SERVICES
+
+
+//Authentication middleware, groupMiddleware and isMemberMiddleware middlewares have already been executed by far
+//which guarantees: 
+/* 
+    - currUserId is a valid user Id
+    - the group is valid
+    - current user is member of the group
+ */
+
+//currEvent format : {_id: eventId (of type ObjectId) , membersGoing [member ids (of type ObjectId)]}
+exports.markAsGoing = async (currUserId, currEvent) => {
+
+    //check if user is already marked as going to this event
+
+    const memberIsGoing = currEvent.membersGoing.find(memberId => memberId.toString() === currUserId);
+
+    if (memberIsGoing) {
+        const error = new Error('Вече сте отбелязали своето присъствие!');
+        error.statusCode = 400;
+        throw error;
+    }
+
+    currEvent.membersGoing.push(currUserId);
+
+    await currEvent.save();
+}
+
+exports.markAsAbsent = async (currUserId, currEvent) => {
+
+    //check if user is already marked as going to this event first, so he can mark himself as absent
+
+    const memberIsGoing = currEvent.membersGoing.find(memberId => memberId.toString() === currUserId);
+
+    if (!memberIsGoing) {
+        const error = new Error('Не можете да премахнете присъствие за събитие, на което не сте отбелязани като присъстващи!');
+        error.statusCode = 400;
+        throw error;
+    }
+
+    const newMembersGoing = currEvent.membersGoing.filter((memberId) => memberId.toString() !== currUserId);
+    currEvent.membersGoing = newMembersGoing;
+
+    await currEvent.save();
 
 }
