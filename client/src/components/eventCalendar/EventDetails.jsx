@@ -1,13 +1,15 @@
-import { Avatar, AvatarGroup, Box, Button, Flex, HStack, Icon, Image, Tag, Text } from '@chakra-ui/react';
+import { Avatar, AvatarGroup, Box, Button, Flex, HStack, Icon, Image, Tag, Text, useDisclosure } from '@chakra-ui/react';
 import React from 'react'
 import { FiCalendar, FiMapPin } from "react-icons/fi";
 import { formatEventTime } from '../../utils/formatEventDisplay';
 import EventButtons from './EventButtons';
+import MembersGoingModal from './MembersGoingModal';
 
 const EventDetails = ({ event, isCurrUserAttending, handleAddMemberGoing, handleRemoveMemberGoing }) => {
 
     const { _id, title, start, end, description, specificLocation, activityTags, membersGoing, groupId, _ownerId } = event;
 
+    const membersGoingModal = useDisclosure();
 
     return (
         <Flex
@@ -102,6 +104,7 @@ const EventDetails = ({ event, isCurrUserAttending, handleAddMemberGoing, handle
                                     key={member._id}
                                     name={member.fullName}
                                     src={member.profilePic}
+                                    onClick={membersGoingModal.onOpen}
                                 />
                             ))}
                         </AvatarGroup>
@@ -121,6 +124,13 @@ const EventDetails = ({ event, isCurrUserAttending, handleAddMemberGoing, handle
                     />
                 </Flex>
             </Flex>
+
+            {/* display member going to an event in a separate modal */}
+            {membersGoingModal.isOpen && <MembersGoingModal
+                isOpen={membersGoingModal.isOpen}
+                onClose={membersGoingModal.onClose}
+                membersGoing={membersGoing}
+            />}
         </Flex >
     );
 
