@@ -37,11 +37,9 @@ const GroupChat = () => {
                 if (error.status === 401) {
                     logoutHandler(); //invalid or missing token
                     navigate('/login');
-                } if (error.status === 403) {
+                } else if (error.status === 403) {
                     navigate(`/groups/${groupId}`);
-                }
-
-                else {
+                } else {
                     toast({
                         title: error.message,
                         status: "error",
