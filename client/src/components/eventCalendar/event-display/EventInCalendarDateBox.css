@@ -1,0 +1,7 @@
+ /* lg breakpoint (992px) */
+ @media (min-width: 62em) {
+     .user-icon {
+         width: 1.5em;
+         height: 1.5em;
+     }
+ }

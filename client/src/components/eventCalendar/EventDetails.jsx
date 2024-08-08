@@ -1,4 +1,4 @@
-import { Avatar, AvatarGroup, Box, Button, Flex, HStack, Icon, Image, Tag, Text, useDisclosure } from '@chakra-ui/react';
+import { Avatar, AvatarGroup, Box, Button, Circle, Flex, HStack, Icon, Image, Tag, Text, useDisclosure } from '@chakra-ui/react';
 import React from 'react'
 import { FiCalendar, FiMapPin } from "react-icons/fi";
 import { formatEventTime } from '../../utils/formatEventDisplay';
@@ -7,7 +7,7 @@ import MembersGoingModal from './MembersGoingModal';
 
 const EventDetails = ({ event, isCurrUserAttending, handleAddMemberGoing, handleRemoveMemberGoing }) => {
 
-    const { _id, title, start, end, description, specificLocation, activityTags, membersGoing, groupId, _ownerId } = event;
+    const { _id, title, color, start, end, description, specificLocation, activityTags, membersGoing, groupId, _ownerId } = event;
 
     const membersGoingModal = useDisclosure();
 
@@ -21,11 +21,18 @@ const EventDetails = ({ event, isCurrUserAttending, handleAddMemberGoing, handle
                     w='100%'
                     mb='10px'
                     justifyContent={'space-between'}>
-                    <Text fontWeight='600'
-                        color={'gray.800'}
-                        fontSize='2xl'>
-                        {title}
-                    </Text>
+                    <Flex
+                        gap={2}
+                        alignItems={'center'}
+                    >
+                        <Circle size='20px' bg={color} />
+                        <Text fontWeight='600'
+                            color={'gray.800'}
+                            fontSize='2xl'>
+                            {title}
+                        </Text>
+                    </Flex>
+
 
                     {/* Event buttons for larger screens */}
                     <Flex

@@ -23,11 +23,11 @@ const Header = ({ onOpen }) => {
             alignItems="center"
             borderBottomWidth="1px"
             borderBottomColor='gray.200'
-            justifyContent={{ base: 'space-between', md: 'flex-end' }}>
+            justifyContent={{ base: 'space-between', lg: 'flex-end' }}>
 
             {/* mobile */}
             <IconButton
-                display={{ base: 'flex', md: 'none' }}
+                display={{ base: 'flex', lg: 'none' }}
                 onClick={onOpen}
                 variant="outline"
                 aria-label="open menu"
@@ -41,7 +41,7 @@ const Header = ({ onOpen }) => {
 
             {/* notifications bell and avatar*/}
 
-            <HStack spacing={{ base: '1', md: '3' }}>
+            <HStack spacing={{ base: '1', lg: '3' }}>
                 <Menu>
                     <MenuButton
                         p={2}

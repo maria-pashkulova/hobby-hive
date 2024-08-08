@@ -14,7 +14,7 @@ const AuthLayout = () => {
     return isAuthenticated ? (
         <>
             <Sidebar
-                display={{ base: 'none', md: 'block' }}
+                display={{ base: 'none', lg: 'block' }}
             />
             <Drawer
                 isOpen={isOpen}
@@ -30,7 +30,7 @@ const AuthLayout = () => {
             <Header onOpen={onOpen} />
             <Box
                 as='main'
-                ml={{ base: 0, md: 60 }}
+                ml={{ base: 0, lg: 60 }}
                 p="4"
                 minH={'full'}
             >

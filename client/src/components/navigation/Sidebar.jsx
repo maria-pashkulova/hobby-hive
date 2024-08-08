@@ -1,10 +1,11 @@
 import { Box, Flex, Heading, CloseButton, List, ListItem } from '@chakra-ui/react'
-import { FiHome, FiCompass, FiStar } from "react-icons/fi";
+import { FiHome, FiStar, FiCalendar } from "react-icons/fi";
 import NavItem from './NavItem';
 
 const listItems = [
     { title: 'Начало', icon: FiHome, to: '/' },
-    { title: 'Моите групи', icon: FiStar, to: '/my-groups' }
+    { title: 'Моите групи', icon: FiStar, to: '/my-groups' },
+    { title: 'Моят календар', icon: FiCalendar, to: '/' }
 ];
 
 
@@ -14,7 +15,7 @@ const Sidebar = ({ onClose, display }) => {
         <Box
             as='nav'
             bg='gray.100'
-            w={{ base: 'full', md: 60 }}
+            w={{ base: 'full', lg: 60 }}
             position="fixed"
             h="full"
             display={display}
@@ -23,7 +24,7 @@ const Sidebar = ({ onClose, display }) => {
                 <Heading fontSize="2xl" >
                     Хоби Кошер
                 </Heading>
-                <CloseButton display={{ base: 'flex', md: 'none' }} onClick={onClose} />
+                <CloseButton display={{ base: 'flex', lg: 'none' }} onClick={onClose} />
             </Flex>
             <List>
                 {listItems.map((link, index) => (

@@ -1,4 +1,44 @@
+/* event display class */
 .fc-daygrid-event {
     white-space: normal;
     padding: 4px;
+}
+
+/* desktop first approach */
+
+/* md in Chakra ui-> 768px */
+@media only screen and (max-width:48em) {
+
+    /* Adjust full calendar's font size for buttons (today, prev,next) and title */
+
+    .fc .fc-button .fc-icon {
+        font-size: 1.3em;
+    }
+
+    .fc .fc-toolbar-title {
+        font-size: 1.3em;
+    }
+
+    .fc .fc-button {
+        font-size: 0.8em;
+    }
+
+
+
+}
+
+/* sm in Chakra ui-> 480px */
+@media only screen and (max-width:30em) {
+    .fc .fc-button .fc-icon {
+        font-size: 1.1em;
+    }
+
+    .fc .fc-toolbar-title {
+        font-size: 1em;
+    }
+
+    .fc .fc-button {
+        font-size: 0.75em;
+    }
+
 }

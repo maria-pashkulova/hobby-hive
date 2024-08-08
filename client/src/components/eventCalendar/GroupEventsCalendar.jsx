@@ -3,14 +3,26 @@ import dayGridPlugin from '@fullcalendar/daygrid'
 import bgLocale from '@fullcalendar/core/locales/bg'
 import interactionPlugin from '@fullcalendar/interaction';
 
-import { Box } from '@chakra-ui/react'
+import { Box, Flex, Spinner, useBreakpointValue } from '@chakra-ui/react'
 import addDefaultTimeToSelectedDate from '../../utils/addTimeToSelectedDate';
 import './GroupEventsCalendar.css';
-import EventInCalendarDateBox from './EventInCalendarDateBox';
+import EventInCalendarDateBox from './event-display/EventInCalendarDateBox';
+import { useEffect, useState } from 'react';
 
 
 const GroupEventsCalendar = ({ groupEvents, onDateClick, onEventClick, fetchEventsForRange }) => {
 
+    //window resizing related
+    const [lastStart, setLastStart] = useState();
+    const [lastEnd, setLastEnd] = useState();
+    //State used to dynamically define the initial view for fullcalendar
+    const [initialView, setInitialView] = useState(null);
+
+
+    useEffect(() => {
+        const isSmallerScreen = window.innerWidth <= 600;
+        setInitialView(isSmallerScreen ? 'dayGridWeekThreeDays' : 'dayGridMonth');
+    }, [])
 
     const dayClickAction = (dateClickInfo) => {
 
@@ -21,7 +33,6 @@ const GroupEventsCalendar = ({ groupEvents, onDateClick, onEventClick, fetchEven
 
     //Change default event display from fullCalendar library
     const renderEventContent = (eventInfo) => {
-        //console.log(eventInfo);
 
         return (
             <EventInCalendarDateBox
@@ -37,23 +48,43 @@ const GroupEventsCalendar = ({ groupEvents, onDateClick, onEventClick, fetchEven
 
     const handleDatesSet = (datesInfo) => {
         //console.log(datesInfo);
+        // console.log(lastStart, lastEnd);
+
 
         //end date is exclusive - for example visible days incuding 11.08 -> end : 12.08
         const { start, end } = datesInfo;
-        fetchEventsForRange(start, end);
+
+        // Check if the date range has actually changed or the window has been resized without changing the view (dayGridMonth / dayGridWeek)
+        if (start.getTime() !== lastStart?.getTime() || end.getTime() !== lastEnd?.getTime()) {
+            // Save the new date range
+            setLastStart(start);
+            setLastEnd(end);
+
+            //fetch events for new range 
+            fetchEventsForRange(start, end);
+
+        }
     }
+
+    // Conditional rendering to avoid rendering FullCalendar until the initial view is determined
+    if (!initialView) {
+        return <Flex justifyContent={'center'} my={5}>
+            <Spinner size='xl' />
+        </Flex>
+    }
+
 
     return (
         <Box
             mt={20}>
             <FullCalendar
                 plugins={[dayGridPlugin, interactionPlugin]}
-                initialView="dayGridMonth"
+                initialView={initialView}
                 locale={bgLocale}
                 headerToolbar={{
                     left: 'prev,next',
                     center: 'title',
-                    right: 'dayGridMonth'
+                    right: 'today' // user would not have opportunity to change view; view is changed programmatically only
                 }}
                 //All events have solid background
                 eventDisplay='block'
@@ -77,6 +108,18 @@ const GroupEventsCalendar = ({ groupEvents, onDateClick, onEventClick, fetchEven
                 dateClick={dayClickAction}
                 eventClick={eventClickAction}
                 datesSet={handleDatesSet}
+                views={{
+                    dayGridWeekThreeDays: {
+                        type: 'dayGrid',
+                        duration: { days: 3 }
+                        // dayCount: 3 //works the same as duration in this specific case
+                    }
+                }}
+                windowResize={(arg) => {
+                    const calendarApi = arg.view.calendar;
+                    const isSmallerScreen = window.innerWidth <= 600;
+                    calendarApi.changeView(isSmallerScreen ? 'dayGridWeekThreeDays' : 'dayGridMonth');
+                }}
             />
         </Box>
     )
