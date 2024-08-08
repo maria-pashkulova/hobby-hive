@@ -1,4 +1,4 @@
-import { Avatar, AvatarGroup, Box, Button, Circle, Flex, HStack, Icon, Image, Tag, Text, useDisclosure } from '@chakra-ui/react';
+import { Avatar, AvatarGroup, Badge, Box, Circle, Flex, HStack, Icon, Tag, Text, useDisclosure } from '@chakra-ui/react';
 import React from 'react'
 import { FiCalendar, FiMapPin } from "react-icons/fi";
 import { formatEventTime } from '../../utils/formatEventDisplay';
@@ -100,22 +100,28 @@ const EventDetails = ({ event, isCurrUserAttending, handleAddMemberGoing, handle
                         </Text>
                     </Flex>
                     {/*  Присъстващи:  */}
-                    <Box>
-                        <AvatarGroup
-                            size='sm'
-                            max={4}
-                            cursor='pointer'
-                        >
-                            {membersGoing.map((member) => (
-                                <Avatar
-                                    key={member._id}
-                                    name={member.fullName}
-                                    src={member.profilePic}
-                                    onClick={membersGoingModal.onOpen}
-                                />
-                            ))}
-                        </AvatarGroup>
-                    </Box>
+                    {membersGoing.length > 0 ?
+                        <Box>
+                            <AvatarGroup
+                                size='sm'
+                                max={4}
+                                cursor='pointer'
+                            >
+                                {membersGoing.map((member) => (
+                                    <Avatar
+                                        key={member._id}
+                                        name={member.fullName}
+                                        src={member.profilePic}
+                                        onClick={membersGoingModal.onOpen}
+                                    />
+                                ))}
+                            </AvatarGroup>
+                        </Box>
+
+                        : (<Badge ml='1' p={1} fontSize='0.8em' colorScheme='red'>
+                            0 присъстващи
+                        </Badge>)
+                    }
                 </Flex>
 
                 {/* Event buttons for smaller screens */}
