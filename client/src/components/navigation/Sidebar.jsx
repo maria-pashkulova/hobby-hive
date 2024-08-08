@@ -5,7 +5,7 @@ import NavItem from './NavItem';
 const listItems = [
     { title: 'Начало', icon: FiHome, to: '/' },
     { title: 'Моите групи', icon: FiStar, to: '/my-groups' },
-    { title: 'Моят календар', icon: FiCalendar, to: '/' }
+    { title: 'Моят календар', icon: FiCalendar, to: '/my-calendar' }
 ];
 
 

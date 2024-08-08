@@ -50,3 +50,8 @@ export const updateUser = (userId, { firstName, lastName, email, password, newPr
     })
 
 );
+
+//Get My events in the currently viewed date range
+export const getMyEvents = (startDate, endDate) => {
+    return request.get(`${baseUrl}/my-calendar?start=${startDate.toISOString()}&end=${endDate.toISOString()}`)
+}

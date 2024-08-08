@@ -38,6 +38,7 @@ exports.getAllGroupEvents = (groupId, startISO, endISO) => {
     return events;
 }
 
+//Used for fetching event details
 exports.getByIdWithMembers = async (event) => {
     // event is valid -> checked in eventMiddleware
     //added event details to request object
@@ -47,6 +48,8 @@ exports.getByIdWithMembers = async (event) => {
             path: 'membersGoing',
             select: 'firstName lastName email profilePic'
         });
+
+    //populate requests for event change here
 
     return eventWithMembers;
 
@@ -101,7 +104,7 @@ exports.getUserAttendingEventsInRange = (currUserId, startISO, endISO) => {
 
     const events = Event
         .find(query)
-        .select('_id title color start end groupId _ownerId specificLocation ')
+        .select('_id title color start end groupId _ownerId')
         .populate({
             path: 'groupId',
             select: 'name'

@@ -1,4 +1,4 @@
-import { Navigate, useNavigate, useOutletContext, useParams } from 'react-router-dom';
+import { useNavigate, useOutletContext } from 'react-router-dom';
 import { useContext, useEffect, useState } from 'react';
 import * as eventService from '../services/eventService';
 import AuthContext from '../contexts/authContext';
@@ -60,6 +60,7 @@ const GroupEvents = () => {
     };
 
     const handleEventClick = (eventDetailsObj) => {
+
         setSelectedEventDetails(eventDetailsObj);
         showEventDetailsModal.onOpen();
     }

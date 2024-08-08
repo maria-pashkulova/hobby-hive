@@ -95,7 +95,11 @@ const GroupEventsCalendar = ({ groupEvents, onDateClick, onEventClick, fetchEven
                     color: event.color, //if event has no color, or color value is invalid a default blue color is set by FullCalendar
                     start: event.start,
                     end: event.end,
-                    groupId: event.groupId,
+                    // my calendar - groupId field is populated : {_id:group id, name:...}
+                    // group events - groupId is just the group id as string
+                    groupId: typeof event.groupId === 'object'
+                        ? JSON.stringify(event.groupId)
+                        : event.groupId,
                     ownerId: event._ownerId
                 }))}
                 eventTimeFormat={{
