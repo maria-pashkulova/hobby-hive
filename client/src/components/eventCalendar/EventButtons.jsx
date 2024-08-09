@@ -1,15 +1,16 @@
-import { Button, Flex, Icon, useToast } from "@chakra-ui/react"
+import { Button, Flex, Icon, IconButton, Menu, MenuButton, MenuItem, MenuList, useToast } from "@chakra-ui/react"
 import { FiMoreHorizontal } from "react-icons/fi"
 
 import * as eventService from '../../services/eventService';
 import { useNavigate } from "react-router-dom";
 import { useContext } from "react";
 import AuthContext from "../../contexts/authContext";
+import { BsThreeDots } from "react-icons/bs";
 
 //Attend / Decline attend buttons
 // Event actions : update, delete, request change according to user role in a group
 
-const EventButtons = ({ isCurrUserAttending, groupId, eventId, handleAddMemberGoing, handleRemoveMemberGoing }) => {
+const EventButtons = ({ isCurrUserAttending, groupId, eventId, eventOwner, groupAdmin, handleAddMemberGoing, handleRemoveMemberGoing }) => {
 
     const navigate = useNavigate();
     const { logoutHandler, userId, fullName, email, profilePic } = useContext(AuthContext);
@@ -125,6 +126,34 @@ const EventButtons = ({ isCurrUserAttending, groupId, eventId, handleAddMemberGo
             >
                 Действия
             </Button>
+
+            {/* open menu for actions */}
+            {/* TODO: make it responsive and remove the other button with three dots */}
+            <Menu>
+                <MenuButton
+                    variant='ghost'
+                    as={IconButton}
+                    icon={< BsThreeDots />}
+                    display={{ base: 'none', md: 'flex' }} //Show only on larger screens
+                />
+                {/* <MenuButton
+                    variant='ghost'
+                    display={{ base: 'flex', md: 'none' }} //Show only on smaller screens
+                >
+                    Действия
+                </MenuButton> */}
+                <MenuList>
+                    {(userId === groupAdmin || userId === eventOwner)
+                        ?
+                        <>
+                            <MenuItem >Редактирай</MenuItem>
+                            {userId === groupAdmin && <MenuItem >Изтрий</MenuItem>}
+                        </>
+                        :
+                        <MenuItem>Заяви промяна</MenuItem>
+                    }
+                </MenuList>
+            </Menu>
         </Flex>
     )
 }

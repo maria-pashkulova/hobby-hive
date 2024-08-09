@@ -10,7 +10,7 @@ import EventDetailsModal from './eventCalendar/EventDetailsModal';
 const GroupEvents = () => {
 
     const navigate = useNavigate();
-    const [groupId, isMember, activityTags, groupRegionCity] = useOutletContext();
+    const [groupId, isMember, activityTags, groupRegionCity, groupAdmin] = useOutletContext();
     const { logoutHandler, socket } = useContext(AuthContext);
 
 
@@ -125,6 +125,7 @@ const GroupEvents = () => {
                     isOpen={showEventDetailsModal.isOpen}
                     onClose={showEventDetailsModal.onClose}
                     eventDetailsObj={selectedEventDetails}
+                    groupAdmin={groupAdmin}
                 />
             }
 

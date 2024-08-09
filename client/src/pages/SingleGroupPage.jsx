@@ -283,7 +283,7 @@ const SingleGroupPage = () => {
                 </Flex>
 
                 {/* order matters when destructuring because outlet context is an array! */}
-                <Outlet context={[groupId, isMember, group.activityTags, group.location.name]} />
+                <Outlet context={[groupId, isMember, group.activityTags, group.location.name, group.groupAdmin]} />
 
             </>
 

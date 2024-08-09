@@ -11,7 +11,7 @@ import ProtectedRouteMembers from './components/protected-route/ProtectedRouteMe
 
 import GroupsPage from './pages/GroupsPage';
 import MyGroupsPage from './pages/MyGroupsPage';
-import MyCalendar from './components/MyCalendar.jsx'
+import MyCalendarPage from './pages/MyCalendarPage';
 import SingleGroupPage from './pages/SingleGroupPage';
 import Login from './components/Login.jsx';
 import Register from './components/Register.jsx';
@@ -39,7 +39,7 @@ function App() {
           <Route element={<AuthLayout />}>
             <Route path='/' element={<GroupsPage />} />
             <Route path='/my-groups' element={<MyGroupsPage />} />
-            <Route path='/my-calendar' element={<MyCalendar />} />
+            <Route path='/my-calendar' element={<MyCalendarPage />} />
             <Route path='/update-profile' element={<UpdateProfilePage />} />
             <Route path='/groups/:groupId' element={<SingleGroupPage />} >
               <Route index element={<GroupPosts />} />
