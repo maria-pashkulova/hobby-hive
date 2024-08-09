@@ -1,21 +1,31 @@
-import { Button, Flex, Icon, IconButton, Menu, MenuButton, MenuItem, MenuList, useToast } from "@chakra-ui/react"
-import { FiMoreHorizontal } from "react-icons/fi"
+import { Button, Flex, Icon, IconButton, Menu, MenuButton, MenuItem, MenuList, useBreakpointValue, useDisclosure, useToast } from "@chakra-ui/react"
+import { BsThreeDots } from "react-icons/bs";
 
 import * as eventService from '../../services/eventService';
 import { useNavigate } from "react-router-dom";
 import { useContext } from "react";
 import AuthContext from "../../contexts/authContext";
-import { BsThreeDots } from "react-icons/bs";
+import RequestEventChangeModal from "./RequestEventChangeModal";
 
 //Attend / Decline attend buttons
 // Event actions : update, delete, request change according to user role in a group
 
-const EventButtons = ({ isCurrUserAttending, groupId, eventId, eventOwner, groupAdmin, handleAddMemberGoing, handleRemoveMemberGoing }) => {
+const EventButtons = ({ isCurrUserAttending, groupId, eventId, eventTitle, eventOwner, groupAdmin, handleAddMemberGoing, handleRemoveMemberGoing }) => {
 
     const navigate = useNavigate();
     const { logoutHandler, userId, fullName, email, profilePic } = useContext(AuthContext);
     const toast = useToast();
 
+    const editEventModal = useDisclosure();
+    const deleteEventModal = useDisclosure();
+    const requestEventChangeModal = useDisclosure();
+
+
+    // Switch between icon and text for actions button
+    const menuButtonContent = useBreakpointValue({
+        base: 'Действия', // Show text on smaller screens
+        md: <Icon as={BsThreeDots} boxSize="1.5em" /> // Show three dots icon on larger screens
+    });
 
     const handleMarkAttendance = async () => {
 
@@ -88,73 +98,58 @@ const EventButtons = ({ isCurrUserAttending, groupId, eventId, eventOwner, group
 
 
     return (
-        <Flex
-            gap={2}
-            flexDir={{ base: 'column', md: 'row' }}
-            w={'100%'}
-        >
-            {
-                isCurrUserAttending ?
-                    (
-                        <Button bgColor={"red.400"} onClick={handleRevokeAttendance}>Отмени присъствие</Button>
+        <>
 
-                    ) :
-                    (
-                        <Button bgColor={"yellow.400"} onClick={handleMarkAttendance}>Ще присъствам</Button>
-                    )
-
-            }
-            <Button
-                w='38px'
-                h='38px'
-                borderRadius='12px'
-                me='12px'
-                display={{ base: 'none', md: 'flex' }} //Show only on larger screens
+            <Flex
+                gap={2}
+                flexDir={{ base: 'column', md: 'row' }}
+                w={'100%'}
             >
+                {
+                    isCurrUserAttending ?
+                        (
+                            <Button bgColor={"red.400"} onClick={handleRevokeAttendance}>Отмени присъствие</Button>
 
-                <Icon
-                    w='24px'
-                    h='24px'
-                    as={FiMoreHorizontal}
-                    color={'gray.700'}
-                />
-            </Button>
-            <Button
-                borderRadius='12px'
-                me='12px'
-                display={{ base: 'flex', md: 'none' }} //Show only on smaller screens
-            >
-                Действия
-            </Button>
+                        ) :
+                        (
+                            <Button bgColor={"yellow.400"} onClick={handleMarkAttendance}>Ще присъствам</Button>
+                        )
 
-            {/* open menu for actions */}
-            {/* TODO: make it responsive and remove the other button with three dots */}
-            <Menu>
-                <MenuButton
-                    variant='ghost'
-                    as={IconButton}
-                    icon={< BsThreeDots />}
-                    display={{ base: 'none', md: 'flex' }} //Show only on larger screens
-                />
-                {/* <MenuButton
-                    variant='ghost'
-                    display={{ base: 'flex', md: 'none' }} //Show only on smaller screens
-                >
-                    Действия
-                </MenuButton> */}
-                <MenuList>
-                    {(userId === groupAdmin || userId === eventOwner)
-                        ?
-                        <>
-                            <MenuItem >Редактирай</MenuItem>
-                            {userId === groupAdmin && <MenuItem >Изтрий</MenuItem>}
-                        </>
-                        :
-                        <MenuItem>Заяви промяна</MenuItem>
-                    }
-                </MenuList>
-            </Menu>
-        </Flex>
+                }
+
+                <Menu>
+                    <MenuButton
+                        as={menuButtonContent === 'Действия' ? Button : IconButton}
+                        variant='ghost'
+                        icon={menuButtonContent !== 'Действия' ? menuButtonContent : undefined} // Only pass icon prop when using icon in the button
+                    >
+                        {menuButtonContent === 'Действия' && menuButtonContent}  {/* Render text in button only when it's not the icon */}
+
+                    </MenuButton>
+
+                    <MenuList>
+                        {(userId === groupAdmin || userId === eventOwner)
+                            ?
+                            <>
+                                <MenuItem >Редактирай</MenuItem>
+                                {userId === groupAdmin && <MenuItem >Изтрий</MenuItem>}
+                            </>
+                            :
+                            <MenuItem onClick={requestEventChangeModal.onOpen}>Заяви промяна</MenuItem>
+                        }
+                    </MenuList>
+                </Menu>
+            </Flex>
+
+
+            {requestEventChangeModal.isOpen && <RequestEventChangeModal
+                isOpen={requestEventChangeModal.isOpen}
+                onClose={requestEventChangeModal.onClose}
+                eventIdForRequest={eventId}
+                eventTitle={eventTitle}
+            />}
+        </>
+
     )
 }
 

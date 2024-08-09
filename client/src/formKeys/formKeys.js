@@ -29,3 +29,7 @@ export const EventKeys = {
     SpecificLocation: 'specificLocation',
     ActivityTags: 'activityTags'
 }
+
+export const EventChangeRequestKeys = {
+    Description: 'description'
+}
