@@ -56,6 +56,18 @@ exports.getByIdWithMembers = async (event) => {
 }
 
 // ----------Used for validations only-----------
+
+//select only _id of event with no other info. Used in eventMiddlewareForChangeRequests.js
+exports.getById = (eventId) => {
+    const event = Event
+        .findById(eventId)
+        .select('_id')
+
+    return event;
+}
+
+
+
 //used in eventMiddleware only - for : event details, update event, my calendar
 exports.getByIdToValidate = (eventId) => {
     const event = Event
@@ -73,7 +85,6 @@ exports.getByIdToValidateForAttendance = (eventId) => {
     return event;
 
 }
-
 // -------------------------------------
 
 //My calendar functionality

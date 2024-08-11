@@ -2,9 +2,13 @@ const router = require('express').Router();
 
 const eventService = require('../services/eventService');
 
+//other routers 
+const changeRequestsController = require('./changeRequestCotroller');
+
 //middlewares 
 const getEvent = require('../middlewares/eventMiddleware');
 const getEventForAttendance = require('../middlewares/eventMiddlewareForAttendance');
+const getEventForChangeRequest = require('../middlewares/eventMiddlewareForChangeRequest');
 
 
 //GET ALL events for visible date range on calendar
@@ -102,5 +106,9 @@ router.put('/:eventId/revokeAttendance', getEventForAttendance, async (req, res)
     }
 });
 
+//Handle request for event update
+//Existence of group and group membership are validated in groupController
+//GetEventForChangeRequest validates if event exists
+router.use('/:eventId/changeRequests', getEventForChangeRequest, changeRequestsController)
 
 module.exports = router;
