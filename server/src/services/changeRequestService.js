@@ -32,7 +32,7 @@ exports.getAll = async (isCurrUserGroupAdmin, groupId, page, limit) => {
 exports.getById = (requestId) => {
     const request = EventChangeRequest
         .findById(requestId)
-        .select('_id');
+        .select('_id groupId');
     return request;
 }
 
@@ -69,7 +69,7 @@ exports.create = (currUserId, isCurrUserGroupAdmin, groupId, eventId, eventOwner
 
 exports.delete = (isCurrUserGroupAdmin, requestIdToDelete) => {
     if (!isCurrUserGroupAdmin) {
-        const error = new Error('Само администраторът на групата може да означава заявки за промяна на събития в групата като осъществени!');
+        const error = new Error('Само администраторът на групата може да означава заявки за промяна на събития в групата като прегледани!');
         error.statusCode = 403;
         throw error;
     }
