@@ -9,8 +9,9 @@ import { Form, Formik } from "formik";
 import { EventChangeRequestKeys } from "../../formKeys/formKeys";
 import { changeEventRequestSchema } from '../../schemas/changeEventRequestSchema';
 
+import * as changeRequestService from '../../services/changeRequestService';
 
-const RequestEventChangeModal = ({ isOpen, onClose, eventIdForRequest, eventTitle }) => {
+const RequestEventChangeModal = ({ isOpen, onClose, groupId, eventIdForRequest, eventTitle }) => {
 
 
     const navigate = useNavigate();
@@ -19,6 +20,37 @@ const RequestEventChangeModal = ({ isOpen, onClose, eventIdForRequest, eventTitl
     const toast = useToast();
 
     const handleFormSubmit = async (formValues) => {
+        try {
+
+            const newRequest = await changeRequestService.createRequest(groupId, eventIdForRequest, formValues);
+
+            // console.log(newRequest);
+
+            //TODO: notify group admin for new event change request
+
+            onClose();
+            toast({
+                title: "Администраторът на групата получи Вашата заявка за промяна!",
+                status: "success",
+                duration: 5000,
+                isClosable: true,
+                position: "bottom",
+            });
+
+        } catch (error) {
+            if (error.status === 401) {
+                logoutHandler();
+                navigate('/login');
+            } else {
+                toast({
+                    title: error.message,
+                    status: "error",
+                    duration: 5000,
+                    isClosable: true,
+                    position: "bottom",
+                });
+            }
+        }
 
     }
 

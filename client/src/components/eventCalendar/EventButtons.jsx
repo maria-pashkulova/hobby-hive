@@ -145,6 +145,7 @@ const EventButtons = ({ isCurrUserAttending, groupId, eventId, eventTitle, event
             {requestEventChangeModal.isOpen && <RequestEventChangeModal
                 isOpen={requestEventChangeModal.isOpen}
                 onClose={requestEventChangeModal.onClose}
+                groupId={groupId}
                 eventIdForRequest={eventId}
                 eventTitle={eventTitle}
             />}

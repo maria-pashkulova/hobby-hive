@@ -7,7 +7,7 @@ const validateRequest = require('../middlewares/changeRequestMiddleware');
 //services
 const changeRequestService = require('../services/changeRequestService');
 
-//req object -> req.eventId for all routes
+//req object -> req.eventId and req.eventOwnerId for all routes
 
 //only group admin can view event requests (for all groups he is admin of)
 router.get('/', isAdminMiddleware, async (req, res) => {
@@ -17,17 +17,20 @@ router.get('/', isAdminMiddleware, async (req, res) => {
 })
 
 
-router.post('/', async (req, res) => {
+router.post('/', isAdminMiddleware, async (req, res) => {
 
     const eventId = req.eventId
+    const eventOwnerId = req.eventOwnerId;
     const { description } = req.body;
     const currUserId = req.user._id;
+    const isCurrUserGroupAdmin = req.isAdmin;
+
 
     try {
-        const newRequest = await changeRequestService.create(currUserId, eventId, description);
+        const newRequest = await changeRequestService.create(currUserId, isCurrUserGroupAdmin, eventId, eventOwnerId, description);
         res.status(200).json(newRequest);
     } catch (error) {
-        res.status(500).json({
+        res.status(error.statusCode || 500).json({
             message: error.message
         })
     }

@@ -13,10 +13,10 @@ const getEventForChangeRequest = async (req, res, next) => {
     if (!event) {
         return res.status(404).json({ message: 'Събитието не съществува!' });
     }
-    console.log(event);
-
 
     req.eventId = requestedEventId;
+    req.eventOwnerId = event._ownerId.toString();
+
     next();
 }
 

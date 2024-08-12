@@ -19,7 +19,20 @@ exports.getById = (requestId) => {
     return request;
 }
 
-exports.create = (currUserId, eventId, description) => {
+exports.create = (currUserId, isCurrUserGroupAdmin, eventId, eventOwnerId, description) => {
+    if (isCurrUserGroupAdmin) {
+        const error = new Error('Aдминистраторът на групата не може да прави заявки за промяна на събития в групата!');
+        error.statusCode = 403;
+        throw error;
+    }
+
+    //if current user is not group admin (for the group of the requested event)
+    if (currUserId === eventOwnerId) {
+        const error = new Error('Вие сте създателят на събитието. Можете да го промените без заявка към администратора на групата!');
+        error.statusCode = 403;
+        throw error;
+    }
+
 
     const newRequestData = {
         eventId,

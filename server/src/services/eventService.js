@@ -57,11 +57,11 @@ exports.getByIdWithMembers = async (event) => {
 
 // ----------Used for validations only-----------
 
-//select only _id of event with no other info. Used in eventMiddlewareForChangeRequests.js
+//select only _id and eventOwer (id) for event with no other info. Used in eventMiddlewareForChangeRequests.js
 exports.getById = (eventId) => {
     const event = Event
         .findById(eventId)
-        .select('_id')
+        .select('_id _ownerId')
 
     return event;
 }
