@@ -1,9 +1,58 @@
-import { Button, Card, CardBody, CardFooter, Divider, Flex, Heading, IconButton, Stack, Text, Tooltip } from "@chakra-ui/react"
+import { Card, CardBody, CardFooter, Divider, Flex, Heading, IconButton, Stack, Text, Tooltip, useToast } from "@chakra-ui/react"
 import { FiCheck, FiEye } from "react-icons/fi";
+import { useContext } from "react";
+import { useNavigate } from "react-router-dom";
+import AuthContext from '../contexts/authContext'
 
 import formatDate from '../utils/formatDate';
+import * as changeRequestService from '../services/changeRequestService';
 
-const GroupEventChangeRequests = ({ eventTitle, requestDescription, requestedFrom, requestDate }) => {
+const ChangeGroupEventRequestCard = ({ requestId, eventTitle, requestDescription, requestedFrom, requestDate, groupId, setRefetch, handleCurrentPageChange }) => {
+    const toast = useToast();
+    const navigate = useNavigate();
+    const { logoutHandler } = useContext(AuthContext);
+
+
+    const handleMarkRequestAsRead = async () => {
+
+        try {
+            await changeRequestService.deleteRequest(groupId, requestId);
+
+            //Refresh the UI with deleted request on the first page
+            setRefetch();
+            handleCurrentPageChange(0);
+
+            toast({
+                title: "Успешно означихте заявката като прегледана!",
+                status: "success",
+                duration: 5000,
+                isClosable: true,
+                position: "bottom",
+            });
+
+        } catch (error) {
+            //invalid or missing token
+            if (error.status === 401) {
+                logoutHandler();
+                navigate('/login');
+            } else {
+
+                //грешка при свързването със сървъра
+                toast({
+                    title: 'Възникна грешка при свързване!',
+                    description: 'Заявката не беше означена като пегледана!',
+                    status: "error",
+                    duration: 5000,
+                    isClosable: true,
+                    position: "bottom",
+                });
+            }
+        }
+
+    }
+
+    //TODO: handle go to event in FullCalendar
+
 
     return (
         <Card mt={5}>
@@ -36,6 +85,7 @@ const GroupEventChangeRequests = ({ eventTitle, requestDescription, requestedFro
                                     aria-label='Done'
                                     fontSize='20px'
                                     icon={<FiCheck />}
+                                    onClick={handleMarkRequestAsRead}
                                 />
                             </Tooltip >
                         </Flex>
@@ -63,4 +113,4 @@ const GroupEventChangeRequests = ({ eventTitle, requestDescription, requestedFro
     )
 }
 
-export default GroupEventChangeRequests;
+export default ChangeGroupEventRequestCard;

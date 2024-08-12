@@ -29,7 +29,7 @@ router.get('/', isAdminMiddleware, async (req, res) => {
 })
 
 
-//req object -> req.eventId and req.eventOwnerId for requests with methods: post and delete 
+//req object -> req.eventId and req.eventOwnerId for requests with method: post
 
 router.post('/', getEventForChangeRequest, isAdminMiddleware, async (req, res) => {
 
@@ -54,7 +54,7 @@ router.post('/', getEventForChangeRequest, isAdminMiddleware, async (req, res) =
 
 
 //only group admin can delete (= mark as done) group event request (for all groups he is admin of)
-router.delete('/:requestId', getEventForChangeRequest, validateRequest, isAdminMiddleware, async (req, res) => {
+router.delete('/:requestId', validateRequest, isAdminMiddleware, async (req, res) => {
     const isCurrUserGroupAdmin = req.isAdmin;
     const requestIdToDelete = req.params.requestId;
 

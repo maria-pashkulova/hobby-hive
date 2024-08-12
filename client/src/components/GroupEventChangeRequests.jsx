@@ -62,18 +62,15 @@ const GroupEventChangeRequests = () => {
 
     //PAGINATION RELATED
 
-    //Handler needed in Pagination component
-    const handleCurrentPageChange = (currPage) => {
-        setCurrentPage(currPage);
+    //When request is deleted (mark as read), requests are re-fetched
+    const setRefetch = () => {
+        setFetchRequestsAgain(true);
     }
 
-    //-----
-    //Handler needed when request is deleted (mark as read)
-    const handleMarkRequestAsRead = () => {
-        //TODO: perform delete request for change requests
 
-        //setFetchRequestsAgain(true); виж дали е излишно
-        handleCurrentPageChange(0);
+    //Handler needed in Pagination component and ChangeGroupEventRequestCard component
+    const handleCurrentPageChange = (currPage) => {
+        setCurrentPage(currPage);
     }
 
 
@@ -96,10 +93,14 @@ const GroupEventChangeRequests = () => {
                                     groupEventChangeRequests.map(request => (
                                         <ChangeGroupEventRequestCard
                                             key={request._id}
+                                            requestId={request._id}
                                             eventTitle={request.eventId?.title}
                                             requestDescription={request.description}
                                             requestedFrom={request.requestFromUser?.fullName}
                                             requestDate={request.createdAt}
+                                            groupId={groupId}
+                                            setRefetch={setRefetch}
+                                            handleCurrentPageChange={handleCurrentPageChange}
                                         />))
                                 )
 
