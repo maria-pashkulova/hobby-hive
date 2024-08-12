@@ -13,11 +13,13 @@ const changeRequestService = require('../services/changeRequestService');
 router.get('/', isAdminMiddleware, async (req, res) => {
     const isCurrUserGroupAdmin = req.isAdmin;
     const groupId = req.groupId;
+    const page = parseInt(req.query.page || '0');
+    const limit = parseInt(req.query.limit || '6');
 
     try {
 
-        const changeRequests = await changeRequestService.getAll(isCurrUserGroupAdmin, groupId);
-        res.json(changeRequests);
+        const changeRequestsResult = await changeRequestService.getAll(isCurrUserGroupAdmin, groupId, page, limit);
+        res.json(changeRequestsResult);
 
     } catch (error) {
         res.status(error.statusCode || 500).json({

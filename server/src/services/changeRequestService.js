@@ -1,18 +1,29 @@
 const EventChangeRequest = require('../models/EventChangeRequest');
 
-exports.getAll = (isCurrUserGroupAdmin, groupId) => {
+exports.getAll = async (isCurrUserGroupAdmin, groupId, page, limit) => {
     if (!isCurrUserGroupAdmin) {
         const error = new Error('Само администраторът на групата може да достъпи заявките за промяна на събития в групата!');
         error.statusCode = 403;
         throw error;
     }
 
-    return EventChangeRequest
+    const skip = page * limit;
+
+
+    const requests = await EventChangeRequest
         .find({ groupId })
         .select('-updatedAt -__v')
         .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
         .populate('requestFromUser', 'firstName lastName')
         .populate('eventId', '_id title');
+
+    //Group events requests for change count
+    const total = await EventChangeRequest.countDocuments({ groupId });
+    const totalPages = Math.ceil(total / limit);
+
+    return { requests, totalPages };
 
 }
 
