@@ -14,7 +14,7 @@ const auth = async (req, res, next) => {
     //const token = req.header('X-Authorization');
 
     if (!token) {
-        return res.status(401).json({ message: 'Unautorized, no token' });
+        return res.status(401).json({ message: 'Действията изискват вписване в системата!' });
     }
 
     try {
@@ -44,7 +44,7 @@ const auth = async (req, res, next) => {
         res.clearCookie(process.env.COOKIE_NAME)
         //сървърът връща статус код 401 и клиента да проверява
         //какъв е статус кода и самия клиент да редиректва
-        res.status(401).json({ message: 'Unautorized, invalid token or invalid user!' });
+        res.status(401).json({ message: 'Действията изискват вписване в системата!' });
         console.log(error.message);
     }
 
