@@ -2,6 +2,7 @@ const router = require('express').Router();
 
 //други routers:
 const eventController = require('./eventController');
+const changeRequestController = require('./changeRequestCotroller');
 const postController = require('./postController');
 const chatController = require('./chatController');
 
@@ -167,6 +168,11 @@ router.use('/:groupId/events', getGroup, isMemberMiddleware, eventController);
 //GROUP CHAT
 router.use('/:groupId/chat', getGroup, isMemberMiddleware, chatController);
 
+
+//Handle requests for group event update
+//Existence of group and group membership are validated by getGroup and isMemberMiddleware middlewares
+
+router.use('/:groupId/groupEventChangeRequests', getGroup, isMemberMiddleware, changeRequestController);
 
 
 module.exports = router;

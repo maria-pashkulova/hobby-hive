@@ -270,11 +270,18 @@ const SingleGroupPage = () => {
                                 )
                         }
 
+                        {(userId === group.groupAdmin) && (
+                            <Tooltip label='Заявки за промяна или изтриване на събитие от членовете на групата' placement="bottom-end">
+                                <Button width={{ base: '100%', sm: 'auto' }} bgColor={"yellow.400"} as={Link} to={`/groups/${groupId}/event-change-requests`}>Заявки за събития</Button>
+                            </Tooltip>
+                        )}
 
 
                         {
                             isMember && (<Button width={{ base: '100%', sm: 'auto' }} bgColor={"yellow.400"} as={Link} to={`/groups/${groupId}/chat`}>Групов чат</Button>)
                         }
+
+
 
                     </Flex>
                     {isMember && (

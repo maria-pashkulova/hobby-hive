@@ -1,24 +1,37 @@
 const router = require('express').Router();
 
 //middlewares
+const getEventForChangeRequest = require('../middlewares/eventMiddlewareForChangeRequest');
 const isAdminMiddleware = require('../middlewares/isAdminMiddleware');
 const validateRequest = require('../middlewares/changeRequestMiddleware');
 
 //services
 const changeRequestService = require('../services/changeRequestService');
 
-//req object -> req.eventId and req.eventOwnerId for all routes
 
-//only group admin can view event requests (for all groups he is admin of)
+//only group admin can view group event requests (for all groups he is admin of)
 router.get('/', isAdminMiddleware, async (req, res) => {
     const isCurrUserGroupAdmin = req.isAdmin;
+    const groupId = req.groupId;
 
-    res.json({ message: 'Get all change reqests for event: ' + req.eventId });
+    try {
+
+        const changeRequests = await changeRequestService.getAll(isCurrUserGroupAdmin, groupId);
+        res.json(changeRequests);
+
+    } catch (error) {
+        res.status(error.statusCode || 500).json({
+            message: error.message
+        });
+    }
 })
 
 
-router.post('/', isAdminMiddleware, async (req, res) => {
+//req object -> req.eventId and req.eventOwnerId for requests with methods: post and delete 
 
+router.post('/', getEventForChangeRequest, isAdminMiddleware, async (req, res) => {
+
+    const groupId = req.groupId;
     const eventId = req.eventId
     const eventOwnerId = req.eventOwnerId;
     const { description } = req.body;
@@ -27,7 +40,7 @@ router.post('/', isAdminMiddleware, async (req, res) => {
 
 
     try {
-        const newRequest = await changeRequestService.create(currUserId, isCurrUserGroupAdmin, eventId, eventOwnerId, description);
+        const newRequest = await changeRequestService.create(currUserId, isCurrUserGroupAdmin, groupId, eventId, eventOwnerId, description);
         res.status(200).json(newRequest);
     } catch (error) {
         res.status(error.statusCode || 500).json({
@@ -38,8 +51,8 @@ router.post('/', isAdminMiddleware, async (req, res) => {
 })
 
 
-//only group admin can delete event request (for all groups he is admin of)
-router.delete('/:requestId', validateRequest, isAdminMiddleware, async (req, res) => {
+//only group admin can delete (= mark as done) group event request (for all groups he is admin of)
+router.delete('/:requestId', getEventForChangeRequest, validateRequest, isAdminMiddleware, async (req, res) => {
     const isCurrUserGroupAdmin = req.isAdmin;
     const requestIdToDelete = req.params.requestId;
 

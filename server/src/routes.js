@@ -13,7 +13,7 @@ router.use('/users', userController);
 router.use('/groups', auth, groupController);
 router.use('/categories', auth, categoryController);
 router.use('/locations', auth, locationController);
-router.get('*', (req, res) => {
+router.use('*', (req, res) => {
     res.status(404).json({ message: 'Endpoint not found!' });
 });
 

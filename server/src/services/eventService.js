@@ -61,7 +61,8 @@ exports.getByIdWithMembers = async (event) => {
 exports.getById = (eventId) => {
     const event = Event
         .findById(eventId)
-        .select('_id _ownerId')
+        .select('_id groupId _ownerId')
+
 
     return event;
 }

@@ -1,6 +1,11 @@
 const mongoose = require('mongoose');
 
 const eventChangeRequestSchema = new mongoose.Schema({
+    groupId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Group',
+        required: true
+    },
     eventId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Event',

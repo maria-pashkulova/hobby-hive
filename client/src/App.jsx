@@ -18,11 +18,13 @@ import Register from './components/Register.jsx';
 import Logout from './components/Logout';
 
 import GroupEvents from './components/GroupEvents.jsx';
+import GroupEventChangeRequests from './components/GroupEventChangeRequests';
 import GroupPosts from './components/GroupPosts.jsx';
 import UpdateProfilePage from './pages/UpdateProfilePage.jsx';
 import MyGroupPosts from './components/MyGroupPosts.jsx';
 import GroupChat from './components/group-chat/GroupChat.jsx';
 import NotFoundPage from './components/NotFoundPage.jsx';
+import ProtectedRouteAdmin from './components/protected-route/ProtectedRouteAdmin.jsx';
 
 
 
@@ -47,6 +49,9 @@ function App() {
               <Route element={<ProtectedRouteMembers />}>
                 <Route path='events' element={<GroupEvents />} />
                 <Route path='chat' element={<GroupChat />} />
+              </Route>
+              <Route element={<ProtectedRouteAdmin />}>
+                <Route path='event-change-requests' element={<GroupEventChangeRequests />} />
               </Route>
             </Route>
             <Route path={'/logout'} element={<Logout />} />
