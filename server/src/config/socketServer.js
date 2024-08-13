@@ -148,6 +148,45 @@ function setupSocketServer(expressServer) {
 
         });
 
+
+        //Handle group events change requests 
+
+        socket.on('join requests room', (groupId) => {
+            socket.join(`requests-${groupId}`)
+        });
+
+        socket.on('leave requests room', (groupId) => {
+            socket.leave(`requests-${groupId}`)
+        });
+
+        socket.on('new event change request', (newRequestData) => {
+            const groupInfo = newRequestData.groupId;
+            const groupAdminId = groupInfo.groupAdmin;
+
+            //Notify current group admin if he is logged in
+            //Determine conncection status: it identifies if the group admin is connected to the server
+            //which ensures that only then he receives notifications
+
+            const groupAdminSockets = userSockets.get(groupAdminId) || [];
+
+            //if current group admin is logged in, send him a notification for newly created request - no matter if he is currently viewing the requests page for events
+            //in current group or not
+            if (groupAdminSockets.length > 0) {
+                socket.to(groupAdminId).emit('new request notification', {
+                    notificationTitle: `Нова заявка за промяна в събитие в група: ${groupInfo.name}`,
+                    uniqueIdentifier: `request-${newRequestData._id}`, //used only for React unique key
+                    fromGroup: groupInfo._id,
+                    type: 'request'
+                })
+            }
+
+
+            // Send event to trigger UI update if the group admin is currently viewing the group event change requests page
+            //In this case the only member who is in room requests-${groupId} is the group admin - other users are not allowed to view this page
+            socket.to(`requests-${groupInfo._id}`).emit('new change request');
+        })
+
+
         socket.on('disconnect', () => {
             if (socket.userId) {
                 const sockets = userSockets.get(socket.userId) || [];

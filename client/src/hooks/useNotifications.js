@@ -6,7 +6,7 @@ export default function useNotifications() {
     const [notificationsCount, setNotificationsCount] = useState(0);
     const { socket } = useContext(AuthContext);
 
-    // Receive message notification
+    // Receive event,message or request for event change (group admin only) notification
     useEffect(() => {
 
         //*hook with state dependencies -> use functional update form of setState() to avoid stale state closure problem!
@@ -14,9 +14,10 @@ export default function useNotifications() {
 
             setNotifications((prevNotifications) => {
 
-                // Check if the notification is for a message or an event
+                // Check if the notification is for a message, an event or a request for event update (for group admins only)
                 const isMessageNotification = notification.type === 'message';
                 const isEventNotification = notification.type === 'event';
+                const isRequestNotification = notification.type === 'request';
 
                 if (isMessageNotification) {
                     /* If there is no message notification for a particular group by now, then display the message notification 
@@ -26,12 +27,16 @@ export default function useNotifications() {
 
                     //If not, add the new notification; increment notifications count
                     if (!hasGroupMessageNotification) {
-                        setNotificationsCount((prevCount) => prevCount + 1)
-                        return [notification, ...prevNotifications]
+                        setNotificationsCount((prevCount) => prevCount + 1);
+                        return [notification, ...prevNotifications];
                     }
 
                 } else if (isEventNotification) {
                     setNotificationsCount((prevCount) => prevCount + 1)
+                    return [notification, ...prevNotifications];
+
+                } else if (isRequestNotification) {
+                    setNotificationsCount((prevCount) => prevCount + 1);
                     return [notification, ...prevNotifications];
                 }
 
@@ -43,11 +48,14 @@ export default function useNotifications() {
         };
 
         socket?.on('message notification', handleNotification);
-        socket?.on('new event notification', handleNotification)
+        socket?.on('new event notification', handleNotification);
+        socket?.on('new request notification', handleNotification);
 
         return () => {
             socket?.off('message notification', handleNotification);
             socket?.off('new event notification', handleNotification);
+            socket?.off('new request notification', handleNotification);
+
         };
     }, [socket]); //socket changes between the time Header component is rendered for the first time (socket is null -> authContext.js) and the tcp connection is established 
 

@@ -36,7 +36,7 @@ exports.getById = (requestId) => {
     return request;
 }
 
-exports.create = (currUserId, isCurrUserGroupAdmin, groupId, eventId, eventOwnerId, description) => {
+exports.create = async (currUserId, isCurrUserGroupAdmin, groupId, eventId, eventOwnerId, description) => {
     if (isCurrUserGroupAdmin) {
         const error = new Error('Aдминистраторът на групата не може да прави заявки за промяна на събития в групата!');
         error.statusCode = 400;
@@ -58,9 +58,14 @@ exports.create = (currUserId, isCurrUserGroupAdmin, groupId, eventId, eventOwner
         description
     }
 
-    const newRequest = EventChangeRequest.create(newRequestData);
+    let newRequest = await EventChangeRequest.create(newRequestData);
 
-    //TODO:populate event info or user info if needed
+    //Populated group info is needed for notifications
+    newRequest = await newRequest
+        .populate({
+            path: 'groupId',
+            select: 'name groupAdmin'
+        })
 
     return newRequest;
 

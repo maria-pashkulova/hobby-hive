@@ -74,7 +74,7 @@ const Header = ({ onOpen }) => {
                             notifications.map((notification) =>
                             (<MenuItem
                                 as={Link}
-                                to={`/groups/${notification.fromGroup}/${notification.type === 'event' ? 'events' : 'chat'}`}
+                                to={`/groups/${notification.fromGroup}/${notification.type === 'event' ? 'events' : notification.type === 'request' ? 'event-change-requests' : 'chat'}`}
                                 key={notification.uniqueIdentifier}
                                 onClick={() => {
                                     handleMarkNotificationAsRead(notification.uniqueIdentifier);

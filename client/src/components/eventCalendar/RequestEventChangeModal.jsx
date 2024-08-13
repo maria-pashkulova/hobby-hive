@@ -15,7 +15,7 @@ const RequestEventChangeModal = ({ isOpen, onClose, groupId, eventIdForRequest, 
 
 
     const navigate = useNavigate();
-    const { logoutHandler, userId } = useContext(AuthContext);
+    const { logoutHandler, socket } = useContext(AuthContext);
 
     const toast = useToast();
 
@@ -26,7 +26,8 @@ const RequestEventChangeModal = ({ isOpen, onClose, groupId, eventIdForRequest, 
 
             // console.log(newRequest);
 
-            //TODO: notify group admin for new event change request
+            //notify group admin for new event change request
+            socket?.emit('new event change request', newRequest);
 
             onClose();
             toast({

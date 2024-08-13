@@ -5,7 +5,7 @@ import AuthContext from '../../contexts/authContext';
 const ProtectedRouteAdmin = () => {
 
     const [groupId, isMember, activityTags, groupRegionCity, groupAdmin] = useOutletContext();
-    const { logoutHandler, userId } = useContext(AuthContext);
+    const { userId } = useContext(AuthContext);
 
     if (userId !== groupAdmin) {
         return <Navigate to={`/groups/${groupId}`} />

@@ -21,7 +21,30 @@ const GroupEventChangeRequests = () => {
     const navigate = useNavigate();
     const toast = useToast();
 
-    const { logoutHandler } = useContext(AuthContext);
+    const { logoutHandler, socket } = useContext(AuthContext);
+
+
+
+    //socket communication related
+    useEffect(() => {
+        // Join the requests room for this group when the component mounts
+        socket?.emit('join requests room', groupId);
+
+        // Handle incoming notification to refetch requests
+        const handleNewChangeRequest = () => {
+            setFetchRequestsAgain(true); // Trigger refetch in the second useEffect
+            setCurrentPage(0);
+        }
+
+        socket?.on('new change request', handleNewChangeRequest);
+
+        // Cleanup function to leave the room when the component unmounts
+        return () => {
+            socket?.emit('leave requests room', groupId);
+            socket?.off('new change request', handleNewChangeRequest);
+        };
+    }, [socket, groupId]);
+
 
     useEffect(() => {
         changeRequestService.getGroupEventChangeRequests(groupId, {
