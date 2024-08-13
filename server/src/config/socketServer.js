@@ -106,16 +106,37 @@ function setupSocketServer(expressServer) {
 
         });
 
+        //Handle Group posts
+        socket.on('join group posts', (groupId) => {
+            socket.join(`posts-${groupId}`);
+        });
+
+        socket.on('leave group posts', (groupId) => {
+            socket.leave(`posts-${groupId}`);
+        })
+
+        //ON CREATE POST
+        socket.on('new group post created', (groupId) => {
+            //notify all sockets currently viewing group posts (except the owner of the post) so UI refresh is triggered
+            //socket.to(...) excludes the user who created the post by default
+            socket.to(`posts-${groupId}`).emit('update group posts');
+
+        })
+
+        //ON DELETE POST
+        socket.on('group post deleted', (groupId) => {
+            socket.to(`posts-${groupId}`).emit('update group posts');
+        })
+
 
         // Handle event calendar visits
         socket.on('visit event calendar', (groupId) => {
-            socket.join(`events-${groupId}`)
+            socket.join(`events-${groupId}`);
         });
 
         socket.on('leave event calendar', (groupId) => {
             socket.leave(`events-${groupId}`);
-        })
-
+        });
 
         socket.on('new event', (newEventData) => {
             const groupInfo = newEventData.groupId;

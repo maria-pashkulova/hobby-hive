@@ -8,7 +8,7 @@ import AuthContext from "../contexts/authContext";
 const DeletePostModal = ({ postIdToDelete, refetchOnDelete, groupId, isOpen, onClose }) => {
 
     const navigate = useNavigate();
-    const { logoutHandler } = useContext(AuthContext);
+    const { logoutHandler, socket } = useContext(AuthContext);
 
 
     const [loading, setLoading] = useState(false);
@@ -20,6 +20,11 @@ const DeletePostModal = ({ postIdToDelete, refetchOnDelete, groupId, isOpen, onC
         try {
 
             await postService.deletePost(groupId, postIdToDelete);
+
+            //delete post from news feed with all posts for other currently viewing group posts
+            socket?.emit('group post deleted', groupId)
+
+            //delete post from local state
             refetchOnDelete();
             onClose();
             toast({

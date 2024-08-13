@@ -19,7 +19,7 @@ const GroupPosts = () => {
     const toast = useToast();
     const { isOpen, onOpen, onClose } = useDisclosure();
 
-    const { logoutHandler } = useContext(AuthContext);
+    const { logoutHandler, socket } = useContext(AuthContext);
 
     const [groupPosts, setGroupPosts] = useState([]);
     const [isInitialLoading, setIsInitialLoading] = useState(true);
@@ -36,6 +36,28 @@ const GroupPosts = () => {
         setFetchPostsAgain(true);
         setCurrentPage(2);
     }
+
+    //socket communication related
+
+    useEffect(() => {
+        // Join group posts room for this group when the component mounts
+        socket?.emit('join group posts', groupId);
+
+        // Handle incoming notification to refetch group posts
+        const handleChangeGroupPosts = () => {
+            setFetchPostsAgain(true); // Trigger refetch in the second useEffect
+            setCurrentPage(2);
+        }
+
+        //on post create or delete
+        socket?.on('update group posts', handleChangeGroupPosts);
+
+        // Cleanup function to leave the room when the component unmounts
+        return () => {
+            socket?.emit('leave group posts', groupId);
+            socket?.off('update group posts', handleChangeGroupPosts);
+        };
+    }, [socket, groupId]);
 
 
     //Load initial posts

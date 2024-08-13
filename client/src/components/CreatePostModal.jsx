@@ -19,7 +19,7 @@ const CreatePostModal = ({ isOpen, onClose, groupId, handleAddNewCreatedPost }) 
 
     const toast = useToast();
     const navigate = useNavigate();
-    const { logoutHandler } = useContext(AuthContext);
+    const { logoutHandler, socket } = useContext(AuthContext);
     const imageRef = useRef(null);
 
     //preview the picture which user has uploaded from file system
@@ -55,7 +55,14 @@ const CreatePostModal = ({ isOpen, onClose, groupId, handleAddNewCreatedPost }) 
                 img: imageUrl
             });
 
+            //add new post to state to other users (not necesserily members - just users viewing group posts) (real time communication)
+            //no notifications -> so new post object is not needed by the socket server
+            //send only groupId of the group the new post is created in.
+            socket?.emit('new group post created', (newPost.groupId));
+
+            //add new post to local state for the current user
             handleAddNewCreatedPost();
+
             onClose();
             toast({
                 title: "Успешна публикация!",
