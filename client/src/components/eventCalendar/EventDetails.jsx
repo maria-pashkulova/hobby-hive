@@ -135,6 +135,9 @@ const EventDetails = ({ event, isCurrUserAttending, groupAdmin, handleAddMemberG
                         isCurrUserAttending={isCurrUserAttending}
                         groupId={groupId}
                         eventId={_id}
+                        eventTitle={title}
+                        eventOwner={_ownerId}
+                        groupAdmin={groupAdmin}
                         handleAddMemberGoing={handleAddMemberGoing}
                         handleRemoveMemberGoing={handleRemoveMemberGoing}
                     />
