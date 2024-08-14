@@ -303,8 +303,9 @@ exports.getGroupsWithMembership = async (userId, page, limit) => {
 async function getAuthResult(user) {
     //create token
 
-    //900 sec = 15 min
-    const accessToken = await jwt.sign({ _id: user._id }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: 900 });
+    //900 sec = 15 min - used for debugging purposes
+    //3600 sec = 60 min - until refresh token is implemented
+    const accessToken = await jwt.sign({ _id: user._id }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: 3600 });
     //const refreshToken = await jwt.sign(payload, process.env.REFRESH_TOKEN_SECRET, { expiresIn: '1d' });
 
 
