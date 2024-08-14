@@ -17,7 +17,7 @@ import Loading from '../components/Loading';
 import useFetchCategoriesAndLocations from '../hooks/useFetchCategoriesAndLocations';
 
 
-const GROUPS_PER_PAGE = 3;
+const GROUPS_PER_PAGE = 6;
 
 
 const GroupsPage = () => {

@@ -11,7 +11,7 @@ import CardsGrid from "../components/CardsGrid";
 import Pagination from "../components/Pagination";
 import Loading from "../components/Loading";
 
-const GROUPS_PER_PAGE = 3;
+const GROUPS_PER_PAGE = 6;
 
 
 const MyGroupsPage = () => {

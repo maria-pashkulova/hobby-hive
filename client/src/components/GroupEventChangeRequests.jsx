@@ -7,7 +7,7 @@ import AuthContext from '../contexts/authContext';
 import * as changeRequestService from '../services/changeRequestService';
 import Pagination from './Pagination';
 
-const REQUESTS_PER_PAGE = 2;
+const REQUESTS_PER_PAGE = 6;
 
 const GroupEventChangeRequests = () => {
     const [groupId] = useOutletContext();
