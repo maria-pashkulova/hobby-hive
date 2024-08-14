@@ -30,7 +30,7 @@ In a single group page all group’s posts, events and chat are available. There
 Group events are displayed in a calendar component (FullCalendar) with different colors - а convenient interface for creating and viewing events.  
 Each group member can create an event suggestion and other users can mark themselves as going / not going. Event data – specific location where it will take place and dates are validated upon creation. Group administrator can update, delete group events and  receive requests for events details change from other group members. Each member (who is not the event creator and group administrator ) can create a request with description for the group event change he wants to suggest (for example reporting insufficient/ inaccurate information about an event).
  
-5. My Calendar  
+5. My Calendar page  
 Includes all events (from different groups) for which the current logged in user has marked himself as going.
 
 ***All group members who are logged in receive notifications for new events and new messages in the groups they members of. Group administrators receive notifications for event change requests.***  
