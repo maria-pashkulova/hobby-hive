@@ -3,14 +3,14 @@ import MessageInput from "./MessageInput"
 import { useContext, useEffect, useState } from "react";
 
 import * as chatService from '../../services/chatService';
-import { Navigate, useNavigate, useOutletContext } from "react-router-dom";
+import { Navigate, useNavigate, useParams } from "react-router-dom";
 import AuthContext from "../../contexts/authContext";
 import './GroupChat.css';
 import ScrollableChat from "./ScrollableChat";
 
 
 const GroupChat = () => {
-    const [groupId, isMember] = useOutletContext();
+    const { groupId } = useParams();
     const toast = useToast();
     const navigate = useNavigate();
     const { logoutHandler, socket } = useContext(AuthContext);

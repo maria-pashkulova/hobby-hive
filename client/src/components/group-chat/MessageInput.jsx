@@ -2,13 +2,13 @@ import { FormControl, IconButton, Input, InputGroup, InputRightElement, useBreak
 import { useContext, useState } from "react";
 import { FiSend } from "react-icons/fi";
 import * as chatService from '../../services/chatService';
-import { useNavigate, useOutletContext } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import AuthContext from "../../contexts/authContext";
 
 
 const MessageInput = ({ handleNewMessages }) => {
 
-    const [groupId] = useOutletContext();
+    const { groupId } = useParams();
 
     const [newMessage, setNewMessage] = useState('');
 
@@ -59,7 +59,6 @@ const MessageInput = ({ handleNewMessages }) => {
 
     const handleKeyDown = (e) => {
         if (e.key === 'Enter') {
-            e.preventDefault(); // Prevents adding a new line
             sendMessage();
         }
     };
