@@ -19,8 +19,9 @@ router.post('/login', async (req, res) => {
 
 
         //httpOnly: true + React ?
-        //15*60*1000 = 900 000 ms = 15 min - cookie expiration
-        res.cookie(process.env.COOKIE_NAME, userData.accessToken, { httpOnly: true, maxAge: 15 * 60 * 1000 });
+        //15*60*1000 = 900 000 ms = 15 min - cookie expiration - used for debugging purposes
+        //60*60*1000 = 3 600 000 ms = 60 min = 1 hour
+        res.cookie(process.env.COOKIE_NAME, userData.accessToken, { httpOnly: true, maxAge: 60 * 60 * 1000 });
 
         res.json({
             _id: userData._id,
@@ -53,7 +54,8 @@ router.post('/register', async (req, res) => {
         const userData = await userService.register(firstName, lastName, email, password);
 
         //15*60*1000 = 900 000 ms = 15 min - cookie expiration
-        res.cookie(process.env.COOKIE_NAME, userData.accessToken, { httpOnly: true, maxAge: 15 * 60 * 1000 });
+        //60*60*1000 = 3 600 000 ms = 60 min = 1 hour
+        res.cookie(process.env.COOKIE_NAME, userData.accessToken, { httpOnly: true, maxAge: 60 * 60 * 1000 });
 
         res.json({
             _id: userData._id,
