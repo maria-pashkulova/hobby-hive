@@ -58,3 +58,15 @@ CLOUDINARY_CLOUD_NAME=...
 CLOUDINARY_API_KEY=...
 CLOUDINARY_API_SECRET=...
 ```
+```
+cd client  
+npm install  
+npm run dev  
+
+``
+```
+cd server  
+npm install  
+npm start  
+
+``
