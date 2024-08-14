@@ -1,4 +1,4 @@
-import { FormControl, Input, InputGroup, InputRightElement, useBreakpointValue, useToast } from "@chakra-ui/react"
+import { FormControl, IconButton, Input, InputGroup, InputRightElement, useBreakpointValue, useToast } from "@chakra-ui/react"
 import { useContext, useState } from "react";
 import { FiSend } from "react-icons/fi";
 import * as chatService from '../../services/chatService';
@@ -22,8 +22,8 @@ const MessageInput = ({ handleNewMessages }) => {
     const navigate = useNavigate();
     const { logoutHandler, socket } = useContext(AuthContext);
 
-    const sendMessage = async (e) => {
-        if (e.key === 'Enter' && newMessage) {
+    const sendMessage = async () => {
+        if (newMessage.trim()) {
 
             setNewMessage('');
 
@@ -36,8 +36,7 @@ const MessageInput = ({ handleNewMessages }) => {
 
             } catch (error) {
                 if (error.status === 401) {
-                    logoutHandler(); //invalid or missing token - пр логнал си се, седял си опр време, изтича ти токена - сървъра връща unauthorized - изчистваш стейта
-                    //и localStorage за да станеш неаутентикиран и за клиента и тогава редиректваш
+                    logoutHandler(); //invalid or missing token
                     navigate('/login');
                 } else {
                     toast({
@@ -55,20 +54,32 @@ const MessageInput = ({ handleNewMessages }) => {
     const handleTyping = (e) => {
         setNewMessage(e.target.value);
 
-        //TODO add typing indicator logic
-
+        //TODO: add typing indicator logic
     }
 
+    const handleKeyDown = (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault(); // Prevents adding a new line
+            sendMessage();
+        }
+    };
+
     return (
-        <FormControl onKeyDown={sendMessage}>
+        <FormControl>
             <InputGroup>
                 <Input w='full'
                     placeholder={placeholderText}
                     value={newMessage}
                     onChange={handleTyping}
+                    onKeyDown={handleKeyDown}
                 ></Input>
                 <InputRightElement>
-                    <FiSend />
+                    <IconButton
+                        icon={<FiSend />}
+                        onClick={sendMessage}
+                        variant={'ghost'}
+                    />
+
                 </InputRightElement>
             </InputGroup>
         </FormControl>
