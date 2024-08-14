@@ -62,8 +62,7 @@ CLOUDINARY_API_SECRET=...
 cd client  
 npm install  
 npm run dev  
-
-``
+```
 ```
 cd server  
 npm install  
