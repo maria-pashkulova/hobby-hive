@@ -9,9 +9,6 @@ const { uploadToCloudinary, destroyFromCloudinary } = require('../utils/cloudina
 
 const { validateAddedOtherMembers, checkForDuplicateUsers, checkForDuplicateTags, checkForExistingTags, validateCategoryAndLocation } = require('../utils/validateGroupData');
 
-//ако една функция просто ще взима и връща promise, няма нужда да
-//awaitваме, защото на ниво контролер ще я awaitваме пак
-
 
 exports.getAll = async (name, category, location, page, limit) => {
 

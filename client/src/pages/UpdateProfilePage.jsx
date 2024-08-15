@@ -14,6 +14,7 @@ import {
     Spinner,
     AvatarBadge,
     IconButton,
+    FormErrorMessage,
 } from "@chakra-ui/react";
 
 
@@ -24,27 +25,21 @@ import { useContext, useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import usePreviewImage from "../hooks/usePreviewImage";
 
+import { RegisterFormKeys as UpdateProfileFormKeys } from "../formKeys/formKeys";
+import { updateUserDataSchema } from "../schemas/userAuthenticationSchema";
+
 import * as userService from "../services/userService";
 
-const UpdateProfileFormKeys = {
-    FirstName: 'firstName',
-    LastName: 'lastName',
-    Email: 'email',
-    Password: 'password',
-    RepeatPass: 'repeatPass',
-    ProfilePic: 'profilePic'
-}
 
 const UpdateProfilePage = () => {
-
-    // console.log('update pre render');
 
     const { userId, updateProfileSubmitHandler, logoutHandler } = useContext(AuthContext);
 
     const [loadingUserData, setLoadingUserData] = useState(true);
     const [loadingUpdate, setLoadingUpdate] = useState(false);
 
-    //Form values + profilePicture and fullName (used for Avatar component) separate states
+    //Custom implementation of using controlled forms with custom hook useForm
+    //Form values + profilePicture and fullName (used for Avatar component) are managed as separate states
     const { formValues: userData, onChange, resetForm } = useForm({
         [UpdateProfileFormKeys.FirstName]: '',
         [UpdateProfileFormKeys.LastName]: '',
@@ -66,13 +61,24 @@ const UpdateProfilePage = () => {
 
     const { handleImageChange, handleImageDecline, imageUrl } = usePreviewImage();
 
+
+    //Validation errors state
+    const [formErrors, setFormErrors] = useState({});
+
+
     const handleFormSubmit = async (e) => {
         e.preventDefault();
-        setLoadingUpdate(true);
 
-        // TODO: validate before making a request -> client side validation
-        //check if password and repeat password match
         try {
+            // Clear previous errors
+            setFormErrors({});
+
+            //Validate form data before perfoming request
+            //abortEarly:false - show all errors, not just the first one
+            await updateUserDataSchema.validate(userData, { abortEarly: false });
+
+            // If validation passes, proceed with the update request
+            setLoadingUpdate(true);
             const updatedUserData = await updateProfileSubmitHandler(userId, userData, imageUrl, currentProfilePic);
 
             toast({
@@ -83,6 +89,7 @@ const UpdateProfilePage = () => {
                 position: "bottom",
             });
 
+            // Reset password fields after successful update
             resetForm({
                 [UpdateProfileFormKeys.Password]: '',
                 [UpdateProfileFormKeys.RepeatPass]: ''
@@ -94,10 +101,17 @@ const UpdateProfilePage = () => {
             setCurrentProfilePic(updatedUserData.profilePic);
 
         } catch (error) {
+            // Handle validation errors
+            if (error.name === 'ValidationError') {
+                const errors = {};
+                error.inner.forEach(err => {
+                    errors[err.path] = err.message;
+                })
 
-            if (error.status === 401) {
-                logoutHandler(); //invalid or missing token - пр логнал си се, седял си опр време, изтича ти токена - сървъра връща unauthorized - изчистваш стейта
-                //и localStorage за да станеш неаутентикиран и за клиента и тогава редиректваш
+                setFormErrors(errors);
+
+            } else if (error.status === 401) {
+                logoutHandler(); //invalid or missing token
                 navigate('/login');
             } else if (error.status === 403) {
                 toast({
@@ -109,7 +123,7 @@ const UpdateProfilePage = () => {
                 });
             } else {
 
-                //TODO: handle other types of errors when you create validation
+                //TODO: handle other types of errors when you create BE validation (if any)
                 toast({
                     title: "Възникна грешка при свързване!",
                     description: "Не успяхме да обновим данните Ви!",
@@ -144,11 +158,10 @@ const UpdateProfilePage = () => {
             })
             .catch(error => {
                 if (error.status === 401) {
-                    logoutHandler(); //invalid or missing token - пр логнал си се, седял си опр време, изтича ти токена - сървъра връща unauthorized - изчистваш стейта
-                    //и localStorage за да станеш неаутентикиран и за клиента и тогава редиректваш
+                    logoutHandler(); //invalid or missing token
                     navigate('/login');
                 } else {
-                    //case изключвам си сървъра - грешка при свързването със сървъра
+                    //грешка при свързването със сървъра
                     toast({
                         title: 'Възникна грешка при свързване!',
                         status: "error",
@@ -179,7 +192,7 @@ const UpdateProfilePage = () => {
     }
 
     return (
-        <form onSubmit={handleFormSubmit}>
+        <form onSubmit={handleFormSubmit} noValidate>
             <Flex align={"center"} justify={"center"} my={6}>
                 <Stack
                     spacing={4}
@@ -227,7 +240,7 @@ const UpdateProfilePage = () => {
                             </Center>
                         </Stack>
                     </FormControl>
-                    <FormControl>
+                    <FormControl isInvalid={formErrors[UpdateProfileFormKeys.FirstName]}>
                         <FormLabel>Име</FormLabel>
                         <Input
                             type='text'
@@ -237,8 +250,9 @@ const UpdateProfilePage = () => {
                             value={userData[UpdateProfileFormKeys.FirstName]}
                             onChange={onChange}
                         />
+                        <FormErrorMessage>{formErrors[UpdateProfileFormKeys.FirstName]}</FormErrorMessage>
                     </FormControl>
-                    <FormControl id='lastName'>
+                    <FormControl id='lastName' isInvalid={formErrors[UpdateProfileFormKeys.LastName]}>
                         <FormLabel>Фамилия</FormLabel>
                         <Input
                             type='text'
@@ -248,8 +262,9 @@ const UpdateProfilePage = () => {
                             value={userData[UpdateProfileFormKeys.LastName]}
                             onChange={onChange}
                         />
+                        <FormErrorMessage>{formErrors[UpdateProfileFormKeys.LastName]}</FormErrorMessage>
                     </FormControl>
-                    <FormControl id='email'>
+                    <FormControl id='email' isInvalid={formErrors[UpdateProfileFormKeys.Email]}>
                         <FormLabel>Имейл</FormLabel>
                         <Input
                             type='email'
@@ -259,9 +274,10 @@ const UpdateProfilePage = () => {
                             value={userData[UpdateProfileFormKeys.Email]}
                             onChange={onChange}
                         />
+                        <FormErrorMessage>{formErrors[UpdateProfileFormKeys.Email]}</FormErrorMessage>
                     </FormControl>
 
-                    <FormControl>
+                    <FormControl isInvalid={formErrors[UpdateProfileFormKeys.Password]}>
                         <FormLabel>Парола</FormLabel>
                         <InputGroup>
                             <Input
@@ -281,8 +297,9 @@ const UpdateProfilePage = () => {
                                 </Button>
                             </InputRightElement>
                         </InputGroup>
+                        <FormErrorMessage>{formErrors[UpdateProfileFormKeys.Password]}</FormErrorMessage>
                     </FormControl>
-                    <FormControl>
+                    <FormControl isInvalid={formErrors[UpdateProfileFormKeys.RepeatPass]}>
                         <FormLabel>Потвърди парола</FormLabel>
                         <InputGroup>
                             <Input
@@ -302,6 +319,7 @@ const UpdateProfilePage = () => {
                                 </Button>
                             </InputRightElement>
                         </InputGroup>
+                        <FormErrorMessage>{formErrors[UpdateProfileFormKeys.RepeatPass]}</FormErrorMessage>
                     </FormControl>
 
                     <Stack spacing={[4, 6]} direction={["column", "row"]}>

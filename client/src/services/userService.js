@@ -35,21 +35,18 @@ export const getMyGroups = (pagination = {}) => {
 
 export const getMyDetails = () => request.get(`${baseUrl}/my-details`);
 
-//return promise
-//repeatPass is also sent!
-export const updateUser = (userId, { firstName, lastName, email, password, newProfilePic, currProfilePic }) => (
 
-    //TODO check if password and repeat password match - maybe here at service
-    request.put(`${baseUrl}/${userId}`, {
-        firstName,
-        lastName,
-        email,
-        password,
+export const updateUser = (userId, { firstName, lastName, email, password, newProfilePic, currProfilePic }) => {
+
+    const sanitizedInput = trimInputValues({ firstName, lastName, email, password });
+
+    return request.put(`${baseUrl}/${userId}`, {
+        ...sanitizedInput,
         newProfilePic,
         currProfilePic
     })
 
-);
+};
 
 //Get My events in the currently viewed date range
 export const getMyEvents = (startDate, endDate) => {
