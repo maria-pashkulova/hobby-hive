@@ -1,5 +1,5 @@
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
-import { useNavigate, useOutletContext } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import AuthContext from "../contexts/authContext";
 import { Box, Container, Flex, Spinner, useToast } from "@chakra-ui/react";
 import Post from "./Post";
@@ -10,7 +10,7 @@ const POSTS_PER_PAGE = 10;
 
 const MyGroupPosts = () => {
 
-    const [groupId] = useOutletContext();
+    const { groupId } = useParams();
     const navigate = useNavigate();
     const toast = useToast();
 
@@ -26,11 +26,6 @@ const MyGroupPosts = () => {
     const spinnerRef = useRef(null);
 
     const [fetchPostsAgain, setFetchPostsAgain] = useState(false);
-
-
-    //TODO: use these for update post modal - separate component which
-    //will perform a request to populate post data or 
-    // май към пост компонента трябва да добавя тва за модала - open/close
 
     const changeMyPostsOnDbUpdate = (editedPost) => {
 

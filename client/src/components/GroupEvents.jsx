@@ -1,4 +1,4 @@
-import { useNavigate, useOutletContext } from 'react-router-dom';
+import { useNavigate, useOutletContext, useParams } from 'react-router-dom';
 import { useContext, useEffect, useState } from 'react';
 import * as eventService from '../services/eventService';
 import AuthContext from '../contexts/authContext';
@@ -10,7 +10,8 @@ import EventDetailsModal from './eventCalendar/EventDetailsModal';
 const GroupEvents = () => {
 
     const navigate = useNavigate();
-    const [groupId, isMember, activityTags, groupRegionCity, groupAdmin] = useOutletContext();
+    const { groupId } = useParams();
+    const { activityTags, groupRegionCity, groupAdmin } = useOutletContext();
     const { logoutHandler, socket } = useContext(AuthContext);
 
 

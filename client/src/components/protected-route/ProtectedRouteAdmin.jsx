@@ -1,10 +1,11 @@
 import { useContext } from 'react';
-import { Navigate, Outlet, useOutletContext } from 'react-router-dom';
+import { Navigate, Outlet, useOutletContext, useParams } from 'react-router-dom';
 import AuthContext from '../../contexts/authContext';
 
 const ProtectedRouteAdmin = () => {
 
-    const [groupId, isMember, activityTags, groupRegionCity, groupAdmin] = useOutletContext();
+    const { groupId } = useParams();
+    const { groupAdmin } = useOutletContext();
     const { userId } = useContext(AuthContext);
 
     if (userId !== groupAdmin) {
@@ -12,7 +13,7 @@ const ProtectedRouteAdmin = () => {
     }
 
 
-    return <Outlet context={[groupId]} />
+    return <Outlet />
 }
 
 export default ProtectedRouteAdmin

@@ -12,8 +12,9 @@ const POSTS_PER_PAGE = 10;
 
 const GroupPosts = () => {
 
+    const { groupId } = useParams();
 
-    const [groupId, isMember] = useOutletContext();
+    const { isMember } = useOutletContext();
 
     const navigate = useNavigate();
     const toast = useToast();

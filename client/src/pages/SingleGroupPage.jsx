@@ -6,6 +6,7 @@ import { FiEdit, FiChevronDown } from "react-icons/fi";
 import * as groupService from '../services/groupService';
 
 import AuthContext from '../contexts/authContext';
+
 import UpdateGroupModal from "../components/update-group/UpdateGroupModal";
 import GroupMembersModal from "../components/GroupMembersModal";
 
@@ -19,8 +20,9 @@ const SingleGroupPage = () => {
 
     const { groupId } = useParams();
     const [group, setGroup] = useState({});
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(true); // set loading to true for initial render (otherwise errors occur because group is empty object)
     const [isMember, setIsMember] = useState(false);
+
     const toast = useToast();
 
     const editGroupDetailsModal = useDisclosure();
@@ -129,9 +131,8 @@ const SingleGroupPage = () => {
         setGroup({ ...group, ...updatedGroup });
     }
 
-
-    //TODO: след като групата е успешно намерена - да направя заявка за нейните публикации
     useEffect(() => {
+        setLoading(true); // Set loading true whenever groupId changes
         groupService.getById(groupId)
             .then((currGroup) => {
                 setGroup(currGroup);
@@ -289,8 +290,7 @@ const SingleGroupPage = () => {
                     )}
                 </Flex>
 
-                {/* order matters when destructuring because outlet context is an array! */}
-                <Outlet context={[groupId, isMember, group.activityTags, group.location.name, group.groupAdmin]} />
+                <Outlet context={{ isMember, activityTags: group.activityTags, groupRegionCity: group.location.name, groupAdmin: group.groupAdmin }} />
 
             </>
 
