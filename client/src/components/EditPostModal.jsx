@@ -112,7 +112,7 @@ const EditPostModal = ({ postIdToUpdate, changeMyPostsOnDbUpdate, groupId, isOpe
                 } else if (error.status === 404) {
                     navigate('/not-found');
                 } else {
-                    //case изключвам си сървъра - грешка при свързването със сървъра
+                    //грешка при свързването със сървъра
                     toast({
                         title: 'Възникна грешка при свързване!',
                         status: "error",
