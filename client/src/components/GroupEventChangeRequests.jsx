@@ -1,7 +1,7 @@
 import { Box, Container, Flex, Spinner, useToast } from '@chakra-ui/react'
 import ChangeGroupEventRequestCard from './ChangeGroupEventRequestCard';
 import React, { useContext, useEffect, useState } from 'react'
-import { useNavigate, useOutletContext } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import AuthContext from '../contexts/authContext';
 
 import * as changeRequestService from '../services/changeRequestService';
@@ -10,7 +10,7 @@ import Pagination from './Pagination';
 const REQUESTS_PER_PAGE = 6;
 
 const GroupEventChangeRequests = () => {
-    const [groupId] = useOutletContext();
+    const { groupId } = useParams();
     const [groupEventChangeRequests, setGroupEventChangeRequests] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [currentPage, setCurrentPage] = useState(0);
@@ -47,6 +47,8 @@ const GroupEventChangeRequests = () => {
 
 
     useEffect(() => {
+        setIsLoading(true);
+
         changeRequestService.getGroupEventChangeRequests(groupId, {
             page: currentPage,
             limit: REQUESTS_PER_PAGE

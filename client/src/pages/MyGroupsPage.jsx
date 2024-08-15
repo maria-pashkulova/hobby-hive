@@ -42,8 +42,7 @@ const MyGroupsPage = () => {
             })
             .catch(error => {
                 if (error.status === 401) {
-                    logoutHandler(); //invalid or missing token - пр логнал си се, седял си опр време, изтича ти токена - сървъра връща unauthorized - изчистваш стейта
-                    //и localStorage за да станеш неаутентикиран и за клиента и тогава редиректваш
+                    logoutHandler(); //invalid or missing token
                     navigate('/login');
                 } else {
                     toast({
