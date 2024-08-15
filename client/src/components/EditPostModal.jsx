@@ -3,9 +3,11 @@ import { useContext, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AuthContext from "../contexts/authContext";
 import usePreviewImage from "../hooks/usePreviewImage";
+import { FiImage } from "react-icons/fi";
 
 import * as postService from '../services/postService';
-import { FiImage } from "react-icons/fi";
+import { PostKeys } from "../formKeys/formKeys";
+
 
 const MAX_CHAR = 500;
 
@@ -148,7 +150,7 @@ const EditPostModal = ({ postIdToUpdate, changeMyPostsOnDbUpdate, groupId, isOpe
                             <FormControl>
                                 <Textarea
                                     placeholder='Напишете нещо за групово събитие...'
-                                    name='text'
+                                    name={PostKeys.Text}
                                     value={postText}
                                     onChange={handleTextChange}
                                 />

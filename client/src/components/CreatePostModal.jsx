@@ -7,6 +7,8 @@ import AuthContext from "../contexts/authContext";
 
 import * as postService from '../services/postService';
 
+import { PostKeys } from "../formKeys/formKeys";
+
 const MAX_CHAR = 500;
 
 
@@ -108,7 +110,7 @@ const CreatePostModal = ({ isOpen, onClose, groupId, handleAddNewCreatedPost }) 
                             <FormControl>
                                 <Textarea
                                     placeholder='Напишете нещо за групово събитие...'
-                                    name='text'
+                                    name={PostKeys.Text}
                                     value={postText}
                                     onChange={handleTextChange}
                                 />

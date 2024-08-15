@@ -19,6 +19,10 @@ export const GroupKeys = {
     Description: 'description'
 }
 
+export const PostKeys = {
+    Text: 'text'
+}
+
 export const EventKeys = {
     Title: 'title',
     Color: 'color',
