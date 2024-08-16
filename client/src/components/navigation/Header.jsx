@@ -75,6 +75,13 @@ const Header = ({ onOpen }) => {
                             (<MenuItem
                                 as={Link}
                                 to={`/groups/${notification.fromGroup}/${notification.type === 'event' ? 'events' : notification.type === 'request' ? 'event-change-requests' : 'chat'}`}
+                                state={
+                                    {
+                                        isMemberFromNotification: notification.isMemberFromNotification,
+                                        isGroupAdminFromNotifications: notification.isGroupAdminFromNotifications
+
+                                    }
+                                }
                                 key={notification.uniqueIdentifier}
                                 onClick={() => {
                                     handleMarkNotificationAsRead(notification.uniqueIdentifier);

@@ -97,7 +97,8 @@ function setupSocketServer(expressServer) {
                             notificationTitle: `Ново съобщение в група: ${groupInfo.name}`,
                             uniqueIdentifier: `message-${newMessageReceived._id}`, //used only for React unique key 
                             fromGroup: groupInfo._id,
-                            type: 'message'
+                            type: 'message',
+                            isMemberFromNotification: true
                         });
                     }
 
@@ -157,7 +158,8 @@ function setupSocketServer(expressServer) {
                             notificationTitle: `Ново събитие в група: ${groupInfo.name}`,
                             uniqueIdentifier: `event-${newEventData._id}`, //used only for React unique key
                             fromGroup: groupInfo._id,
-                            type: 'event'
+                            type: 'event',
+                            isMemberFromNotification: true
                         })
                     }
                 }
@@ -197,7 +199,8 @@ function setupSocketServer(expressServer) {
                     notificationTitle: `Нова заявка за промяна в събитие в група: ${groupInfo.name}`,
                     uniqueIdentifier: `request-${newRequestData._id}`, //used only for React unique key
                     fromGroup: groupInfo._id,
-                    type: 'request'
+                    type: 'request',
+                    isGroupAdminFromNotifications: true
                 })
             }
 
