@@ -1,7 +1,7 @@
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import AuthContext from "../contexts/authContext";
-import { Box, Container, Flex, Spinner, useToast } from "@chakra-ui/react";
+import { Box, Container, Flex, Spinner, Text, useToast } from "@chakra-ui/react";
 import Post from "./Post";
 
 import * as postService from '../services/postService';
@@ -193,7 +193,13 @@ const MyGroupPosts = () => {
 
                     </div>)}
 
-            </Container> : (<p> Все още не сте публикували в тази група.</p>)
+            </Container> :
+            (<Container mt={8}>
+                <Text>
+                    Все още не сте публикували в тази група.
+                </Text>
+            </Container>
+            )
 
         )
 }

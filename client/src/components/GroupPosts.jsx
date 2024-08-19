@@ -4,7 +4,7 @@ import { useCallback, useContext, useEffect, useRef, useState } from "react";
 
 import * as postService from '../services/postService';
 import AuthContext from "../contexts/authContext";
-import { Box, Button, Container, Flex, Spinner, useDisclosure, useToast } from "@chakra-ui/react";
+import { Box, Text, Button, Container, Flex, Spinner, useDisclosure, useToast } from "@chakra-ui/react";
 import { FiPlus } from "react-icons/fi";
 import CreatePostModal from "./CreatePostModal";
 
@@ -228,7 +228,7 @@ const GroupPosts = () => {
                                     </div>)}
 
 
-                            </> : (<p>Все още няма публикации в групата</p>)
+                            </> : (<Text>Все още няма публикации в групата.</Text>)
 
                         )
                 }

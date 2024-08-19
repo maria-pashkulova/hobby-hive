@@ -1,8 +1,9 @@
-import { Button, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, useToast } from "@chakra-ui/react"
+import { useToast } from "@chakra-ui/react"
 import * as postService from '../services/postService';
 import { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AuthContext from "../contexts/authContext";
+import DeleteModal from "./DeleteModal";
 
 
 const DeletePostModal = ({ postIdToDelete, refetchOnDelete, groupId, isOpen, onClose }) => {
@@ -67,30 +68,13 @@ const DeletePostModal = ({ postIdToDelete, refetchOnDelete, groupId, isOpen, onC
     }
 
     return (
-        <Modal isOpen={isOpen} onClose={onClose}>
-            <ModalOverlay />
-            <ModalContent
-                maxWidth={{ base: '90vw', md: '80vw', lg: '50vw', xl: '35vw' }}
-            >
-                <ModalHeader>Внимание!</ModalHeader>
-                <ModalCloseButton />
-                <ModalBody>
-                    Сигурни ли сте, че искате да изтриете публикацията?
-                </ModalBody>
-
-                <ModalFooter>
-                    <Button
-                        colorScheme='red'
-                        mr={3}
-                        isLoading={loading}
-                        loadingText='Изтриване...'
-                        onClick={handleDeletePost}>
-                        Изтриване
-                    </Button>
-                    <Button variant='ghost' onClick={onClose}>Отмяна</Button>
-                </ModalFooter>
-            </ModalContent>
-        </Modal>
+        <DeleteModal
+            description='Сигурни ли сте, че искате да изтриете публикацията?'
+            loading={loading}
+            handleDeleteAction={handleDeletePost}
+            isOpen={isOpen}
+            onClose={onClose}
+        />
     )
 }
 
