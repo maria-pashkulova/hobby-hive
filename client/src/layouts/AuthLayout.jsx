@@ -37,7 +37,7 @@ const AuthLayout = () => {
                 <Outlet />
             </Box>
         </>
-    ) : <Navigate to='/login' />
+    ) : <Navigate to='/login' replace />
 }
 
 export default AuthLayout;
