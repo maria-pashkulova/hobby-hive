@@ -1,4 +1,4 @@
-import { Button, Flex, FormControl, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Text, Textarea, Image, CloseButton, useToast, typography } from "@chakra-ui/react";
+import { Button, Flex, FormControl, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Text, Textarea, Image, CloseButton, useToast, Box } from "@chakra-ui/react";
 import { useContext, useRef, useState } from "react";
 import usePreviewImage from "../hooks/usePreviewImage";
 import { FiImage } from "react-icons/fi";
@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import AuthContext from "../contexts/authContext";
 
 import * as postService from '../services/postService';
+import checkForRequiredFields from "../utils/checkPostData";
 
 import { PostKeys } from "../formKeys/formKeys";
 
@@ -27,6 +28,7 @@ const CreatePostModal = ({ isOpen, onClose, groupId, handleAddNewCreatedPost }) 
     //preview the picture which user has uploaded from file system
     const { handleImageChange, handleImageDecline, imageUrl } = usePreviewImage();
 
+    const [error, setError] = useState('');
 
     //HANDLERS
 
@@ -46,16 +48,25 @@ const CreatePostModal = ({ isOpen, onClose, groupId, handleAddNewCreatedPost }) 
 
     const handleFormSubmit = async (e) => {
         e.preventDefault();
-        setLoading(true)
 
+        const postInputData = {
+            text: postText,
+            img: imageUrl
+        }
+
+        //Check for required fields before performing request
+        const error = checkForRequiredFields(postInputData, ['text', 'img']);
+        if (error) {
+            setError(error);
+            return;
+        }
 
         //loading state of the button just like in UpdateUserProfile.jsx
         //due to slower request handling because of cloudinary image upload
         try {
-            const newPost = await postService.createPost(groupId, {
-                text: postText,
-                img: imageUrl
-            });
+            setLoading(true)
+
+            const newPost = await postService.createPost(groupId, postInputData);
 
             //add new post to state to other users (not necesserily members - just users viewing group posts) (real time communication)
             //no notifications -> so new post object is not needed by the socket server
@@ -80,8 +91,9 @@ const CreatePostModal = ({ isOpen, onClose, groupId, handleAddNewCreatedPost }) 
                 //и localStorage за да станеш неаутентикиран и за клиента и тогава редиректваш
                 navigate('/login');
             } else {
+                //error connecting with server
                 toast({
-                    title: error.message,
+                    title: 'Възникна грешка при свързване!',
                     status: "error",
                     duration: 5000,
                     isClosable: true,
@@ -100,7 +112,9 @@ const CreatePostModal = ({ isOpen, onClose, groupId, handleAddNewCreatedPost }) 
         <>
             <Modal isOpen={isOpen} onClose={onClose}>
                 <ModalOverlay />
-                <ModalContent>
+                <ModalContent
+                    maxWidth={{ base: '90vw', md: '80vw', lg: '50vw', xl: '35vw' }}
+                >
                     <ModalHeader>Създаване на публикация</ModalHeader>
                     <ModalCloseButton />
 
@@ -153,6 +167,16 @@ const CreatePostModal = ({ isOpen, onClose, groupId, handleAddNewCreatedPost }) 
                                     />
                                 </Flex>
                             )}
+
+                            {/* Show required fields error message */}
+                            {error &&
+                                <Box
+                                    mt={4}
+                                    color='red'
+                                >
+                                    {error}
+                                </Box>
+                            }
 
                         </ModalBody>
 

@@ -1,4 +1,4 @@
-import { Button, FormControl, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Textarea, Text, useToast, Input, Flex, CloseButton, Image, Spinner } from "@chakra-ui/react";
+import { Button, FormControl, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Textarea, Text, useToast, Input, Flex, CloseButton, Image, Spinner, Box } from "@chakra-ui/react";
 import { useContext, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AuthContext from "../contexts/authContext";
@@ -6,6 +6,8 @@ import usePreviewImage from "../hooks/usePreviewImage";
 import { FiImage } from "react-icons/fi";
 
 import * as postService from '../services/postService';
+import checkForRequiredFields from "../utils/checkPostData";
+
 import { PostKeys } from "../formKeys/formKeys";
 
 
@@ -30,6 +32,8 @@ const EditPostModal = ({ postIdToUpdate, changeMyPostsOnDbUpdate, groupId, isOpe
     //preview the picture which user has uploaded from file system
     const { handleImageChange, handleImageDecline, imageUrl } = usePreviewImage();
 
+    const [error, setError] = useState('');
+
 
     //HANDLERS
 
@@ -48,14 +52,24 @@ const EditPostModal = ({ postIdToUpdate, changeMyPostsOnDbUpdate, groupId, isOpe
     }
     const handleFormSubmit = async (e) => {
         e.preventDefault();
-        setLoadingUpdate(true);
+
+        const postEditInputData = {
+            text: postText,
+            newImg: imageUrl,
+            currImg: currentImg
+        }
+
+        //Check for required fields before performing request
+        const error = checkForRequiredFields(postEditInputData, ['text', 'newImg', 'currImg']);
+        if (error) {
+            setError(error);
+            return;
+        }
 
         try {
-            const editedPost = await postService.editPost(groupId, postIdToUpdate, {
-                text: postText,
-                newImg: imageUrl,
-                currImg: currentImg
-            });
+            setLoadingUpdate(true);
+
+            const editedPost = await postService.editPost(groupId, postIdToUpdate, postEditInputData);
 
             changeMyPostsOnDbUpdate(editedPost);
             onClose();
@@ -79,7 +93,7 @@ const EditPostModal = ({ postIdToUpdate, changeMyPostsOnDbUpdate, groupId, isOpe
                     position: "bottom",
                 });
             } else {
-                //case изключвам си сървъра - грешка при свързването със сървъра
+                //error connecting with server
                 toast({
                     title: 'Възникна грешка при свързване!',
                     status: "error",
@@ -206,6 +220,16 @@ const EditPostModal = ({ postIdToUpdate, changeMyPostsOnDbUpdate, groupId, isOpe
 
                                 </Flex>
                             )}
+
+                            {/* Show required fields error message */}
+                            {error &&
+                                <Box
+                                    mt={4}
+                                    color='red'
+                                >
+                                    {error}
+                                </Box>
+                            }
 
                         </ModalBody>
 
