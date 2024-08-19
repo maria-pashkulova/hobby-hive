@@ -1,24 +1,34 @@
 import { createContext, useEffect, useState } from "react";
-import * as userService from '../services/userService';
-import usePersistedState from "../hooks/usePersistedState";
 
 import io from 'socket.io-client';
 const ENDPOINT = 'http://localhost:5000';
 
-const AuthContext = createContext();
+import * as userService from '../services/userService';
+import usePersistedState from "../hooks/usePersistedState";
 
+const AuthContext = createContext();
 AuthContext.displayName = 'AuthContext';
 
-//* контекста не се занимава с обработка на грешки,
-//това се случва в самите компоненти
-//handlers за login, register, logout, updateProfile са
-//тук за да запаметят данни за потребителя в контекста
 
+/* Error handling for asynchronous API calls in 
+-loginSubmitHandler
+-registerSubmitHandler
+-updateProfileSubmitHandler
+-logoutSubmitHandler
+is placed in the respective components using these handlers.
+These handlers are defined here so they can set the auth state with
+the user data fetched and update the context values
+*/
 
 export const AuthProvider = ({ children }) => {
 
-    //auth - данните върнати от сървъра след успешен логин
+    /*auth value : 
+    -  user data after successful login, register, user update.
+    The server responds with object in format {_id: ..., fullName:..., email: ..., profilePic:...}
+    - null (when user logs out)
+    */
     const [auth, setAuth] = usePersistedState('user', {});
+    //socket connection object for real-time communication
     const [socket, setSocket] = useState(null);
 
 
@@ -26,33 +36,35 @@ export const AuthProvider = ({ children }) => {
 
         //Create new socket connection only upon successful login/ register
         if (auth._id) {
-            // Only create new socket connection if it doesn't exist 
-            //this check is needed because of the dependency array
-            if (!socket) {
-                const newSocket = io(ENDPOINT);
+
+            //Initialize new socket connection
+            const newSocket = io(ENDPOINT);
+
+            newSocket.on('connect', () => {
+                //when connection is fully established, 
+                //set 'socket' state to the socket connection object (newSocket)
+                console.log('New socket connection established. Socket Id: ' + newSocket.id);
                 setSocket(newSocket);
 
                 newSocket.emit('setup', auth._id);
-                return () => {
-                    newSocket.disconnect();
-                }
+
+            })
+
+            return () => {
+                console.log('Cleanup function for socket disconnection');
+                newSocket.disconnect();
             }
-
-        } else if (socket) {
-            socket.disconnect(); // Disconnect the socket if the user logs out
-            setSocket(null);
         }
-    }, [auth])
+
+    }, [auth._id])
 
 
-    //ВХОД:
-    //await is needed in order to save user data in the context
+
     const loginSubmitHandler = async (userData) => {
 
+        //await is needed in order to save user data in the context
         const result = await userService.login(userData);
 
-        //разчитаме че сървъра връща обект с _id, fullName, email
-        //можем да деструктурираме обекта за по-сигурно
         setAuth(result);
 
     }
@@ -62,12 +74,10 @@ export const AuthProvider = ({ children }) => {
 
         const result = await userService.register(userData);
 
-        //разчитаме че сървъра връща обект с _id, fullName, email, profilePic
-        //можем да деструктурираме обекта за по-сигурно
         setAuth(result);;
     }
 
-    //logout + invalid or missing token handling (при изтичане на токена (бисквитката също в моя случай))
+    //logout + invalid or missing token handling (token and cookie expiration)
     const logoutHandler = () => {
         console.log('logout handler');
         setAuth(null);
@@ -78,8 +88,6 @@ export const AuthProvider = ({ children }) => {
     const updateProfileSubmitHandler = async (userId, userData, newProfilePic, currProfilePic) => {
         const result = await userService.updateUser(userId, { ...userData, newProfilePic, currProfilePic }); //updated user data
 
-        //разчитаме че сървъра връща обект с _id, fullName, email, profilePic
-        //можем да деструктурираме обекта за по-сигурно
         setAuth(result);
 
         return result;
@@ -106,6 +114,7 @@ export const AuthProvider = ({ children }) => {
     )
 }
 
-//за да използваме values от Provider-a в останалите компоненти трябва да 
-//exportнем AuthContext
+/*In order to use values from AuthContext.Provider in the nested child components of AuthProvider
+export of AuthContext object is needed, so it can be used as useContext()'s argument
+*/
 export default AuthContext;
