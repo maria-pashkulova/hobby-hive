@@ -82,15 +82,12 @@ const GroupEvents = () => {
     //Setup event listeners for events from socket server for immediate(real-time) group calendar view change
     useEffect(() => {
 
-        console.log('GroupEvents for group MOUNT OR UPDATE: ' + groupId);
-
         socket?.emit('visit event calendar', groupId);
         socket?.on('update event calendar', handleAddNewEvent);
         socket?.on('delete event from calendar', handleRemoveEvent);
 
         //Cleanup the event listener on component unmount or when groupId / socket changes and use effect is triggered again
         return () => {
-            console.log('GroupEvents for group UNMOUNT or BEFORE UPDATE: ' + groupId);
 
             socket?.emit('leave event calendar', groupId);
             socket?.off('update event calendar', handleAddNewEvent);
