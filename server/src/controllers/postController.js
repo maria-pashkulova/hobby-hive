@@ -1,5 +1,6 @@
 const router = require('express').Router();
 
+const isMemberMiddleware = require('../middlewares/isMemberMiddleware');
 const postService = require('../services/postService');
 
 //get posts with pagination (as infinite scroll at the front end)
@@ -28,7 +29,7 @@ router.get('/', async (req, res) => {
 //a parametric path inserted just before a literal one takes the precedence over the literal one.
 
 //get posts with pagination (as infinite scroll at the front end)
-router.get('/user-posts', async (req, res) => {
+router.get('/user-posts', isMemberMiddleware, async (req, res) => {
 
     const groupId = req.groupId;
     const currUser = req.user;
@@ -61,7 +62,7 @@ router.get('/:postId', async (req, res) => {
 })
 
 //CREATE POST
-router.post('/', async (req, res) => {
+router.post('/', isMemberMiddleware, async (req, res) => {
     try {
 
         const { text, img } = req.body;
@@ -95,7 +96,7 @@ router.post('/', async (req, res) => {
 
 //EDIT POST
 
-router.put('/:postId', async (req, res) => {
+router.put('/:postId', isMemberMiddleware, async (req, res) => {
     const currUserId = req.user._id;
     const postIdToEdit = req.params.postId;
     const { text, newImg, currImg } = req.body;
@@ -128,7 +129,7 @@ router.put('/:postId', async (req, res) => {
 })
 
 //DELETE POST
-router.delete('/:postId', async (req, res) => {
+router.delete('/:postId', isMemberMiddleware, async (req, res) => {
     const currUserId = req.user._id;
     try {
         await postService.delete(req.params.postId, currUserId);

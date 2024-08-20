@@ -62,6 +62,10 @@ exports.getById = async (postId) => {
 
 exports.getUserPostsForGroup = async (groupId, currUser, page, limit) => {
 
+    //authMiddleware guarantees user who wants to edit post still exists
+    //groupMiddleware guarantees that the group exists
+    //isMemberMiddleware guarantees that the current user is a member of the group he is trying to create post in
+
     const skip = (page - 1) * limit;
 
     let posts = await Post
@@ -94,8 +98,7 @@ exports.getUserPostsForGroup = async (groupId, currUser, page, limit) => {
 
 exports.createPost = async (text, img, _ownerId, groupId) => {
 
-    const group = await Group.findById(groupId);
-
+    //authMiddleware guarantees user who wants to edit post still exists
     //groupMiddleware guarantees that the group exists
     //isMemberMiddleware guarantees that the current user is a member of the group he is trying to create post in
 
@@ -123,7 +126,9 @@ exports.edit = async (postIdToEdit, currUserId, text, newImg, currImg) => {
     //не мога да преизползвам getById, защото в него има lean() -> няма да мога да кажа post.save()
     //защото това няма да е Mongoose document , а POJO
 
-    //проверка дали потребителят, който се опитва да редактира съществува -> вече сме я направили в authMiddleware
+    //authMiddleware guarantees user who wants to edit post still exists
+    //groupMiddleware guarantees that the group exists
+    //isMemberMiddleware guarantees that the current user is a member of the group he is trying to edit post in
 
     let post;
 
@@ -198,11 +203,9 @@ exports.edit = async (postIdToEdit, currUserId, text, newImg, currImg) => {
 
 exports.delete = async (postIdToDelete, currUserId) => {
 
-    //проверка дали потребителят, който се опитва да изтрива съществува -> вече сме я направили в authMiddleware
-
-    //TODO : проверка групата съществува ли? - в постман пробвах да имам невалидно groupId
-    //но валидно postId и си става
-    //TODO: проверка потребителят член ли е на групата, за да изтрива публикации в нея ?
+    //authMiddleware guarantees user who wants to delete post still exists
+    //groupMiddleware guarantees that the group exists
+    //isMemberMiddleware guarantees that the current user is a member of the group he is trying to delete post in
 
     //reuse getById() service method -> тук е проверката дали публикацията съществува
     const post = await this.getById(postIdToDelete);
