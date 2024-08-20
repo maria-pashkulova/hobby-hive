@@ -1,7 +1,7 @@
 const router = require('express').Router();
 
 //middlewares
-const getEventForChangeRequest = require('../middlewares/eventMiddlewareForChangeRequest');
+const getEventForChangeRequest = require('../middlewares/eventWithOwnerMiddleware');
 const isAdminMiddleware = require('../middlewares/isAdminMiddleware');
 const validateRequest = require('../middlewares/changeRequestMiddleware');
 

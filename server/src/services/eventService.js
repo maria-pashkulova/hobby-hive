@@ -1,5 +1,6 @@
 const Event = require('../models/Event');
 const Group = require('../models/Group');
+const EventChangeRequest = require('../models/EventChangeRequest');
 const { checkForDuplicateTags } = require('../utils/validateGroupData');
 const { validateEventTags } = require('../utils/validateEventData');
 
@@ -57,7 +58,10 @@ exports.getByIdWithMembers = async (event) => {
 
 // ----------Used for validations only-----------
 
-//select only _id and eventOwer (id) for event with no other info. Used in eventMiddlewareForChangeRequests.js
+/*select only _id and eventOwer (id) for event with no other info. Used in 
+eventMiddlewareWithOwnerMiddleware used for routes related to event change requests
+and routes for delete event
+*/
 exports.getById = (eventId) => {
     const event = Event
         .findById(eventId)
@@ -66,7 +70,6 @@ exports.getById = (eventId) => {
 
     return event;
 }
-
 
 
 //used in eventMiddleware only - for : event details, update event, my calendar
@@ -180,6 +183,22 @@ exports.create = async (title, color, description, specificLocation, start, end,
         });
 
     return newEvent;
+
+}
+
+//DELETE EVENT 
+exports.delete = async (eventIdToDelete, isCurrUserGroupAdmin) => {
+
+    if (!isCurrUserGroupAdmin) {
+        const error = new Error('Само администраторът на групата може да изтрива събития от груповия календар!');
+        error.statusCode = 403;
+        throw error;
+    }
+
+    //TODO: transaction
+    await Event.findByIdAndDelete(eventIdToDelete);
+    //Delete all requests for change for the deleted event
+    await EventChangeRequest.deleteMany({ eventId: eventIdToDelete })
 
 }
 

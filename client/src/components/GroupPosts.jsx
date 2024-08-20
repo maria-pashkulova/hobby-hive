@@ -41,7 +41,7 @@ const GroupPosts = () => {
     //socket communication related
 
     useEffect(() => {
-        // Join group posts room for this group when the component mounts
+        // Join group posts room for this group when the component mounts or dependencies change (visit another group's calendar)
         socket?.emit('join group posts', groupId);
 
         // Handle incoming notification to refetch group posts
@@ -53,7 +53,7 @@ const GroupPosts = () => {
         //on post create or delete
         socket?.on('update group posts', handleChangeGroupPosts);
 
-        // Cleanup function to leave the room when the component unmounts
+        // Cleanup function to leave the room when the component unmounts / or dependencies change
         return () => {
             socket?.emit('leave group posts', groupId);
             socket?.off('update group posts', handleChangeGroupPosts);

@@ -1,12 +1,15 @@
-import { useToast } from "@chakra-ui/react"
-import * as postService from '../services/postService';
-import { useContext, useState } from "react";
+import { useToast } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
+import DeleteModal from "./DeleteModal"
+import { useContext, useState } from "react";
 import AuthContext from "../contexts/authContext";
-import DeleteModal from "./DeleteModal";
+import * as eventService from '../services/eventService';
 
 
-const DeletePostModal = ({ postIdToDelete, refetchOnDelete, groupId, isOpen, onClose }) => {
+
+
+const DeleteEventModal = ({ eventIdToDelete, updateLocalStateOnDelete, groupId, isOpen, onClose }) => {
+
 
     const navigate = useNavigate();
     const { logoutHandler, socket } = useContext(AuthContext);
@@ -15,27 +18,25 @@ const DeletePostModal = ({ postIdToDelete, refetchOnDelete, groupId, isOpen, onC
     const [loading, setLoading] = useState(false);
     const toast = useToast();
 
-    const handleDeletePost = async () => {
+    const handleDeleteEvent = async () => {
 
         setLoading(true);
         try {
+            await eventService.deleteEvent(groupId, eventIdToDelete);
 
-            await postService.deletePost(groupId, postIdToDelete);
+            //Real time update for other users currently viewing group calendar
+            socket?.emit('group event deleted', { groupId, eventId: eventIdToDelete })
 
-            //delete post from news feed with all posts for other currently viewing group posts
-            socket?.emit('group post deleted', groupId)
-
-            //delete post from local state
-            refetchOnDelete();
+            //delete event from local state
+            updateLocalStateOnDelete(eventIdToDelete);
             onClose();
             toast({
-                title: "Успешно изтрихте публикацията!",
+                title: "Успешно изтрихте събитието!",
                 status: "success",
                 duration: 5000,
                 isClosable: true,
                 position: "bottom",
             });
-
 
         } catch (error) {
             if (error.status === 401) {
@@ -50,6 +51,8 @@ const DeletePostModal = ({ postIdToDelete, refetchOnDelete, groupId, isOpen, onC
                     position: "bottom",
                 });
             } else {
+                console.log(error);
+
                 //error connecting with server
                 toast({
                     title: 'Възникна грешка при свързване!',
@@ -59,22 +62,22 @@ const DeletePostModal = ({ postIdToDelete, refetchOnDelete, groupId, isOpen, onC
                     position: "bottom",
                 });
             }
-        }
-        finally {
-            setLoading(false)
-        }
+        } finally {
+            setLoading(false);
 
+        }
     }
 
     return (
         <DeleteModal
-            description='Сигурни ли сте, че искате да изтриете публикацията?'
+            description='Сигурни ли сте, че искате да изтриете събитието от груповия календар?
+            Всички заявки за промяна на събитието също ще бъдат изтрити.'
             loading={loading}
-            handleDeleteAction={handleDeletePost}
+            handleDeleteAction={handleDeleteEvent}
             isOpen={isOpen}
             onClose={onClose}
         />
     )
 }
 
-export default DeletePostModal;
+export default DeleteEventModal

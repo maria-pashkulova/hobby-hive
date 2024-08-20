@@ -6,11 +6,12 @@ import { useNavigate } from "react-router-dom";
 import { useContext } from "react";
 import AuthContext from "../../contexts/authContext";
 import RequestEventChangeModal from "./RequestEventChangeModal";
+import DeleteEventModal from "../DeleteEventModal";
 
 //Attend / Decline attend buttons
 // Event actions : update, delete, request change according to user role in a group
 
-const EventButtons = ({ isCurrUserAttending, groupId, eventId, eventTitle, eventOwner, groupAdmin, handleAddMemberGoing, handleRemoveMemberGoing }) => {
+const EventButtons = ({ isCurrUserAttending, groupId, eventId, eventTitle, eventOwner, groupAdmin, handleAddMemberGoing, handleRemoveMemberGoing, handleRemoveEvent }) => {
 
     const navigate = useNavigate();
     const { logoutHandler, userId, fullName, email, profilePic } = useContext(AuthContext);
@@ -131,8 +132,14 @@ const EventButtons = ({ isCurrUserAttending, groupId, eventId, eventTitle, event
                         {(userId === groupAdmin || userId === eventOwner)
                             ?
                             <>
-                                <MenuItem >Редактирай</MenuItem>
-                                {userId === groupAdmin && <MenuItem >Изтрий</MenuItem>}
+                                <MenuItem onClick={editEventModal.onOpen}>Редактирай</MenuItem>
+                                {userId === groupAdmin &&
+                                    <MenuItem
+                                        onClick={deleteEventModal.onOpen}
+                                    >
+                                        Изтрий
+                                    </MenuItem>
+                                }
                             </>
                             :
                             <MenuItem onClick={requestEventChangeModal.onOpen}>Заяви промяна</MenuItem>
@@ -148,6 +155,14 @@ const EventButtons = ({ isCurrUserAttending, groupId, eventId, eventTitle, event
                 groupId={groupId}
                 eventIdForRequest={eventId}
                 eventTitle={eventTitle}
+            />}
+
+            {deleteEventModal.isOpen && <DeleteEventModal
+                isOpen={deleteEventModal.isOpen}
+                onClose={deleteEventModal.onClose}
+                groupId={groupId}
+                eventIdToDelete={eventId}
+                updateLocalStateOnDelete={handleRemoveEvent}
             />}
         </>
 

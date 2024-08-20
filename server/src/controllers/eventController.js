@@ -5,7 +5,8 @@ const eventService = require('../services/eventService');
 //middlewares 
 const getEvent = require('../middlewares/eventMiddleware');
 const getEventForAttendance = require('../middlewares/eventMiddlewareForAttendance');
-
+const getEventWithOwner = require('../middlewares/eventWithOwnerMiddleware');
+const isAdminMiddleware = require('../middlewares/isAdminMiddleware');
 
 //GET ALL events for visible date range on calendar
 
@@ -51,6 +52,24 @@ router.post('/', async (req, res) => {
     const groupId = req.groupId;
 
 
+    //TODO: regionCity : location.address.county || state -- use openstreet map for reverse geocoding -> (lat,lon) to get location's county | state (server-side)
+    //Трябва да проверя дали 
+    /* specificLocation
+    {
+        name: 'Варна, Варна',
+        locationRegionCity: 'Варна',
+        coordinates: [ 43.2073873, 27.9166653 ]
+    }
+     */
+    /*от координатите на избрана локация мога да получа нейния областен град, ако 
+    сървърът комуникира с openstreet map
+    или може да ползвам идващата от клиента инфо за същото - locationRegionCity,
+    но не съм сигурна че ще ми го прати ппц и може да не искам да разчитам, а да си го извлека от координатите
+    то и за координатите дали са пратени нямам проверка
+
+    и трябва да сравня и на бекенда дали съвпада с локацията на групата
+    */
+
     try {
         const createdEvent = await eventService.create(title, color, description, specificLocation, start, end, activityTags, groupId, _ownerId);
 
@@ -63,6 +82,21 @@ router.post('/', async (req, res) => {
     }
 
 });
+
+//DELETE EVENT
+//Only group administrator can delete group events
+
+router.delete('/:eventId', isAdminMiddleware, getEventWithOwner, async (req, res) => {
+    const isCurrUserGroupAdmin = req.isAdmin;
+    const eventIdToDelete = req.eventId; // comes from getEventWithOwner middleware; same as req.params.eventId
+    try {
+        await eventService.delete(eventIdToDelete, isCurrUserGroupAdmin);
+        res.status(204).end();
+
+    } catch (error) {
+        res.status(error.statusCode || 500).json({ message: error.message });
+    }
+})
 
 //MARK ATTENDANCE
 //groupMiddleware and isMemberMiddleware middlewares have already been executed by far

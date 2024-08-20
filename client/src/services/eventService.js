@@ -22,6 +22,8 @@ export const createEvent = (groupId, { title, color, description, specificLocati
 
 }
 
+export const deleteEvent = (groupId, eventId) => request.remove(`${baseUrl}/${groupId}/events/${eventId}`);
+
 //Attend an event
 export const markAttendance = (groupId, eventId) => request.put(`${baseUrl}/${groupId}/events/${eventId}/markAttendance`);
 

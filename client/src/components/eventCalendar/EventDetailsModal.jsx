@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import AuthContext from '../../contexts/authContext';
 
 //Fetch additional event details data - description, location, activity tags, members going
-const EventDetailsModal = ({ isOpen, onClose, eventDetailsObj, groupAdmin }) => {
+const EventDetailsModal = ({ isOpen, onClose, eventDetailsObj, groupAdmin, handleRemoveEvent }) => {
 
     const { groupId, id } = eventDetailsObj;
     const [particularEvent, setParticularEvent] = useState({});
@@ -73,7 +73,6 @@ const EventDetailsModal = ({ isOpen, onClose, eventDetailsObj, groupAdmin }) => 
         setIsAttending(false);
     }
 
-
     return (
         <Modal isOpen={isOpen} onClose={onClose}
 
@@ -98,6 +97,7 @@ const EventDetailsModal = ({ isOpen, onClose, eventDetailsObj, groupAdmin }) => 
                                     groupAdmin={groupAdmin}
                                     handleAddMemberGoing={handleAddMemberGoing}
                                     handleRemoveMemberGoing={handleRemoveMemberGoing}
+                                    handleRemoveEvent={handleRemoveEvent}
                                 />
                             </Box>
                         )

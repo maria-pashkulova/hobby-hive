@@ -56,7 +56,7 @@ function setupSocketServer(expressServer) {
             //user and other user as well. When other users join it is going to add them to this room
             socket.join(groupId);
 
-            console.log(`Socket ${socket.id} went to Group chat for group:  ${groupId}`);
+            console.log(`Socket ${socket.id} went to Group chat for group: ${groupId}`);
         })
 
 
@@ -110,10 +110,12 @@ function setupSocketServer(expressServer) {
         //Handle Group posts
         socket.on('join group posts', (groupId) => {
             socket.join(`posts-${groupId}`);
+            console.log(`Socket ${socket.id} joined Group posts: ${groupId}`);
         });
 
         socket.on('leave group posts', (groupId) => {
             socket.leave(`posts-${groupId}`);
+            console.log(`Socket ${socket.id} left Group posts: ${groupId}`);
         })
 
         //ON CREATE POST
@@ -133,10 +135,14 @@ function setupSocketServer(expressServer) {
         // Handle event calendar visits
         socket.on('visit event calendar', (groupId) => {
             socket.join(`events-${groupId}`);
+            console.log(`Socket ${socket.id} is viewing calendar for :${groupId}`);
+
         });
 
         socket.on('leave event calendar', (groupId) => {
             socket.leave(`events-${groupId}`);
+            console.log(`Socket ${socket.id} left calendar for :${groupId}`);
+
         });
 
         socket.on('new event', (newEventData) => {
@@ -170,6 +176,12 @@ function setupSocketServer(expressServer) {
             socket.to(`events-${groupInfo._id}`).emit('update event calendar', newEventData);
 
         });
+
+        //ON DELETE EVENT
+        socket.on('group event deleted', ({ groupId, eventId }) => {
+            //socket.to(...) excludes the user who deleted the event a.k.a group administrator
+            socket.to(`events-${groupId}`).emit('delete event from calendar', eventId);
+        })
 
 
         //Handle group events change requests 

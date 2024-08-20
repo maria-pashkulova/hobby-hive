@@ -70,7 +70,6 @@ const SearchLocation = () => {
     const handleSelectLocation = (location) => {
         const locationData = getLocationData(location);
 
-        //TODO: regionCity: location.address.county or state?? -- use openstreet map for reverse geocoding -> (lat,lon) to get location's county
         setFieldValue(EventKeys.SpecificLocation, {
             name: locationData,
             locationRegionCity: location.address.state, //used for FE valion with Yup
