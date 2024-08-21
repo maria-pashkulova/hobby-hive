@@ -61,7 +61,7 @@ const GroupEvents = () => {
 
     //Working with the callback form of setState (with updater function) ensures access to the latest state value regardless of when or where it is called.
     //regardless of the refernce given in useEffect used for managing event listeners for events from socket server 
-    //FOR THE CURRENT GROUP context (because groupId is in its dependecy array) 
+    //FOR THE CURRENT GROUP context (because groupId is in its dependency array) 
 
     //Add new event to the local state of the event creator + update other members' calendars who are viewing event calendar for the current group in the moment of event creation
     const handleAddNewEvent = (newEvent) => {

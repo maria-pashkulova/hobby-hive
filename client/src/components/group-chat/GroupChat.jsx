@@ -3,7 +3,7 @@ import MessageInput from "./MessageInput"
 import { useContext, useEffect, useState } from "react";
 
 import * as chatService from '../../services/chatService';
-import { Navigate, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import AuthContext from "../../contexts/authContext";
 import './GroupChat.css';
 import ScrollableChat from "./ScrollableChat";
@@ -20,6 +20,8 @@ const GroupChat = () => {
 
 
     //Add new message to the local state of the user who sends a message
+    //Update other members' chats who are viewing group chat
+    //Working with the callback form of setState (with updater function) ensures access to the latest state value regardless of when or where it is called.
     const handleNewMessages = (messageSent) => {
         setMessages((prevMessages) => [...prevMessages, messageSent])
     }
@@ -31,7 +33,6 @@ const GroupChat = () => {
             .then((groupMessages) => {
                 //if user has access to group messages he is 100% authenticated and is a member of group
                 setMessages(groupMessages);
-                socket?.emit('join chat', groupId);
             })
             .catch(error => {
                 if (error.status === 401) {
@@ -54,29 +55,20 @@ const GroupChat = () => {
             })
 
 
-        // Cleanup function to run when the component unmounts or groupId changes
-        return () => {
-            socket.emit('leave group chat', groupId);
-        };
-
     }, [groupId]);
 
 
     //Receive new message (for all group members currently viewing the chat in which a message was sent (except the member who has sent it))
     useEffect(() => {
 
-        const handleMessageReceived = (newMessageReceived) => {
-
-            setMessages((prevMessages) => [...prevMessages, newMessageReceived]);
-
-        };
-
-        socket?.on('message received', handleMessageReceived)
+        socket?.emit('join chat', groupId);
+        socket?.on('message received', handleNewMessages)
 
 
         //Cleanup the event listener on component unmount or when groupId / socket changes and use effect is triggered again
         return () => {
-            socket?.off('message received', handleMessageReceived);
+            socket?.emit('leave group chat', groupId);
+            socket?.off('message received', handleNewMessages);
         };
     }, [socket, groupId])
 

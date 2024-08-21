@@ -132,7 +132,6 @@ const SingleGroupPage = () => {
     }
 
     useEffect(() => {
-        setLoading(true); // Set loading true whenever groupId changes
         groupService.getById(groupId)
             .then((currGroup) => {
                 setGroup(currGroup);
