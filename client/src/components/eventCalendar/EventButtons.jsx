@@ -3,7 +3,7 @@ import { BsInfoLg, BsThreeDots } from "react-icons/bs";
 
 import * as eventService from '../../services/eventService';
 import { useNavigate } from "react-router-dom";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import AuthContext from "../../contexts/authContext";
 import RequestEventChangeModal from "./RequestEventChangeModal";
 import DeleteEventModal from "../DeleteEventModal";
@@ -21,6 +21,7 @@ const EventButtons = ({ isCurrUserAttending, groupId, eventId, eventTitle, event
     const deleteEventModal = useDisclosure();
     const requestEventChangeModal = useDisclosure();
 
+    const [loadingChangeAttendanceStatus, setLoadingChangeAttendanceStatus] = useState(false);
 
     // Switch between icon and text for actions button
     const menuButtonContent = useBreakpointValue({
@@ -31,6 +32,7 @@ const EventButtons = ({ isCurrUserAttending, groupId, eventId, eventTitle, event
     const handleMarkAttendance = async () => {
 
         try {
+            setLoadingChangeAttendanceStatus(true);
             const markAttendanceMsg = await eventService.markAttendance(groupId, eventId);
 
             //update members going on event state (only locally for the current user)
@@ -77,12 +79,15 @@ const EventButtons = ({ isCurrUserAttending, groupId, eventId, eventTitle, event
                     position: "bottom",
                 });
             }
+        } finally {
+            setLoadingChangeAttendanceStatus(false);
         }
 
     }
 
     const handleRevokeAttendance = async () => {
         try {
+            setLoadingChangeAttendanceStatus(true);
             const revokeAttendanceMsg = await eventService.revokeAttendance(groupId, eventId);
 
             //isMyCalendar flag is used to differentiate GroupCalendar events and My calendar events
@@ -134,6 +139,8 @@ const EventButtons = ({ isCurrUserAttending, groupId, eventId, eventTitle, event
                     position: "bottom",
                 });
             }
+        } finally {
+            setLoadingChangeAttendanceStatus(false);
         }
     }
 
@@ -149,11 +156,25 @@ const EventButtons = ({ isCurrUserAttending, groupId, eventId, eventTitle, event
                 {
                     isCurrUserAttending ?
                         (
-                            <Button bgColor={"red.400"} onClick={handleRevokeAttendance}>Отмени присъствие</Button>
+                            <Button
+                                bgColor={"red.400"}
+                                onClick={handleRevokeAttendance}
+                                isLoading={loadingChangeAttendanceStatus}
+                                loadingText='Отмяна на присъствие...'
+                            >
+                                Отмени присъствие
+                            </Button>
 
                         ) :
                         (
-                            <Button bgColor={"yellow.400"} onClick={handleMarkAttendance}>Ще присъствам</Button>
+                            <Button
+                                bgColor={"yellow.400"}
+                                onClick={handleMarkAttendance}
+                                isLoading={loadingChangeAttendanceStatus}
+                                loadingText='Ще присъствам...'
+                            >
+                                Ще присъствам
+                            </Button>
                         )
 
                 }
