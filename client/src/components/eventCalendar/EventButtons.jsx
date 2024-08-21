@@ -11,7 +11,7 @@ import DeleteEventModal from "../DeleteEventModal";
 //Attend / Decline attend buttons
 // Event actions : update, delete, request change according to user role in a group
 
-const EventButtons = ({ isCurrUserAttending, groupId, eventId, eventTitle, eventOwner, groupAdmin, handleAddMemberGoing, handleRemoveMemberGoing, handleRemoveEvent }) => {
+const EventButtons = ({ isCurrUserAttending, groupId, eventId, eventTitle, eventOwner, groupAdmin, handleAddMemberGoing, handleRemoveMemberGoing, handleRemoveEvent, isMyCalendar = false }) => {
 
     const navigate = useNavigate();
     const { logoutHandler, userId, fullName, email, profilePic } = useContext(AuthContext);
@@ -70,8 +70,14 @@ const EventButtons = ({ isCurrUserAttending, groupId, eventId, eventTitle, event
         try {
             const revokeAttendanceMsg = await eventService.revokeAttendance(groupId, eventId);
 
-            //update members going on event state (only locally for the current user)
-            handleRemoveMemberGoing(userId)
+            //isMyCalendar flag is used to differentiate GroupCalendar events and My calendar events
+            if (isMyCalendar) {
+                handleRemoveEvent(eventId);
+            } else {
+                //update members going on event state (only locally for the current user)
+                //for Group events calendar only; For My calendar is not needed because the Details modal is closed after attendance revoke
+                handleRemoveMemberGoing(userId)
+            }
 
             toast({
                 title: revokeAttendanceMsg.message,

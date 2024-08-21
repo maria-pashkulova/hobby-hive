@@ -5,7 +5,7 @@ import { formatEventTime } from '../../utils/formatEventDisplay';
 import EventButtons from './EventButtons';
 import MembersGoingModal from './MembersGoingModal';
 
-const EventDetails = ({ event, isCurrUserAttending, groupAdmin, handleAddMemberGoing, handleRemoveMemberGoing, handleRemoveEvent }) => {
+const EventDetails = ({ event, isCurrUserAttending, groupAdmin, handleAddMemberGoing, handleRemoveMemberGoing, handleRemoveEvent, isMyCalendar }) => {
 
     const { _id, title, color, start, end, description, specificLocation, activityTags, membersGoing, groupId, _ownerId } = event;
 
@@ -48,6 +48,7 @@ const EventDetails = ({ event, isCurrUserAttending, groupAdmin, handleAddMemberG
                             handleAddMemberGoing={handleAddMemberGoing}
                             handleRemoveMemberGoing={handleRemoveMemberGoing}
                             handleRemoveEvent={handleRemoveEvent}
+                            isMyCalendar={isMyCalendar}
                         />
                     </Flex>
                 </Flex>
@@ -142,6 +143,7 @@ const EventDetails = ({ event, isCurrUserAttending, groupAdmin, handleAddMemberG
                         handleAddMemberGoing={handleAddMemberGoing}
                         handleRemoveMemberGoing={handleRemoveMemberGoing}
                         handleRemoveEvent={handleRemoveEvent}
+                        isMyCalendar={isMyCalendar}
                     />
                 </Flex>
             </Flex>

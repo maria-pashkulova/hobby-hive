@@ -17,7 +17,11 @@ const MyCalendar = () => {
     const [myEvents, setMyEvents] = useState([]);
     const [selectedEventDetails, setSelectedEventDetails] = useState({});
 
-
+    //Remove event from My calendar - local state update upon revoke attendance
+    const handleRemoveRevokedEvent = (revokedEventId) => {
+        setMyEvents((prevMyEvents) => prevMyEvents.filter((currEvent) => currEvent._id !== revokedEventId));
+        showEventDetailsModal.onClose()
+    }
 
     const fetchEventsForRange = (startDate, endDate) => {
         userService.getMyEvents(startDate, endDate)
@@ -66,6 +70,8 @@ const MyCalendar = () => {
                     isOpen={showEventDetailsModal.isOpen}
                     onClose={showEventDetailsModal.onClose}
                     eventDetailsObj={selectedEventDetails}
+                    handleRemoveEvent={handleRemoveRevokedEvent}
+                    isMyCalendar={true}
                 />
             }
 
