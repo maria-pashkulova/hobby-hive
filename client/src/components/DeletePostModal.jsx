@@ -68,7 +68,7 @@ const DeletePostModal = ({ postIdToDelete, refetchOnDelete, groupId, isOpen, onC
 
     return (
         <DeleteModal
-            description='Сигурни ли сте, че искате да изтриете публикацията?'
+            confirmQuestion='Сигурни ли сте, че искате да изтриете публикацията?'
             loading={loading}
             handleDeleteAction={handleDeletePost}
             isOpen={isOpen}

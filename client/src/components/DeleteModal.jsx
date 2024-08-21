@@ -1,6 +1,6 @@
-import { Button, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay } from "@chakra-ui/react"
+import { Button, Heading, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Text } from "@chakra-ui/react"
 
-const DeleteModal = ({ description, loading, handleDeleteAction, isOpen, onClose }) => {
+const DeleteModal = ({ confirmQuestion, additionalDescriptionOne, additionalDescriptionTwo, loading, handleDeleteAction, isOpen, onClose }) => {
     return (
         <Modal isOpen={isOpen} onClose={onClose}>
             <ModalOverlay />
@@ -10,7 +10,21 @@ const DeleteModal = ({ description, loading, handleDeleteAction, isOpen, onClose
                 <ModalHeader>Внимание!</ModalHeader>
                 <ModalCloseButton />
                 <ModalBody>
-                    {description}
+                    <Heading as='h3' size={{ base: 'sm', md: 'md' }} mb={5}>{confirmQuestion}</Heading>
+                    {additionalDescriptionOne &&
+                        <Text
+                            mb={2}
+                            fontSize={{ base: 'sm', md: 'md' }}
+                        >
+                            {additionalDescriptionOne}
+                        </Text>}
+                    {additionalDescriptionTwo &&
+                        <Text
+                            color='red'
+                            fontSize={{ base: 'sm', md: 'md' }}
+                            fontWeight='bold'>
+                            {additionalDescriptionTwo}
+                        </Text>}
                 </ModalBody>
 
                 <ModalFooter>
