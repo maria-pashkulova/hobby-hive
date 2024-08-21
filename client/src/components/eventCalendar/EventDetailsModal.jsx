@@ -1,4 +1,4 @@
-import { Modal, ModalBody, ModalContent, ModalOverlay, Box, Flex, Spinner } from '@chakra-ui/react'
+import { Modal, ModalBody, ModalContent, ModalOverlay, Box, Flex, Spinner, useToast } from '@chakra-ui/react'
 import React, { useContext, useEffect, useState } from 'react'
 import EventDetails from './EventDetails'
 
@@ -13,6 +13,8 @@ const EventDetailsModal = ({ isOpen, onClose, eventDetailsObj, groupAdmin, handl
     const [particularEvent, setParticularEvent] = useState({});
     const [isAttending, setIsAttending] = useState(false);
     const [loading, setLoading] = useState(true);
+    const toast = useToast();
+
 
     const { logoutHandler, userId } = useContext(AuthContext);
     const navigate = useNavigate();
@@ -38,10 +40,33 @@ const EventDetailsModal = ({ isOpen, onClose, eventDetailsObj, groupAdmin, handl
                     logoutHandler(); //invalid or missing token
                     navigate('/login');
                 } else if (error.status === 404) {
-                    navigate('/not-found');
+
+                    //handle case : concurrently manipulated event from group administrator and a group member
+                    //User is trying to get event details for an event that was deleted by admin during the time the other user was viwing My Calendar page
+                    //For a particular group event calendar this case is handled out-of-the-box by real-time group calendar update when event is deleted
+
+                    if (isMyCalendar) {
+                        navigate(`/groups/${groupId}/events`);
+                    }
+
+                    //user-friendly error message comes from server
+                    toast({
+                        title: error.message,
+                        status: "error",
+                        duration: 6000,
+                        isClosable: true,
+                        position: "bottom",
+                    });
+
                 } else {
-                    //handle other errors
-                    console.log(error.message);
+                    //handle case : error connecting with server or server errors with other statuses
+                    toast({
+                        title: error.message || 'Възникна грешка при свързване!',
+                        status: "error",
+                        duration: 5000,
+                        isClosable: true,
+                        position: "bottom",
+                    });
                 }
 
             })

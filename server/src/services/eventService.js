@@ -72,7 +72,8 @@ exports.getById = (eventId) => {
 }
 
 
-//used in eventMiddleware only - for : event details, update event, my calendar
+//used in eventMiddleware only - for : event details fetched from both group and my calendar pages
+//and for event update 
 exports.getByIdToValidate = (eventId) => {
     const event = Event
         .findById(eventId)

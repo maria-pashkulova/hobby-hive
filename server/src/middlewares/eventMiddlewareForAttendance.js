@@ -11,7 +11,7 @@ const getEventForAttendance = async (req, res, next) => {
 
     const event = await eventService.getByIdToValidateForAttendance(requestedEventId);
     if (!event) {
-        return res.status(404).json({ message: 'Събитието не съществува!' });
+        return res.status(404).json({ message: 'Администраторът на групата е изтрил събитието, за което правите заявка' });
     }
 
     req.event = event;

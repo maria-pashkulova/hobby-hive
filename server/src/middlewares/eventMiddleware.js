@@ -4,8 +4,7 @@ const eventService = require('../services/eventService');
 //Check if requested event is valid
 //Attach event to req object
 
-//TODO: идеята ми е извлечения event да се ползва в event details, update event
-// и в Моят календар
+//Used for: event details fetching from both group and my calendar pages
 
 const getEvent = async (req, res, next) => {
     const requestedEventId = req.params.eventId;
@@ -17,7 +16,7 @@ const getEvent = async (req, res, next) => {
 
     const event = await eventService.getByIdToValidate(requestedEventId);
     if (!event) {
-        return res.status(404).json({ message: 'Събитието не съществува!' });
+        return res.status(404).json({ message: 'Администраторът на групата е изтрил събитието, за което правите заявка!' });
     }
 
     req.event = event;

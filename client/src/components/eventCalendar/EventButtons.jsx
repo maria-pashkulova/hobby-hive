@@ -1,5 +1,5 @@
 import { Button, Flex, Icon, IconButton, Menu, MenuButton, MenuItem, MenuList, useBreakpointValue, useDisclosure, useToast } from "@chakra-ui/react"
-import { BsThreeDots } from "react-icons/bs";
+import { BsInfoLg, BsThreeDots } from "react-icons/bs";
 
 import * as eventService from '../../services/eventService';
 import { useNavigate } from "react-router-dom";
@@ -53,9 +53,24 @@ const EventButtons = ({ isCurrUserAttending, groupId, eventId, eventTitle, event
             if (error.status === 401) {
                 logoutHandler(); //invalid or missing token 
                 navigate('/login');
-            } else {
+            } else if (error.status === 404) {
+                //handle case : concurrently manipulated event from group administrator and a group member
+                //User is trying to mark attendance for an event that was deleted by admin during the time the other user was viwing event's details
+                //from Group events calendar. This case is handled out-of-the-box by real-time group calendar update, but also handled here if some edge cases are possible
+
+                //user-friendly error message comes from server
                 toast({
                     title: error.message,
+                    status: "error",
+                    duration: 6000,
+                    isClosable: true,
+                    position: "bottom",
+                });
+
+            } else {
+                //handle case : error connecting with server or server errors with other statuses
+                toast({
+                    title: error.message || 'Възникна грешка при свързване!',
                     status: "error",
                     duration: 5000,
                     isClosable: true,
@@ -91,9 +106,28 @@ const EventButtons = ({ isCurrUserAttending, groupId, eventId, eventTitle, event
             if (error.status === 401) {
                 logoutHandler(); //invalid or missing token 
                 navigate('/login');
-            } else {
+            } else if (error.status === 404) {
+
+                //handle case : concurrently manipulated event from group administrator and a group member
+                //User is trying to revoke attendance for an event that was deleted by admin during the time the other user was viwing event's details in My Calendar page
+
+                if (isMyCalendar) {
+                    //If user is currently viewing My Calendar page, redirect him so he can see the updated group event calendar
+                    navigate(`/groups/${groupId}/events`);
+                }
+
+                //user-friendly error message comes from server
                 toast({
                     title: error.message,
+                    status: "error",
+                    duration: 6000,
+                    isClosable: true,
+                    position: "bottom",
+                });
+            } else {
+                //handle case : error connecting with server or server errors with other statuses
+                toast({
+                    title: error.message || 'Възникна грешка при свързване!',
                     status: "error",
                     duration: 5000,
                     isClosable: true,

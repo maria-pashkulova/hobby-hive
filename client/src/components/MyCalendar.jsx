@@ -36,8 +36,14 @@ const MyCalendar = () => {
                 } else if (error.status === 404) {
                     navigate('/not-found');
                 } else {
-                    //handle other errors
-                    console.log(error.message);
+                    //handle case : error connecting with server or server errors with other statuses
+                    toast({
+                        title: error.message || 'Възникна грешка при свързване!',
+                        status: "error",
+                        duration: 5000,
+                        isClosable: true,
+                        position: "bottom",
+                    });
                 }
             });
 

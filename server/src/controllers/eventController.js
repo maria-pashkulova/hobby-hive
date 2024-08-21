@@ -27,7 +27,9 @@ router.get('/', async (req, res) => {
 
 })
 
-//GET EVENT DETAILS
+//GET EVENT DETAILS 
+// endpoint for fetching event details for events both from a particular Group calendar
+//and from My calendar pages on the front-end
 router.get('/:eventId', getEvent, async (req, res) => {
 
     const fetchedEvent = req.event;
