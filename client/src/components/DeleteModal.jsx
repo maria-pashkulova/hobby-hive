@@ -20,7 +20,7 @@ const DeleteModal = ({ confirmQuestion, additionalDescriptionOne, additionalDesc
                         </Text>}
                     {additionalDescriptionTwo &&
                         <Text
-                            color='red'
+                            color='red.400'
                             fontSize={{ base: 'sm', md: 'md' }}
                             fontWeight='bold'>
                             {additionalDescriptionTwo}

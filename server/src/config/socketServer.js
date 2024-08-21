@@ -75,7 +75,7 @@ function setupSocketServer(expressServer) {
             // Send the new message to users currently viewing the chat (except the user who has sent the message)
             socket.to(groupInfo._id).emit('message received', newMessageReceived);
 
-            // Notify individual group members which are logged in
+            // Notify individual group members who are logged in
             //and are not currently viewing group chat page
             groupInfo.members.forEach((member) => {
                 if (member._id !== newMessageReceived.sender._id) {
@@ -178,9 +178,35 @@ function setupSocketServer(expressServer) {
         });
 
         //ON DELETE EVENT
-        socket.on('group event deleted', ({ groupId, eventId }) => {
+        socket.on('group event deleted', ({ groupId, eventId, eventName, groupName, groupAdmin, membersToNotify }) => {
+
+            //Update group events for members currently viewing group calendar
             //socket.to(...) excludes the user who deleted the event a.k.a group administrator
             socket.to(`events-${groupId}`).emit('delete event from calendar', eventId);
+
+            //Notify individual group members who are logged in 
+            //who were marked as going
+            //except group admin
+            membersToNotify.forEach((memberId) => {
+                if (memberId !== groupAdmin) {
+
+                    //Determine conncection status: only connected users receive notification
+                    const attendeeSockets = userSockets.get(memberId) || [];
+
+                    //if current event attendee is logged in, send him a notification
+                    //All attendees are group members (used in ProtectedRouteMembers)
+                    if (attendeeSockets.length > 0) {
+                        socket.to(memberId).emit('deleted event notification', {
+                            notificationTitle: `Събитие: ${eventName} в група ${groupName} беше изтрито!`,
+                            uniqueIdentifier: `event-${eventId}-delete`,
+                            fromGroup: groupId,
+                            type: 'event',
+                            isMemberFromNotification: true
+                        })
+                    }
+                }
+            })
+
         })
 
 

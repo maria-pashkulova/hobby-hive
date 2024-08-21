@@ -197,10 +197,20 @@ exports.delete = async (eventIdToDelete, isCurrUserGroupAdmin) => {
     }
 
     //TODO: transaction
-    await Event.findByIdAndDelete(eventIdToDelete);
+    const deletedEventInfo = await Event
+        .findByIdAndDelete(eventIdToDelete)
+        .select('title membersGoing groupId')
+        .populate('groupId', 'groupAdmin name');
+
     //Delete all requests for change for the deleted event
     await EventChangeRequest.deleteMany({ eventId: eventIdToDelete })
 
+    return {
+        eventName: deletedEventInfo.title,
+        groupName: deletedEventInfo.groupId.name,
+        groupAdmin: deletedEventInfo.groupId.groupAdmin,
+        membersToNotify: deletedEventInfo.membersGoing
+    }
 }
 
 //MARK ATTENDANCE RELATED SERVICES

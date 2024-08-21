@@ -22,10 +22,10 @@ const DeleteEventModal = ({ eventIdToDelete, updateLocalStateOnDelete, groupId, 
 
         setLoading(true);
         try {
-            await eventService.deleteEvent(groupId, eventIdToDelete);
+            const deletedEventInfo = await eventService.deleteEvent(groupId, eventIdToDelete);
 
             //Real time update for other users currently viewing group calendar
-            socket?.emit('group event deleted', { groupId, eventId: eventIdToDelete })
+            socket?.emit('group event deleted', { groupId, eventId: eventIdToDelete, ...deletedEventInfo })
 
             //delete event from local state
             updateLocalStateOnDelete(eventIdToDelete);

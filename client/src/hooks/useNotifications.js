@@ -31,12 +31,8 @@ export default function useNotifications() {
                         return [notification, ...prevNotifications];
                     }
 
-                } else if (isEventNotification) {
+                } else if (isEventNotification || isRequestNotification) {
                     setNotificationsCount((prevCount) => prevCount + 1)
-                    return [notification, ...prevNotifications];
-
-                } else if (isRequestNotification) {
-                    setNotificationsCount((prevCount) => prevCount + 1);
                     return [notification, ...prevNotifications];
                 }
 
@@ -49,11 +45,13 @@ export default function useNotifications() {
 
         socket?.on('message notification', handleNotification);
         socket?.on('new event notification', handleNotification);
+        socket?.on('deleted event notification', handleNotification);
         socket?.on('new request notification', handleNotification);
 
         return () => {
             socket?.off('message notification', handleNotification);
             socket?.off('new event notification', handleNotification);
+            socket?.off('deleted event notification', handleNotification);
             socket?.off('new request notification', handleNotification);
 
         };

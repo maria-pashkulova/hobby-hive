@@ -92,8 +92,8 @@ router.delete('/:eventId', isAdminMiddleware, getEventWithOwner, async (req, res
     const isCurrUserGroupAdmin = req.isAdmin;
     const eventIdToDelete = req.eventId; // comes from getEventWithOwner middleware; same as req.params.eventId
     try {
-        await eventService.delete(eventIdToDelete, isCurrUserGroupAdmin);
-        res.status(204).end();
+        const deletedEventInfo = await eventService.delete(eventIdToDelete, isCurrUserGroupAdmin);
+        res.status(200).json(deletedEventInfo);
 
     } catch (error) {
         res.status(error.statusCode || 500).json({ message: error.message });
