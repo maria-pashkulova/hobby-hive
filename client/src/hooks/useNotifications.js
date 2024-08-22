@@ -65,7 +65,10 @@ export default function useNotifications() {
     }
 
     const handleHideNotificationIndicator = () => {
-        setNotificationsCount(0);
+        //Prevent from redundant re-renders when bell ring button is clicked
+        if (notificationsCount !== 0) {
+            setNotificationsCount(0);
+        }
     }
 
 

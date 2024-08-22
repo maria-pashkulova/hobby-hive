@@ -155,7 +155,9 @@ const SingleGroupPage = () => {
 
             })
             .finally(() => {
-                setLoading(false);
+                if (loading) {
+                    setLoading(false); // perform state change only on initial render
+                }
             })
 
     }, [groupId]);
