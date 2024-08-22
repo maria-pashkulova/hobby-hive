@@ -10,8 +10,9 @@ import DeleteEventModal from "../DeleteEventModal";
 
 //Attend / Decline attend buttons
 // Event actions : update, delete, request change according to user role in a group
-
-const EventButtons = ({ isCurrUserAttending, groupId, eventId, eventTitle, eventOwner, groupAdmin, handleAddMemberGoing, handleRemoveMemberGoing, handleRemoveEvent, isMyCalendar = false }) => {
+//Future events are considered events with start date after the current date and time. 
+//Today's events are considered as future or past depending on their start time compared to the current time
+const EventButtons = ({ isCurrUserAttending, groupId, eventId, eventTitle, eventOwner, groupAdmin, handleAddMemberGoing, handleRemoveMemberGoing, handleRemoveEvent, isMyCalendar = false, isFutureEvent }) => {
 
     const navigate = useNavigate();
     const { logoutHandler, userId, fullName, email, profilePic } = useContext(AuthContext);
@@ -153,6 +154,8 @@ const EventButtons = ({ isCurrUserAttending, groupId, eventId, eventTitle, event
                 flexDir={{ base: 'column', md: 'row' }}
                 w={'100%'}
             >
+
+                {/* Attendance related buttons - enabled only for future events */}
                 {
                     isCurrUserAttending ?
                         (
@@ -161,6 +164,7 @@ const EventButtons = ({ isCurrUserAttending, groupId, eventId, eventTitle, event
                                 onClick={handleRevokeAttendance}
                                 isLoading={loadingChangeAttendanceStatus}
                                 loadingText='Отмяна на присъствие...'
+                                isDisabled={!isFutureEvent}
                             >
                                 Отмени присъствие
                             </Button>
@@ -172,6 +176,8 @@ const EventButtons = ({ isCurrUserAttending, groupId, eventId, eventTitle, event
                                 onClick={handleMarkAttendance}
                                 isLoading={loadingChangeAttendanceStatus}
                                 loadingText='Ще присъствам...'
+                                disabled={!isFutureEvent}
+                                isDisabled={!isFutureEvent}
                             >
                                 Ще присъствам
                             </Button>
@@ -179,6 +185,11 @@ const EventButtons = ({ isCurrUserAttending, groupId, eventId, eventTitle, event
 
                 }
 
+
+                {/* Event actions related buttons
+                    edit buttons and event change request buttons are enabled only for future events
+                    delete buttons are enabled for group admin for both future and past events
+                */}
                 <Menu>
                     <MenuButton
                         as={menuButtonContent === 'Действия' ? Button : IconButton}
@@ -193,7 +204,14 @@ const EventButtons = ({ isCurrUserAttending, groupId, eventId, eventTitle, event
                         {(userId === groupAdmin || userId === eventOwner)
                             ?
                             <>
-                                <MenuItem onClick={editEventModal.onOpen}>Редактирай</MenuItem>
+
+                                <MenuItem
+                                    isDisabled={!isFutureEvent}
+                                    onClick={editEventModal.onOpen}
+                                >
+                                    Редактирай
+                                </MenuItem>
+
                                 {userId === groupAdmin &&
                                     <MenuItem
                                         onClick={deleteEventModal.onOpen}
@@ -203,28 +221,38 @@ const EventButtons = ({ isCurrUserAttending, groupId, eventId, eventTitle, event
                                 }
                             </>
                             :
-                            <MenuItem onClick={requestEventChangeModal.onOpen}>Заяви промяна</MenuItem>
+                            <MenuItem
+                                isDisabled={!isFutureEvent}
+                                onClick={requestEventChangeModal.onOpen}
+                            >
+                                Заяви промяна
+                            </MenuItem>
                         }
+
                     </MenuList>
                 </Menu>
-            </Flex>
+            </Flex >
 
 
-            {requestEventChangeModal.isOpen && <RequestEventChangeModal
-                isOpen={requestEventChangeModal.isOpen}
-                onClose={requestEventChangeModal.onClose}
-                groupId={groupId}
-                eventIdForRequest={eventId}
-                eventTitle={eventTitle}
-            />}
+            {
+                requestEventChangeModal.isOpen && <RequestEventChangeModal
+                    isOpen={requestEventChangeModal.isOpen}
+                    onClose={requestEventChangeModal.onClose}
+                    groupId={groupId}
+                    eventIdForRequest={eventId}
+                    eventTitle={eventTitle}
+                />
+            }
 
-            {deleteEventModal.isOpen && <DeleteEventModal
-                isOpen={deleteEventModal.isOpen}
-                onClose={deleteEventModal.onClose}
-                groupId={groupId}
-                eventIdToDelete={eventId}
-                updateLocalStateOnDelete={handleRemoveEvent}
-            />}
+            {
+                deleteEventModal.isOpen && <DeleteEventModal
+                    isOpen={deleteEventModal.isOpen}
+                    onClose={deleteEventModal.onClose}
+                    groupId={groupId}
+                    eventIdToDelete={eventId}
+                    updateLocalStateOnDelete={handleRemoveEvent}
+                />
+            }
         </>
 
     )

@@ -1,3 +1,4 @@
+import { isBefore, isSameDay } from "date-fns";
 import checkIsObjectEmpty from "./checkIsObjectEmpty";
 
 export const checkForOverlappingEvents = (events, newEventStart, newEventEnd, newEventLocation, newEventTitle) => {
@@ -22,4 +23,18 @@ export const checkForOverlappingEvents = (events, newEventStart, newEventEnd, ne
 
         return isSameLocation && isOverlapping && isSameTitle;
     })
+}
+
+export const checkIsFutureEvent = (eventStartDate) => {
+    const eventStart = new Date(eventStartDate);
+    const todayDate = new Date();
+
+    /*isBefore includes both date and time in comparison
+    
+    if eventStart date is todays date but event start time
+    is before the current time, isBefore returns true -> 
+    the event is considered as a past event
+    because it has already started (and also it is even possible it has ended)
+    */
+    return !isBefore(eventStart, todayDate)
 }

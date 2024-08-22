@@ -9,7 +9,7 @@ const MembersGoingModal = ({ isOpen, onClose, membersGoing }) => {
                 <ModalContent
                     maxWidth={{ base: '90vw', md: '80vw', lg: '50vw', xl: '35vw' }}
                 >
-                    <ModalHeader>Членове, които ще присъстват</ModalHeader>
+                    <ModalHeader>Присъстващи членове</ModalHeader>
                     <ModalCloseButton />
 
 

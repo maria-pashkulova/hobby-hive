@@ -14,7 +14,7 @@ import Select from 'react-select';
 import SearchLocation from "./SearchLocation";
 import CustomInput from "./input-fields/CustomInput";
 import TextArea from "./input-fields/TextArea";
-import { checkForOverlappingEvents } from "../utils/checkForOverlappingEvents";
+import { checkForOverlappingEvents } from "../utils/checkEventData";
 
 const CreateEventModal = ({ isOpen, onClose, groupId, groupRegionCity, activityTags, selectedDate, handleAddNewEvent, existingEvents }) => {
 

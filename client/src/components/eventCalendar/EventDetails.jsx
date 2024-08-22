@@ -4,6 +4,7 @@ import { FiCalendar, FiMapPin } from "react-icons/fi";
 import { formatEventTime } from '../../utils/formatEventDisplay';
 import EventButtons from './EventButtons';
 import MembersGoingModal from './MembersGoingModal';
+import { checkIsFutureEvent } from '../../utils/checkEventData';
 
 const EventDetails = ({ event, isCurrUserAttending, groupAdmin, handleAddMemberGoing, handleRemoveMemberGoing, handleRemoveEvent, isMyCalendar }) => {
 
@@ -49,6 +50,7 @@ const EventDetails = ({ event, isCurrUserAttending, groupAdmin, handleAddMemberG
                             handleRemoveMemberGoing={handleRemoveMemberGoing}
                             handleRemoveEvent={handleRemoveEvent}
                             isMyCalendar={isMyCalendar}
+                            isFutureEvent={checkIsFutureEvent(start)}
                         />
                     </Flex>
                 </Flex>
@@ -144,6 +146,7 @@ const EventDetails = ({ event, isCurrUserAttending, groupAdmin, handleAddMemberG
                         handleRemoveMemberGoing={handleRemoveMemberGoing}
                         handleRemoveEvent={handleRemoveEvent}
                         isMyCalendar={isMyCalendar}
+                        isFutureEvent={checkIsFutureEvent(start)}
                     />
                 </Flex>
             </Flex>
