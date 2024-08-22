@@ -3,9 +3,11 @@ import { useState } from "react";
 
 
 export default function usePersistedState(key, defaultValue) {
+
+    //get data from localStorage only on page refresh
+    //a.k.a initial render = unmount -> mount;
     const [state, setState] = useState(() => {
         const persistedState = localStorage.getItem(key);
-        //от localStorage четем единствено и само при презареждане на application-а (mount)
 
         if (persistedState) {
             return JSON.parse(persistedState); //default value == persistedState

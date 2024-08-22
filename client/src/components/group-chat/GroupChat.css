@@ -1,4 +1,4 @@
-/* Scrollable feed from react-scrollable-feed librar is flex container 
+/* Scrollable feed from react-scrollable-feed library is flex container 
 so each message is flex item and it can use alignSelf property 
 alignSelf value depends on if message is sent from the current logged in user
 or another user in the group

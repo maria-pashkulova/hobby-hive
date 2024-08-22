@@ -80,6 +80,9 @@ export const AuthProvider = ({ children }) => {
     //logout + invalid or missing token handling (token and cookie expiration)
     const logoutHandler = () => {
         console.log('logout handler');
+
+        //Clear user data from local storage, because it was persited
+        //the actual auth state value is {} , set in usePersistedState
         setAuth(null);
     }
 
