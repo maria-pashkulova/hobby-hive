@@ -68,6 +68,16 @@ const MyGroupPosts = () => {
                     navigate('/login');
                 } else if (error.status === 404) {
                     navigate('/not-found');
+                } else if (error.status === 403) {
+                    navigate(`/groups/${groupId}`); //redirect to group posts
+                    toast({
+                        title: 'Не сте член на групата!',
+                        description: 'Присъдинете се към групата за да можете да създавате публикации!',
+                        status: "info",
+                        duration: 10000,
+                        isClosable: true,
+                        position: "bottom",
+                    });
                 } else {
                     //handle other errors
                     toast({

@@ -38,8 +38,8 @@ function App() {
             <Route path='/update-profile' element={<UpdateProfilePage />} />
             <Route path='/groups/:groupId' element={<SingleGroupPage />} >
               <Route index element={<GroupPosts />} />
-              <Route path='my-posts' element={<MyGroupPosts />} />
               <Route element={<ProtectedRouteMembers />}>
+                <Route path='my-posts' element={<MyGroupPosts />} />
                 <Route path='events' element={<GroupEvents />} />
                 <Route path='chat' element={<GroupChat />} />
               </Route>
