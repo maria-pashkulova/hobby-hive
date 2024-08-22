@@ -61,6 +61,19 @@ const GroupEventChangeRequests = () => {
                 if (error.status === 401) {
                     logoutHandler(); //invalid or missing token
                     navigate('/login');
+                } else if (error.status === 403) {
+                    //handle edge case : user who was a group admin opens notification for group event request change
+                    // after he left this group and new admin was selected by the system.
+
+                    navigate(`/groups/${groupId}`); //redirect to group posts
+                    toast({
+                        title: 'Вече не сте администратор на групата',
+                        description: 'След вашето напускане автоматично е бил избран нов администратор. Присъединете се отново към групата сега!',
+                        status: "info",
+                        duration: 10000,
+                        isClosable: true,
+                        position: "bottom",
+                    });
                 } else if (error.status === 404) {
                     navigate('/not-found');
                 } else {

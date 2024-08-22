@@ -2,7 +2,7 @@ import { useNavigate, useOutletContext, useParams } from 'react-router-dom';
 import { useContext, useEffect, useState } from 'react';
 import * as eventService from '../services/eventService';
 import AuthContext from '../contexts/authContext';
-import { useDisclosure } from '@chakra-ui/react';
+import { useDisclosure, useToast } from '@chakra-ui/react';
 import CreateEventModal from './CreateEventModal';
 import GroupEventsCalendar from './eventCalendar/GroupEventsCalendar';
 import EventDetailsModal from './eventCalendar/EventDetailsModal';
@@ -10,6 +10,7 @@ import EventDetailsModal from './eventCalendar/EventDetailsModal';
 const GroupEvents = () => {
 
     const navigate = useNavigate();
+    const toast = useToast();
     const { groupId } = useParams();
     const { activityTags, groupRegionCity, groupAdmin } = useOutletContext();
     const { logoutHandler, socket } = useContext(AuthContext);
@@ -31,9 +32,19 @@ const GroupEvents = () => {
             .catch(error => {
 
                 if (error.status === 401) {
-                    logoutHandler(); //invalid or missing token - пр логнал си се, седял си опр време, изтича ти токена - сървъра връща unauthorized - изчистваш стейта
-                    //и localStorage за да станеш неаутентикиран и за клиента и тогава редиректваш
+                    logoutHandler(); //invalid or missing token
                     navigate('/login');
+                } else if (error.status === 403) {
+                    //handle edge case : user opens notification for group event after he was removed or left this group
+                    navigate(`/groups/${groupId}`); //redirect to group posts
+                    toast({
+                        title: 'Не сте член на групата!',
+                        description: 'Присъдинете се към групата отново, за да получите достъп.',
+                        status: "info",
+                        duration: 10000,
+                        isClosable: true,
+                        position: "bottom",
+                    });
                 } else if (error.status === 404) {
                     navigate('/not-found');
                 } else {

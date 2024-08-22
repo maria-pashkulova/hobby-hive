@@ -40,6 +40,14 @@ const GroupChat = () => {
                     navigate('/login');
                 } else if (error.status === 403) {
                     navigate(`/groups/${groupId}`);
+                    toast({
+                        title: 'Не сте член на групата!',
+                        description: `За да достъпите груповия разговор, присъединете се отново!`,
+                        status: "info",
+                        duration: 10000,
+                        isClosable: true,
+                        position: "bottom",
+                    })
                 } else {
                     toast({
                         title: error.message,

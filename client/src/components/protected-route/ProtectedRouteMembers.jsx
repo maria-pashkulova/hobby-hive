@@ -8,7 +8,7 @@ const ProtectedRoute = () => {
     const { state } = useLocation()
 
     //User comes to events or chat page redirected from notification
-    //Use isMember from notification for most up-to-date data about group members
+    //Use isMember from notification for most up-to-date data about group members (if user has not left or has been removed before opening notification)
 
     if (state && state.isMemberFromNotification) {
         //If user receives notification for event / message he is a member of a group, no need for check

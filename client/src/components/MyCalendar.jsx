@@ -58,7 +58,10 @@ const MyCalendar = () => {
         const groupPopulatedObj = JSON.parse(eventDetailsObj.groupId);
         const groupId = groupPopulatedObj._id;
 
-        setSelectedEventDetails({ groupId, id });
+        //Access event name in case of user attending on an event in a group he left
+        const eventTitle = eventDetailsObj.title;
+
+        setSelectedEventDetails({ groupId, id, eventTitle });
         showEventDetailsModal.onOpen();
     }
 

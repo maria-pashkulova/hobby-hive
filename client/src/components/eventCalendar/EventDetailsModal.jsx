@@ -9,7 +9,7 @@ import AuthContext from '../../contexts/authContext';
 //Fetch additional event details data - description, location, activity tags, members going
 const EventDetailsModal = ({ isOpen, onClose, eventDetailsObj, groupAdmin, handleRemoveEvent, isMyCalendar }) => {
 
-    const { groupId, id } = eventDetailsObj;
+    const { groupId, id, eventTitle } = eventDetailsObj;
     const [particularEvent, setParticularEvent] = useState({});
     const [isAttending, setIsAttending] = useState(false);
     const [loading, setLoading] = useState(true);
@@ -58,6 +58,17 @@ const EventDetailsModal = ({ isOpen, onClose, eventDetailsObj, groupAdmin, handl
                         position: "bottom",
                     });
 
+                } else if (error.status === 403) {
+                    //Handle case : user attending on an event in a group he left, trying to get event details from My calendar page
+                    navigate(`/groups/${groupId}`);
+                    toast({
+                        title: 'Не сте член на групата!',
+                        description: `Напуснали сте група, в която сте заявили присъствие за събитие: ${eventTitle}. Присъдинете се към групата отново, за да достъпите събитието.`,
+                        status: "info",
+                        duration: 10000,
+                        isClosable: true,
+                        position: "bottom",
+                    })
                 } else {
                     //handle case : error connecting with server or server errors with other statuses
                     toast({

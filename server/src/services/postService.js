@@ -1,6 +1,4 @@
 const Post = require('../models/Post');
-const Group = require('../models/Group');
-const User = require('../models/User');
 
 
 const POST_PICS_FOLDER = 'post-pics';
@@ -62,7 +60,7 @@ exports.getById = async (postId) => {
 
 exports.getUserPostsForGroup = async (groupId, currUser, page, limit) => {
 
-    //authMiddleware guarantees user who wants to edit post still exists
+    //authMiddleware guarantees user who wants to view his posts still exists
     //groupMiddleware guarantees that the group exists
     //isMemberMiddleware guarantees that the current user is a member of the group he is trying to create post in
 
