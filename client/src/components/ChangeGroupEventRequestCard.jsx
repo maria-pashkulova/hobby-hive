@@ -1,13 +1,13 @@
 import { Card, CardBody, CardFooter, Divider, Flex, Heading, IconButton, Stack, Text, Tooltip, useToast } from "@chakra-ui/react"
 import { FiCheck, FiEye } from "react-icons/fi";
 import { useContext } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import AuthContext from '../contexts/authContext'
 
 import formatDate from '../utils/formatDate';
 import * as changeRequestService from '../services/changeRequestService';
 
-const ChangeGroupEventRequestCard = ({ requestId, eventTitle, requestDescription, requestedFrom, requestDate, groupId, setRefetch, handleCurrentPageChange }) => {
+const ChangeGroupEventRequestCard = ({ requestId, eventTitle, eventStart, requestDescription, requestedFrom, requestDate, groupId, setRefetch, handleCurrentPageChange }) => {
     const toast = useToast();
     const navigate = useNavigate();
     const { logoutHandler } = useContext(AuthContext);
@@ -51,9 +51,6 @@ const ChangeGroupEventRequestCard = ({ requestId, eventTitle, requestDescription
 
     }
 
-    //TODO: handle go to event in FullCalendar
-
-
     return (
         <Card mt={5}>
             <CardBody>
@@ -71,10 +68,15 @@ const ChangeGroupEventRequestCard = ({ requestId, eventTitle, requestDescription
                                 <IconButton
                                     isRound={true}
                                     variant='solid'
-                                    colorScheme='blue'
+                                    colorScheme="blue"
                                     aria-label='Done'
                                     fontSize='20px'
                                     icon={<FiEye />}
+                                    as={Link}
+                                    to={`/groups/${groupId}/events`}
+                                    state={
+                                        { eventStart: eventStart }
+                                    }
                                 />
                             </Tooltip >
                             <Tooltip label='Отбележи като прегледано' placement="bottom-end">

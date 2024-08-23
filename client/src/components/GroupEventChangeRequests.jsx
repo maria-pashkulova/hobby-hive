@@ -17,7 +17,6 @@ const GroupEventChangeRequests = () => {
     const [pagesCount, setPagesCount] = useState(0);
     const [fetchRequestsAgain, setFetchRequestsAgain] = useState(false);
 
-
     const navigate = useNavigate();
     const toast = useToast();
 
@@ -47,6 +46,7 @@ const GroupEventChangeRequests = () => {
 
 
     useEffect(() => {
+
         setIsLoading(true);
 
         changeRequestService.getGroupEventChangeRequests(groupId, {
@@ -55,7 +55,7 @@ const GroupEventChangeRequests = () => {
         })
             .then(({ requests, totalPages }) => {
                 setGroupEventChangeRequests(requests);
-                setPagesCount(totalPages)
+                setPagesCount(totalPages);
             })
             .catch(error => {
                 if (error.status === 401) {
@@ -133,6 +133,7 @@ const GroupEventChangeRequests = () => {
                                             key={request._id}
                                             requestId={request._id}
                                             eventTitle={request.eventId?.title}
+                                            eventStart={request.eventId?.start}
                                             requestDescription={request.description}
                                             requestedFrom={request.requestFromUser?.fullName}
                                             requestDate={request.createdAt}
