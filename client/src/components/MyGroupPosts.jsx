@@ -172,7 +172,7 @@ const MyGroupPosts = () => {
 
 
     return isInitialLoading ?
-        (<Flex justifyContent={'center'}>
+        (<Flex justifyContent={'center'} mt={8}>
             <Spinner size='xl' />
         </Flex>)
         : (myPosts.length > 0 ?
