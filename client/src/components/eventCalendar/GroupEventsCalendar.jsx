@@ -21,28 +21,40 @@ const GroupEventsCalendar = ({ groupEvents, onDateClick, onEventClick, fetchEven
     //page load and if calendar page has been previously viewed by user when he received notification for event create/delete
     const [initialView, setInitialView] = useState(null);
 
+
     //If user is has come on group events page by notification
     //for event create / delete , goToDate is used to show the month in which a group was created / deleted
     //because by default FullCalendar loads the current month
 
     const location = useLocation();
+    //if user does not go to group events page from notification - in this case location.state is null
+    //end error will be thrown if trying to destucture null; fallback {} -> destructuring empty object assigns 
+    //eventStart undefined value (which is falsy and works ok in this case)
     const { eventStart } = location.state || {};
 
     const calendarRef = useRef(null);
 
-    useEffect(() => {
-
-        if (initialView && eventStart) {
-            //optional chaining is needed because of initial null value of calendarRef
-            const calendarApi = calendarRef.current?.getApi();
-            calendarApi?.gotoDate(new Date(eventStart));
-        }
-    }, [initialView, eventStart]);
-
+    //determine initial view dynamically on component mount
     useEffect(() => {
         const isSmallerScreen = window.innerWidth <= 600;
         setInitialView(isSmallerScreen ? 'dayGridWeekThreeDays' : 'dayGridMonth');
     }, [])
+
+
+    useEffect(() => {
+
+        if (initialView && eventStart) {
+
+            // Use a microtask to defer the operation until after the render
+            Promise.resolve().then(() => {
+                //optional chaining is needed because of initial null value of calendarRef
+                const calendarApi = calendarRef.current?.getApi();
+                calendarApi?.gotoDate(new Date(eventStart));
+            });
+        }
+    }, [initialView, eventStart]);
+
+
 
     const dayClickAction = (dateClickInfo) => {
 
