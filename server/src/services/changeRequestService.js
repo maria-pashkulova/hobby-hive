@@ -17,7 +17,7 @@ exports.getAll = async (isCurrUserGroupAdmin, groupId, page, limit) => {
         .skip(skip)
         .limit(limit)
         .populate('requestFromUser', 'firstName lastName')
-        .populate('eventId', '_id title');
+        .populate('eventId', '_id title start');
 
     //Group events requests for change count
     const total = await EventChangeRequest.countDocuments({ groupId });
@@ -62,10 +62,10 @@ exports.create = async (currUserId, isCurrUserGroupAdmin, groupId, eventId, even
 
     //Populated group info is needed for notifications
     newRequest = await newRequest
-        .populate({
-            path: 'groupId',
-            select: 'name groupAdmin'
-        })
+        .populate('groupId', 'name groupAdmin')
+    //Populated event info is needed for notifications
+    newRequest = await newRequest
+        .populate('eventId', 'title')
 
     return newRequest;
 

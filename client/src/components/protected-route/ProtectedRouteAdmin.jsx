@@ -7,6 +7,7 @@ const ProtectedRouteAdmin = () => {
     const { groupId } = useParams();
     const { groupAdmin } = useOutletContext();
     const { userId } = useContext(AuthContext);
+    //if user navigation is not from notification state is null!
     const { state } = useLocation();
 
 

@@ -5,6 +5,8 @@ const ProtectedRoute = () => {
 
     const { groupId } = useParams();
     const { isMember, activityTags, groupRegionCity, groupAdmin } = useOutletContext();
+
+    //if user navigation is not from notification state is null!
     const { state } = useLocation()
 
     //User comes to events or chat page redirected from notification

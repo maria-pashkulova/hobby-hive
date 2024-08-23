@@ -199,7 +199,7 @@ exports.delete = async (eventIdToDelete, isCurrUserGroupAdmin) => {
     //TODO: transaction
     const deletedEventInfo = await Event
         .findByIdAndDelete(eventIdToDelete)
-        .select('title membersGoing groupId')
+        .select('title start color membersGoing groupId')
         .populate('groupId', 'groupAdmin name');
 
     //Delete all requests for change for the deleted event
@@ -207,6 +207,8 @@ exports.delete = async (eventIdToDelete, isCurrUserGroupAdmin) => {
 
     return {
         eventName: deletedEventInfo.title,
+        eventColor: deletedEventInfo.color,
+        eventStart: deletedEventInfo.start,
         groupName: deletedEventInfo.groupId.name,
         groupAdmin: deletedEventInfo.groupId.groupAdmin,
         membersToNotify: deletedEventInfo.membersGoing

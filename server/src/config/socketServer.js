@@ -94,9 +94,11 @@ function setupSocketServer(expressServer) {
 
                     if (!isMemberViewingChat) {
                         socket.to(member._id).emit('message notification', {
-                            notificationTitle: `Ново съобщение в група: ${groupInfo.name}`,
-                            uniqueIdentifier: `message-${newMessageReceived._id}`, //used only for React unique key 
+                            notificationAbout: 'Ново съобщение',
+                            notificationColor: 'blue.300',
                             fromGroup: groupInfo._id,
+                            groupName: groupInfo.name,
+                            uniqueIdentifier: `message-${newMessageReceived._id}`, //used only for React unique key 
                             type: 'message',
                             isMemberFromNotification: true
                         });
@@ -161,9 +163,13 @@ function setupSocketServer(expressServer) {
                     //if current group member is logged in, send him a notification
                     if (memberSockets.length > 0) {
                         socket.to(member._id).emit('new event notification', {
-                            notificationTitle: `Ново събитие в група: ${groupInfo.name}`,
-                            uniqueIdentifier: `event-${newEventData._id}`, //used only for React unique key
+                            notificationAbout: 'Ново събитие',
+                            notificationColor: newEventData.color,
                             fromGroup: groupInfo._id,
+                            groupName: groupInfo.name,
+                            eventName: newEventData.title,
+                            eventStart: newEventData.start,
+                            uniqueIdentifier: `event-${newEventData._id}`, //used only for React unique key
                             type: 'event',
                             isMemberFromNotification: true
                         })
@@ -178,14 +184,14 @@ function setupSocketServer(expressServer) {
         });
 
         //ON DELETE EVENT
-        socket.on('group event deleted', ({ groupId, eventId, eventName, groupName, groupAdmin, membersToNotify }) => {
+        socket.on('group event deleted', ({ groupId, eventId, eventName, eventColor, eventStart, groupName, groupAdmin, membersToNotify }) => {
 
             //Update group events for members currently viewing group calendar
             //socket.to(...) excludes the user who deleted the event a.k.a group administrator
             socket.to(`events-${groupId}`).emit('delete event from calendar', eventId);
 
             //Notify individual group members who are logged in 
-            //who were marked as going
+            //who were marked as going (even if they has left the group / has been removed from group)
             //except group admin
             membersToNotify.forEach((memberId) => {
                 if (memberId !== groupAdmin) {
@@ -197,9 +203,13 @@ function setupSocketServer(expressServer) {
                     //All attendees are group members (used in ProtectedRouteMembers)
                     if (attendeeSockets.length > 0) {
                         socket.to(memberId).emit('deleted event notification', {
-                            notificationTitle: `Събитие: ${eventName} в група ${groupName} беше изтрито!`,
-                            uniqueIdentifier: `event-${eventId}-delete`,
+                            notificationAbout: `Премахнато събитие`,
+                            notificationColor: eventColor,
                             fromGroup: groupId,
+                            groupName: groupName,
+                            eventName: eventName,
+                            eventStart: eventStart,
+                            uniqueIdentifier: `event-${eventId}-delete`,
                             type: 'event',
                             isMemberFromNotification: true
                         })
@@ -223,6 +233,7 @@ function setupSocketServer(expressServer) {
         socket.on('new event change request', (newRequestData) => {
             const groupInfo = newRequestData.groupId;
             const groupAdminId = groupInfo.groupAdmin;
+            const eventInfo = newRequestData.eventId;
 
             //Notify current group admin if he is logged in
             //Determine conncection status: it identifies if the group admin is connected to the server
@@ -234,9 +245,12 @@ function setupSocketServer(expressServer) {
             //in current group or not
             if (groupAdminSockets.length > 0) {
                 socket.to(groupAdminId).emit('new request notification', {
-                    notificationTitle: `Нова заявка за промяна в събитие в група: ${groupInfo.name}`,
-                    uniqueIdentifier: `request-${newRequestData._id}`, //used only for React unique key
+                    notificationAbout: 'Нова заявка за промяна на събитие',
+                    notificationColor: 'green.300',
                     fromGroup: groupInfo._id,
+                    groupName: groupInfo.name,
+                    eventName: eventInfo.title,
+                    uniqueIdentifier: `request-${newRequestData._id}`, //used only for React unique key
                     type: 'request',
                     isGroupAdminFromNotifications: true
                 })

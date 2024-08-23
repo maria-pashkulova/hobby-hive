@@ -104,12 +104,13 @@ const Header = ({ onOpen }) => {
                                     flexWrap={'wrap'}
                                     borderLeftWidth={10}
                                     borderLeftRadius={3}
-                                    borderColor={notification.notificationColor || 'yellow.300'}
+                                    borderColor={notification.notificationColor || 'blue.300'}
                                     gap={2}
+                                    alignItems={'flex-start'} // so flex items won't stretch to fill flex container which is the default
                                 >
                                     <Heading as='h3' size='sm'>{notification.notificationAbout}</Heading>
                                     {notification.eventName && <Text fontStyle={'italic'}>{notification.eventName}</Text>}
-                                    <Tag p={2} variant='outline'>
+                                    <Tag p={2} flexShrink='0' variant='outline'>
                                         {notification.groupName}
                                     </Tag>
                                 </Flex>
