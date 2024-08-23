@@ -24,8 +24,6 @@ const RequestEventChangeModal = ({ isOpen, onClose, groupId, eventIdForRequest, 
 
             const newRequest = await changeRequestService.createRequest(groupId, eventIdForRequest, formValues);
 
-            // console.log(newRequest);
-
             //notify group admin for new event change request
             socket?.emit('new event change request', newRequest);
 
@@ -55,7 +53,24 @@ const RequestEventChangeModal = ({ isOpen, onClose, groupId, eventIdForRequest, 
                     isClosable: true,
                     position: "bottom",
                 });
-            } else {
+            } else if (error.status === 404) {
+                //handle edge case : concurrently manipulated event from group administrator and a group member
+                //user has opened request event change modal from My calendar, but during this time group administrator has deleted the event
+                //and My Calendar page has not been refreshed (no real-time update)
+                //For a particular group event calendar this case is handled out-of-the-box by real-time group calendar update when event is deleted
+
+                navigate(`/groups/${groupId}/events`);
+
+                //user-friendly error message comes from server
+                toast({
+                    title: 'Администраторът на групата, в която е било създадено събитието е изтрил събитието от груповия календар!',
+                    status: "error",
+                    duration: 10000,
+                    isClosable: true,
+                    position: "bottom",
+                });
+            }
+            else {
                 toast({
                     title: error.message,
                     status: "error",

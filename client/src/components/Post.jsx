@@ -31,7 +31,7 @@ const Post = ({ postId, text, img, isOwner, postedByName, postedByProfilePic, cr
                         <Text fontSize='sm' fontWeight='bold'>{postedByName}</Text>
 
                         <Flex gap={4} alignItems='center'>
-                            <Text fontSize='sm' color={"gray.light"}>
+                            <Text display={{ base: 'none', md: 'flex' }} fontSize='sm' color={"gray.light"}>
                                 преди {formatDistanceToNow(new Date(createdAt), { locale: bg })}
                             </Text>
                             {isOwner && (

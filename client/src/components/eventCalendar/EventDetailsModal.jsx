@@ -53,7 +53,7 @@ const EventDetailsModal = ({ isOpen, onClose, eventDetailsObj, groupAdmin, handl
                     toast({
                         title: error.message,
                         status: "error",
-                        duration: 6000,
+                        duration: 10000,
                         isClosable: true,
                         position: "bottom",
                     });
