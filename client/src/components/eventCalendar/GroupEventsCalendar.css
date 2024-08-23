@@ -4,6 +4,12 @@
     padding: 4px;
 }
 
+.calendar-disabled {
+    pointer-events: none;
+    opacity: 0.5;
+    /* Optional: for visual feedback */
+}
+
 /* desktop first approach */
 
 /* md in Chakra ui-> 768px */

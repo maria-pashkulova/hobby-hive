@@ -3,21 +3,41 @@ import dayGridPlugin from '@fullcalendar/daygrid'
 import bgLocale from '@fullcalendar/core/locales/bg'
 import interactionPlugin from '@fullcalendar/interaction';
 
-import { Box, Flex, Spinner, useBreakpointValue } from '@chakra-ui/react'
+import { Box, Flex, Spinner } from '@chakra-ui/react'
 import addDefaultTimeToSelectedDate from '../../utils/addTimeToSelectedDate';
 import './GroupEventsCalendar.css';
 import EventInCalendarDateBox from './event-display/EventInCalendarDateBox';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 
 
-const GroupEventsCalendar = ({ groupEvents, onDateClick, onEventClick, fetchEventsForRange }) => {
+const GroupEventsCalendar = ({ groupEvents, onDateClick, onEventClick, fetchEventsForRange, isLoading }) => {
 
     //window resizing related
     const [lastStart, setLastStart] = useState();
     const [lastEnd, setLastEnd] = useState();
     //State used to dynamically define the initial view for fullcalendar
+    //on first page load. Also used to determine if the calendar is setup so .gotoDate() works properly both on first
+    //page load and if calendar page has been previously viewed by user when he received notification for event create/delete
     const [initialView, setInitialView] = useState(null);
 
+    //If user is has come on group events page by notification
+    //for event create / delete , goToDate is used to show the month in which a group was created / deleted
+    //because by default FullCalendar loads the current month
+
+    const location = useLocation();
+    const { eventStart } = location.state || {};
+
+    const calendarRef = useRef(null);
+
+    useEffect(() => {
+
+        if (initialView && eventStart) {
+            //optional chaining is needed because of initial null value of calendarRef
+            const calendarApi = calendarRef.current?.getApi();
+            calendarApi?.gotoDate(new Date(eventStart));
+        }
+    }, [initialView, eventStart]);
 
     useEffect(() => {
         const isSmallerScreen = window.innerWidth <= 600;
@@ -56,6 +76,7 @@ const GroupEventsCalendar = ({ groupEvents, onDateClick, onEventClick, fetchEven
 
         // Check if the date range has actually changed or the window has been resized without changing the view (dayGridMonth / dayGridWeek)
         if (start.getTime() !== lastStart?.getTime() || end.getTime() !== lastEnd?.getTime()) {
+
             // Save the new date range
             setLastStart(start);
             setLastEnd(end);
@@ -76,8 +97,11 @@ const GroupEventsCalendar = ({ groupEvents, onDateClick, onEventClick, fetchEven
 
     return (
         <Box
-            mt={20}>
+            mt={20}
+            className={isLoading ? 'calendar-disabled' : ''}
+        >
             <FullCalendar
+                ref={calendarRef}
                 plugins={[dayGridPlugin, interactionPlugin]}
                 initialView={initialView}
                 locale={bgLocale}

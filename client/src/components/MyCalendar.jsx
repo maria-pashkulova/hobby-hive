@@ -17,6 +17,9 @@ const MyCalendar = () => {
     const [myEvents, setMyEvents] = useState([]);
     const [selectedEventDetails, setSelectedEventDetails] = useState({});
 
+    //Monitor when the calendar starts and finishes loading events
+    const [isLoading, setIsLoading] = useState(false);
+
     //Remove event from My calendar - local state update upon revoke attendance
     const handleRemoveRevokedEvent = (revokedEventId) => {
         setMyEvents((prevMyEvents) => prevMyEvents.filter((currEvent) => currEvent._id !== revokedEventId));
@@ -24,6 +27,7 @@ const MyCalendar = () => {
     }
 
     const fetchEventsForRange = (startDate, endDate) => {
+        setIsLoading(true);
         userService.getMyEvents(startDate, endDate)
             .then((myEvents) => {
                 setMyEvents(myEvents);
@@ -45,6 +49,9 @@ const MyCalendar = () => {
                         position: "bottom",
                     });
                 }
+            })
+            .finally(() => {
+                setIsLoading(false);
             });
 
     }
@@ -72,6 +79,7 @@ const MyCalendar = () => {
                 groupEvents={myEvents}
                 onEventClick={handleEventClick}
                 fetchEventsForRange={fetchEventsForRange}
+                isLoading={isLoading}
             />
 
             {

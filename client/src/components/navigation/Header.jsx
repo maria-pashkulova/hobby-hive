@@ -1,8 +1,8 @@
-import { Flex, Heading, IconButton, Box, Text, HStack, Avatar, Menu, MenuButton, MenuList, MenuItem, MenuDivider, Badge } from '@chakra-ui/react';
+import { Flex, Heading, IconButton, Box, Text, HStack, Avatar, Menu, MenuButton, MenuList, MenuItem, MenuDivider, Badge, Tag } from '@chakra-ui/react';
 
 import { FiMenu, FiChevronDown, FiBell, FiX } from "react-icons/fi";
 import { Link } from 'react-router-dom';
-import { useContext, useState } from 'react';
+import { useContext } from 'react';
 import AuthContext from '../../contexts/authContext';
 
 import useNotifications from '../../hooks/useNotifications';
@@ -67,19 +67,28 @@ const Header = ({ onOpen }) => {
                         <FiBell />
 
                     </MenuButton>
-                    <MenuList>
+                    <MenuList
+                        minW={'40vw'}
+                        maxW={'70vw'}
+                    >
                         {!notifications.length ?
                             (<MenuItem>Нямате нови известия</MenuItem>)
                             :
                             notifications.map((notification) =>
                             (<MenuItem
+                                w={'100%'}
                                 as={Link}
-                                to={`/groups/${notification.fromGroup}/${notification.type === 'event' ? 'events' : notification.type === 'request' ? 'event-change-requests' : 'chat'}`}
+                                to={`/groups/${notification.fromGroup}/${notification.type === 'event'
+                                    ? 'events'
+                                    : notification.type === 'request'
+                                        ? 'event-change-requests'
+                                        : 'chat'
+                                    }`}
                                 state={
                                     {
                                         isMemberFromNotification: notification.isMemberFromNotification,
-                                        isGroupAdminFromNotifications: notification.isGroupAdminFromNotifications
-
+                                        isGroupAdminFromNotifications: notification.isGroupAdminFromNotifications,
+                                        eventStart: notification.eventStart
                                     }
                                 }
                                 key={notification.uniqueIdentifier}
@@ -88,7 +97,23 @@ const Header = ({ onOpen }) => {
                                 }}
                             >
 
-                                {notification.notificationTitle}
+                                <Flex
+                                    p={3}
+                                    w={'100%'}
+                                    flexDir="column"
+                                    flexWrap={'wrap'}
+                                    borderLeftWidth={10}
+                                    borderLeftRadius={3}
+                                    borderColor={notification.notificationColor || 'yellow.300'}
+                                    gap={2}
+                                >
+                                    <Heading as='h3' size='sm'>{notification.notificationAbout}</Heading>
+                                    {notification.eventName && <Text fontStyle={'italic'}>{notification.eventName}</Text>}
+                                    <Tag p={2} variant='outline'>
+                                        {notification.groupName}
+                                    </Tag>
+                                </Flex>
+
                             </MenuItem>)
 
                             )

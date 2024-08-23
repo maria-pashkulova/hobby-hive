@@ -23,8 +23,12 @@ const GroupEvents = () => {
     const [selectedDate, setSelectedDate] = useState('');
     const [selectedEventDetails, setSelectedEventDetails] = useState({});
 
+    //Monitor when the calendar starts and finishes loading events
+    const [isLoading, setIsLoading] = useState(false);
+
 
     const fetchEventsForRange = (startDate, endDate) => {
+        setIsLoading(true);
         eventService.getGroupEvents(groupId, startDate, endDate)
             .then((groupEvents) => {
                 setGroupEvents(groupEvents);
@@ -51,6 +55,9 @@ const GroupEvents = () => {
                     //handle other errors
                     console.log(error.message);
                 }
+            })
+            .finally(() => {
+                setIsLoading(false);
             });
 
     }
@@ -130,6 +137,7 @@ const GroupEvents = () => {
                 onDateClick={handleDateClick}
                 onEventClick={handleEventClick}
                 fetchEventsForRange={fetchEventsForRange}
+                isLoading={isLoading}
             />
 
             {
