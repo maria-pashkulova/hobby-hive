@@ -1,5 +1,5 @@
 import * as request from '../lib/request';
-
+import trimInputValue from '../utils/sanitizeUserInput';
 const baseUrl = 'http://localhost:5000/groups';
 
 export const getGroupEventChangeRequests = (groupId, pagination = {}) => {
@@ -12,6 +12,6 @@ export const getGroupEventChangeRequests = (groupId, pagination = {}) => {
 }
 
 
-export const createRequest = (groupId, eventId, { description }) => request.post(`${baseUrl}/${groupId}/groupEventChangeRequests`, { requestedEventId: eventId, description });
+export const createRequest = (groupId, eventId, formValues) => request.post(`${baseUrl}/${groupId}/groupEventChangeRequests`, { requestedEventId: eventId, ...trimInputValue(formValues) });
 
 export const deleteRequest = (groupId, requestId) => request.remove(`${baseUrl}/${groupId}/groupEventChangeRequests/${requestId}`); 

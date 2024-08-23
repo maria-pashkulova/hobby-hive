@@ -56,10 +56,6 @@ const groupSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 
-// groupSchema.virtual('membersCount').get(function () {
-//     return this.members.length
-// });
-
 //Create model
 
 const Group = mongoose.model('Group', groupSchema)

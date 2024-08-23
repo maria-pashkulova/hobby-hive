@@ -18,7 +18,8 @@ const eventChangeRequestSchema = new mongoose.Schema({
     },
     description: {
         type: String,
-        required: true
+        required: true,
+        maxLength: 500
     }
 
 }, { timestamps: true }) // time stamps for createdAt
