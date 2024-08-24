@@ -56,6 +56,15 @@ const EventButtons = ({ isCurrUserAttending, groupId, eventId, eventTitle, event
             if (error.status === 401) {
                 logoutHandler(); //invalid or missing token 
                 navigate('/login');
+            } else if (error.status === 400) {
+                //edge case : try to change attendance for past event before UI disabled it
+                toast({
+                    title: error.message, // message comes from server in user-friendly format
+                    status: "error",
+                    duration: 10000,
+                    isClosable: true,
+                    position: "bottom",
+                });
             } else if (error.status === 404) {
                 //handle case : concurrently manipulated event from group administrator and a group member
                 //User is trying to mark attendance for an event that was deleted by admin during the time the other user was viwing event's details
@@ -112,6 +121,15 @@ const EventButtons = ({ isCurrUserAttending, groupId, eventId, eventTitle, event
             if (error.status === 401) {
                 logoutHandler(); //invalid or missing token 
                 navigate('/login');
+            } else if (error.status === 400) {
+                //edge case : try to change attendance for past event before UI disabled it
+                toast({
+                    title: error.message, // message comes from server in user-friendly format
+                    status: "error",
+                    duration: 10000,
+                    isClosable: true,
+                    position: "bottom",
+                });
             } else if (error.status === 404) {
 
                 //handle case : concurrently manipulated event from group administrator and a group member

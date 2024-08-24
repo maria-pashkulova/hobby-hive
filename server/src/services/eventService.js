@@ -85,7 +85,7 @@ exports.getByIdToValidate = (eventId) => {
 exports.getByIdToValidateForAttendance = (eventId) => {
     const event = Event
         .findById(eventId)
-        .select('membersGoing');
+        .select('membersGoing start');
 
     return event;
 

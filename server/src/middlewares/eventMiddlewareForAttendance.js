@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const eventService = require('../services/eventService');
+const { checkIsFutureEvent } = require('../utils/validateEventData');
 
 const getEventForAttendance = async (req, res, next) => {
     const requestedEventId = req.params.eventId;
@@ -12,6 +13,10 @@ const getEventForAttendance = async (req, res, next) => {
     const event = await eventService.getByIdToValidateForAttendance(requestedEventId);
     if (!event) {
         return res.status(404).json({ message: 'Администраторът на групата е изтрил събитието, за което правите заявка' });
+    }
+
+    if (!checkIsFutureEvent(event.start)) {
+        return res.status(400).json({ message: 'Датата на провеждане на събитието е минала! Не можете да променяте статуса за присъствие!' });
     }
 
     req.event = event;
