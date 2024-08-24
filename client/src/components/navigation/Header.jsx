@@ -1,24 +1,17 @@
-import { Flex, Heading, IconButton, Box, Text, HStack, Avatar, Menu, MenuButton, MenuList, MenuItem, MenuDivider, Badge, Tag } from '@chakra-ui/react';
+import { Flex, Heading, IconButton, HStack } from '@chakra-ui/react';
 
-import { FiMenu, FiChevronDown, FiBell, FiX } from "react-icons/fi";
-import { Link } from 'react-router-dom';
-import { useContext } from 'react';
-import AuthContext from '../../contexts/authContext';
+import { FiMenu } from "react-icons/fi";
 
-import useNotifications from '../../hooks/useNotifications';
+import NotificationsMenuList from '../NotificationsMenuList';
+import CurrentUserMenuList from '../CurrentUserMenuList';
 
 
 const Header = ({ onOpen }) => {
-
-    const { fullName, profilePic, userId } = useContext(AuthContext);
-    const { notifications, notificationsCount, handleHideNotificationIndicator, handleMarkNotificationAsRead } = useNotifications();
-    const avatarKey = profilePic ? 'withImage' : 'withoutImage';
 
     return (
         <Flex
             as='header'
             px='4'
-            // mb='4'
             height="20"
             alignItems="center"
             borderBottomWidth="1px"
@@ -34,118 +27,18 @@ const Header = ({ onOpen }) => {
                 icon={<FiMenu />}
             />
             <Heading
-                display={{ base: 'flex', md: 'none' }}
+                display={{ base: 'flex', lg: 'none' }}
                 fontSize="2xl">
                 ХК
             </Heading>
 
-            {/* notifications bell and avatar*/}
+            {/* notifications and current logged in user menus*/}
 
             <HStack spacing={{ base: '1', lg: '3' }}>
-                <Menu>
-                    <MenuButton
-                        p={2}
-                        borderRadius={4}
-                        m={2}
-                        _hover={{
-                            background: 'gray.100',
-                        }}
-                        position='relative'
-                        onClick={handleHideNotificationIndicator}
-                    >
-                        {notificationsCount !== 0 &&
-                            <Badge
-                                position='absolute'
-                                top="-10px"
-                                colorScheme="red"
-                                icon={<FiX />}
-                            >
-                                {notificationsCount}
-                            </Badge>
 
-                        }
-                        <FiBell />
+                <NotificationsMenuList />
 
-                    </MenuButton>
-                    <MenuList
-                        minW={'40vw'}
-                        maxW={'70vw'}
-                    >
-                        {!notifications.length ?
-                            (<MenuItem>Нямате нови известия</MenuItem>)
-                            :
-                            notifications.map((notification) =>
-                            (<MenuItem
-                                w={'100%'}
-                                as={Link}
-                                to={`/groups/${notification.fromGroup}/${notification.type === 'event'
-                                    ? 'events'
-                                    : notification.type === 'request'
-                                        ? 'event-change-requests'
-                                        : 'chat'
-                                    }`}
-                                state={
-                                    {
-                                        isMemberFromNotification: notification.isMemberFromNotification,
-                                        isGroupAdminFromNotifications: notification.isGroupAdminFromNotifications,
-                                        eventStart: notification.eventStart
-                                    }
-                                }
-                                key={notification.uniqueIdentifier}
-                                onClick={() => {
-                                    handleMarkNotificationAsRead(notification.uniqueIdentifier);
-                                }}
-                            >
-
-                                <Flex
-                                    p={3}
-                                    w={'100%'}
-                                    flexDir="column"
-                                    flexWrap={'wrap'}
-                                    borderLeftWidth={10}
-                                    borderLeftRadius={3}
-                                    borderColor={notification.notificationColor || 'blue.300'}
-                                    gap={2}
-                                    alignItems={'flex-start'} // so flex items won't stretch to fill flex container which is the default
-                                >
-                                    <Heading as='h3' size='sm'>{notification.notificationAbout}</Heading>
-                                    {notification.eventName && <Text fontStyle={'italic'}>{notification.eventName}</Text>}
-                                    <Tag p={2} flexShrink='0' variant='outline'>
-                                        {notification.groupName}
-                                    </Tag>
-                                </Flex>
-
-                            </MenuItem>)
-
-                            )
-                        }
-
-                    </MenuList>
-
-                </Menu>
-                <Menu>
-                    <MenuButton py={2}>
-                        <HStack >
-                            <Avatar
-                                key={avatarKey}
-                                size={'sm'}
-                                name={fullName}
-                                src={profilePic}
-                            />
-                            <Text display={{ base: 'none', md: 'flex' }} fontSize="sm">{fullName}</Text>
-                            <Box display={{ base: 'none', md: 'flex' }}>
-                                <FiChevronDown />
-                            </Box>
-                        </HStack>
-                    </MenuButton>
-                    <MenuList
-                        bg='white'
-                        borderColor='gray.200'>
-                        <MenuItem as={Link} to={'/update-profile'}>Редактиране на профила</MenuItem>
-                        <MenuDivider />
-                        <MenuItem as={Link} to={'/logout'}>Изход</MenuItem>
-                    </MenuList>
-                </Menu>
+                <CurrentUserMenuList />
             </HStack>
         </Flex>
     )
