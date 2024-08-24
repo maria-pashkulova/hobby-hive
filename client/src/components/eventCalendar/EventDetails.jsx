@@ -1,16 +1,18 @@
-import { Avatar, AvatarGroup, Badge, Box, Circle, Flex, HStack, Icon, Tag, Text, useDisclosure } from '@chakra-ui/react';
+import { Avatar, AvatarGroup, Badge, Box, Circle, Flex, HStack, Icon, IconButton, Tag, Text, Tooltip, useBreakpointValue, useDisclosure } from '@chakra-ui/react';
 import React from 'react'
-import { FiCalendar, FiMapPin } from "react-icons/fi";
+import { FiCalendar, FiUsers, FiMapPin } from "react-icons/fi";
 import { formatEventTime } from '../../utils/formatEventDisplay';
 import EventButtons from './EventButtons';
 import MembersGoingModal from './MembersGoingModal';
 import { checkIsFutureEvent } from '../../utils/checkEventData';
+import { Link } from 'react-router-dom';
 
 const EventDetails = ({ event, isCurrUserAttending, groupAdmin, handleAddMemberGoing, handleRemoveMemberGoing, handleRemoveEvent, isMyCalendar }) => {
 
     const { _id, title, color, start, end, description, specificLocation, activityTags, membersGoing, groupId, _ownerId } = event;
 
     const membersGoingModal = useDisclosure();
+    const goToGroupTooltipPlacement = useBreakpointValue({ base: 'right-start', md: 'bottom-end' });
 
     return (
         <Flex
@@ -79,6 +81,7 @@ const EventDetails = ({ event, isCurrUserAttending, groupAdmin, handleAddMemberG
                     mb='auto'>
                     {description}
                 </Text>
+                {/* event time, location and members going, go to group calendar */}
                 <Flex
                     flexDirection={{ base: 'column', md: 'row' }}
                     gap={{ base: '15px', md: '25px' }}
@@ -129,6 +132,22 @@ const EventDetails = ({ event, isCurrUserAttending, groupAdmin, handleAddMemberG
                             0 присъстващи
                         </Badge>)
                     }
+
+                    {/* My calendar page - go to group button */}
+                    {isMyCalendar &&
+                        <Tooltip label='Прегледай груповия календар' placement={goToGroupTooltipPlacement}>
+                            <IconButton
+                                icon={<FiUsers />}
+                                fontSize='1em'
+                                as={Link}
+                                to={`/groups/${groupId}/events`}
+                                state={{
+                                    eventStart: start
+                                }}
+                            />
+                        </Tooltip>
+                    }
+
                 </Flex>
 
                 {/* Event buttons for smaller screens */}

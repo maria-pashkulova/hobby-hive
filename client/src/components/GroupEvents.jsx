@@ -70,7 +70,12 @@ const GroupEvents = () => {
 
     const handleEventClick = (eventDetailsObj) => {
 
-        setSelectedEventDetails(eventDetailsObj);
+        //Get clicked event info : 
+        //Access event id 
+        //Access group id of the group in which current event is created in
+        const { id, groupId } = eventDetailsObj;
+
+        setSelectedEventDetails({ groupId, id });
         showEventDetailsModal.onOpen();
     }
 

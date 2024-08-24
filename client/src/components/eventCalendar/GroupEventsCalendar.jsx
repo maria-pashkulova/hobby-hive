@@ -75,6 +75,7 @@ const GroupEventsCalendar = ({ groupEvents, onDateClick, onEventClick, fetchEven
 
     const eventClickAction = (eventInfo) => {
         //eventInfo includes fields from FullCalendar -> event prop we defined and other defaut fields
+
         onEventClick(eventInfo.event);
     }
 
@@ -136,7 +137,7 @@ const GroupEventsCalendar = ({ groupEvents, onDateClick, onEventClick, fetchEven
                     groupId: typeof event.groupId === 'object'
                         ? JSON.stringify(event.groupId)
                         : event.groupId,
-                    ownerId: event._ownerId
+                    ownerId: event._ownerId //goes to extendedProps object in the object given from full calendar on event click
                 }))}
                 eventTimeFormat={{
                     hour: '2-digit',

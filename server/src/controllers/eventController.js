@@ -32,7 +32,7 @@ router.get('/', async (req, res) => {
 //and from My calendar pages on the front-end
 router.get('/:eventId', getEvent, async (req, res) => {
 
-    const fetchedEvent = req.event;
+    const fetchedEvent = req.event; //Mongoose document!
     try {
 
         const event = await eventService.getByIdWithMembers(fetchedEvent);

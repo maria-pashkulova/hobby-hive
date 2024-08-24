@@ -159,6 +159,7 @@ const EventButtons = ({ isCurrUserAttending, groupId, eventId, eventTitle, event
                 {
                     isCurrUserAttending ?
                         (
+                            //In My Calendar page only this button is shown - all events member will attend / has once attended are shown
                             <Button
                                 bgColor={"red.400"}
                                 onClick={handleRevokeAttendance}
