@@ -5,6 +5,7 @@ import { FiUser } from "react-icons/fi";
 import AuthContext from '../../../contexts/authContext';
 import './EventInCalendarDateBox.css';
 import isValidJsonString from '../../../utils/validateJsonString';
+import { checkIsFutureEvent } from '../../../utils/checkEventData';
 
 
 const EventInCalendarDateBox = ({ event }) => {
@@ -17,10 +18,13 @@ const EventInCalendarDateBox = ({ event }) => {
     //And groupId is populated in this case
     let groupName;
 
+    //in GroupEvents groupId is a string, not object so JSON.parse will throw error
     if (isValidJsonString(groupId)) {
         const eventGroupPopulatedObj = JSON.parse(groupId);
         groupName = eventGroupPopulatedObj.name;
     }
+
+    const isFutureEvent = checkIsFutureEvent(start);
 
 
     return (
@@ -29,6 +33,7 @@ const EventInCalendarDateBox = ({ event }) => {
             padding={1}
             fontSize={{ base: '14px', md: '16px' }}
             width={'100%'}
+            opacity={isFutureEvent ? 1 : 0.5}
         >
             <Heading as={'h5'} size={'1em'}>{title}</Heading>
 
