@@ -4,6 +4,7 @@ const router = require('express').Router();
 const getEventForChangeRequest = require('../middlewares/eventWithOwnerMiddleware');
 const isAdminMiddleware = require('../middlewares/isAdminMiddleware');
 const validateRequest = require('../middlewares/changeRequestMiddleware');
+const forbidPastEventActions = require('../middlewares/forbidPastEventActions');
 
 //services
 const changeRequestService = require('../services/changeRequestService');
@@ -31,7 +32,7 @@ router.get('/', isAdminMiddleware, async (req, res) => {
 
 //req object -> req.eventId and req.eventOwnerId for requests with method: post
 
-router.post('/', getEventForChangeRequest, isAdminMiddleware, async (req, res) => {
+router.post('/', getEventForChangeRequest, isAdminMiddleware, forbidPastEventActions, async (req, res) => {
 
     const groupId = req.groupId;
     const eventId = req.eventId

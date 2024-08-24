@@ -41,6 +41,16 @@ const RequestEventChangeModal = ({ isOpen, onClose, groupId, eventIdForRequest, 
                 logoutHandler();
                 navigate('/login');
             } else if (error.status === 400) {
+                //edge case : try to create request for past event before UI disabled it
+                onClose();
+                toast({
+                    title: error.message, // message comes from server in user-friendly format
+                    status: "error",
+                    duration: 10000,
+                    isClosable: true,
+                    position: "bottom",
+                });
+            } else if (error.status === 403) {
                 //user has been automatically selected to be new group admin, after the previous admin has left the group
                 //and his UI has not been refreshed
                 navigate(`/my-groups`); //redirect to another page for refresh members data upon going back to current group page

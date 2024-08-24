@@ -1,4 +1,4 @@
-import { isBefore, isSameDay } from "date-fns";
+import { isBefore } from "date-fns";
 import checkIsObjectEmpty from "./checkIsObjectEmpty";
 
 export const checkForOverlappingEvents = (events, newEventStart, newEventEnd, newEventLocation, newEventTitle) => {

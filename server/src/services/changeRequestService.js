@@ -39,17 +39,17 @@ exports.getById = (requestId) => {
 exports.create = async (currUserId, isCurrUserGroupAdmin, groupId, eventId, eventOwnerId, description) => {
     if (isCurrUserGroupAdmin) {
         const error = new Error('Aдминистраторът на групата не може да прави заявки за промяна на събития в групата!');
-        error.statusCode = 400;
+        error.statusCode = 403;
         throw error;
     }
 
     //if current user is not group admin (for the group of the requested event)
+    //only for postman requests
+    //returned with status code 500 (default in controller)
     if (currUserId === eventOwnerId) {
         const error = new Error('Вие сте създателят на събитието. Можете да го промените без заявка към администратора на групата!');
-        error.statusCode = 400;
         throw error;
     }
-
 
     const newRequestData = {
         groupId,

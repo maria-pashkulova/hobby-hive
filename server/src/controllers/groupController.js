@@ -2,7 +2,7 @@ const router = require('express').Router();
 
 //други routers:
 const eventController = require('./eventController');
-const changeRequestController = require('./changeRequestCotroller');
+const changeRequestController = require('./changeRequestController');
 const postController = require('./postController');
 const chatController = require('./chatController');
 

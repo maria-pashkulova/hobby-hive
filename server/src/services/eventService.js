@@ -90,6 +90,14 @@ exports.getByIdToValidateForAttendance = (eventId) => {
     return event;
 
 }
+
+exports.getByIdToValidatePastEventActions = (eventId) => {
+    const eventWithStartDate = Event
+        .findById(eventId)
+        .select('start');
+
+    return eventWithStartDate;
+}
 // -------------------------------------
 
 //My calendar functionality

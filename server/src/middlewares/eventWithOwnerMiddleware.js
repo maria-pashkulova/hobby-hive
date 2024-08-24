@@ -22,6 +22,7 @@ const getEventWithOwner = async (req, res, next) => {
     }
 
     //check if requested event belongs to the requested group
+    //postman only
     if (event.groupId.toString() !== requestedGroupId) {
         return res.status(400).json({ message: 'Заявеното събитие не е за текущата група' });
 
