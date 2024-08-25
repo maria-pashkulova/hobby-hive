@@ -172,7 +172,7 @@ const EventButtons = ({ isCurrUserAttending, groupId, eventId, eventTitle, event
                     position: "bottom",
                 });
             } else {
-                //handle case : error connecting with server or server errors with other statuses
+                //handle case : error connecting with server or other possible server errors
                 toast({
                     title: error.message || 'Възникна грешка при свързване!',
                     status: "error",
@@ -231,48 +231,49 @@ const EventButtons = ({ isCurrUserAttending, groupId, eventId, eventTitle, event
                 {/* Event actions related buttons
                     edit buttons and event change request buttons are enabled only for future events
                     delete buttons are enabled for group admin for both future and past events
+                    Event actions are not possible from My Calendar page
                 */}
-                <Menu>
-                    <MenuButton
-                        as={menuButtonContent === 'Действия' ? Button : IconButton}
-                        variant='ghost'
-                        icon={menuButtonContent !== 'Действия' ? menuButtonContent : undefined} // Only pass icon prop when using icon in the button
-                    >
-                        {menuButtonContent === 'Действия' && menuButtonContent}  {/* Render text in button only when it's not the icon */}
+                {!isMyCalendar &&
+                    <Menu>
+                        <MenuButton
+                            as={menuButtonContent === 'Действия' ? Button : IconButton}
+                            variant='ghost'
+                            icon={menuButtonContent !== 'Действия' ? menuButtonContent : undefined} // Only pass icon prop when using icon in the button
+                        >
+                            {menuButtonContent === 'Действия' && menuButtonContent}  {/* Render text in button only when it's not the icon */}
 
-                    </MenuButton>
+                        </MenuButton>
 
-                    <MenuList>
-                        {(userId === groupAdmin || userId === eventOwner)
-                            ?
-                            <>
+                        <MenuList>
+                            {(userId === groupAdmin || userId === eventOwner)
+                                ?
+                                <>
+                                    <MenuItem
+                                        isDisabled={!isFutureEvent}
+                                        onClick={updateEventModal.onOpen}
+                                    >
+                                        Редактирай
+                                    </MenuItem>
 
+                                    {userId === groupAdmin &&
+                                        <MenuItem
+                                            onClick={deleteEventModal.onOpen}
+                                        >
+                                            Изтрий
+                                        </MenuItem>
+                                    }
+                                </>
+                                :
                                 <MenuItem
                                     isDisabled={!isFutureEvent}
-                                    onClick={updateEventModal.onOpen}
+                                    onClick={requestEventChangeModal.onOpen}
                                 >
-                                    Редактирай
+                                    Заяви промяна
                                 </MenuItem>
+                            }
 
-                                {userId === groupAdmin &&
-                                    <MenuItem
-                                        onClick={deleteEventModal.onOpen}
-                                    >
-                                        Изтрий
-                                    </MenuItem>
-                                }
-                            </>
-                            :
-                            <MenuItem
-                                isDisabled={!isFutureEvent}
-                                onClick={requestEventChangeModal.onOpen}
-                            >
-                                Заяви промяна
-                            </MenuItem>
-                        }
-
-                    </MenuList>
-                </Menu>
+                        </MenuList>
+                    </Menu>}
             </Flex >
 
 
