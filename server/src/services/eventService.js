@@ -2,7 +2,8 @@ const Event = require('../models/Event');
 const Group = require('../models/Group');
 const EventChangeRequest = require('../models/EventChangeRequest');
 const { checkForDuplicateTags } = require('../utils/validateGroupData');
-const { validateEventTags } = require('../utils/validateEventData');
+const { validateEventTags, normalizeLocationCoordinates } = require('../utils/validateEventData');
+const checkIsObjectEmpty = require('../utils/checkIsObjectEmpty');
 
 
 exports.getAllGroupEvents = (groupId, startISO, endISO) => {
@@ -154,6 +155,8 @@ exports.create = async (title, color, description, specificLocation, start, end,
         throw error;
     }
 
+    //TODO: валидна дата която е преди текущото време
+
     //Check if event's activityTags are unique (client input itself)
     checkForDuplicateTags(activityTags)
 
@@ -164,14 +167,20 @@ exports.create = async (title, color, description, specificLocation, start, end,
         throw error;
     }
 
-    //TODO: валидна дата която е преди текущото време
+    //Round lat and lon values for location to 5 decimal places before storing it to DB
+    let locationObjWithRoundedCoordinates;
+    if (!checkIsObjectEmpty(specificLocation)) {
+        const roundedLocationCoordinates = normalizeLocationCoordinates(specificLocation.coordinates)
+
+        locationObjWithRoundedCoordinates = { ...specificLocation, coordinates: roundedLocationCoordinates };
+    }
 
 
     const newEventData = {
         title,
         color,
         description,
-        specificLocation,
+        specificLocation: locationObjWithRoundedCoordinates || specificLocation, //if no location was selected, specificLocation is empty object and an object with default values is saved in DB
         start,
         end,
         activityTags,

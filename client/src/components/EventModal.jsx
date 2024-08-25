@@ -23,20 +23,9 @@ const EventModal = ({ isOpen, onClose, groupId, groupRegionCity, groupActivityTa
 
     //groupActivity tags - used for select's options
     const tagsOptions = groupActivityTags.map(tag => ({ label: tag, value: tag }));
-
-    // Convert the activity tags from string array to the format react-select expects -> { label: string, value: string }
-    //optional chaining checks if currentEventData is null (event create modal) or it has event data (update event modal)
-    //If EventModal is opened from CreateEventModal currentEventData is null -> optional chaining handles this case so error is not thrown
-    //If EventModal is opened from UpdateEventModal on first render currentEventData is {}, loading is true so Formik form is not rendered, instead loading spinner is shown
-    //but initialActivityTags is in component body so we should have optional chaining for the first render so we dont try to access a key in the empty object
-    //that doesnt exist -> undefined.map which will throw error. When data is fetched successfully currentEventData is event object returned from server
-    //const initialEventActivityTags = currentEventData?.[EventKeys.ActivityTags]?.map(tag => ({ label: tag, value: tag }));
     const initialEventLocationName = currentEventData?.[EventKeys.SpecificLocation]?.name || '';
-
-
     //If event data was sent as prop, the action is update event
     const isUpdateAction = !!currentEventData;
-
 
     const toast = useToast();
     const navigate = useNavigate();
@@ -56,9 +45,8 @@ const EventModal = ({ isOpen, onClose, groupId, groupRegionCity, groupActivityTa
 
             actions.setSubmitting(false);
             toast({
-                title: "Вече съществува събитие по същото време и на същото място! Променете заглавието и детайлите, за да бъде запазено събитието",
+                title: "Вече съществува събитие със същото име, на същото място в зададения времеви диапазон! Променете поне името на събитието, за да бъде запазено. Дайте допълнителни детайли в описанието, ако е нужно!",
                 status: "error",
-                duration: 5000,
                 isClosable: true,
                 position: "bottom",
             });
