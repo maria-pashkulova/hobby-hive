@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import AuthContext from '../../contexts/authContext';
 
 //Fetch additional event details data - description, location, activity tags, members going
-const EventDetailsModal = ({ isOpen, onClose, eventDetailsObj, groupAdmin, handleRemoveEvent, isMyCalendar }) => {
+const EventDetailsModal = ({ isOpen, onClose, eventDetailsObj, groupAdmin, groupRegionCity, groupActivityTags, existingEvents, handleRemoveEvent, handleUpdateEvent, isMyCalendar }) => {
 
     //eventTitle is available only in My Calendar page
     const { groupId, id, eventTitle } = eventDetailsObj;
@@ -129,12 +129,16 @@ const EventDetailsModal = ({ isOpen, onClose, eventDetailsObj, groupAdmin, handl
                         (eventDetailsObj &&
                             <Box width="100%" height="100%">
                                 <EventDetails
-                                    event={particularEvent}
+                                    event={particularEvent} //fetched event
                                     isCurrUserAttending={isAttending}
                                     groupAdmin={groupAdmin}
+                                    groupRegionCity={groupRegionCity}
+                                    groupActivityTags={groupActivityTags}
+                                    existingEvents={existingEvents}
                                     handleAddMemberGoing={handleAddMemberGoing}
                                     handleRemoveMemberGoing={handleRemoveMemberGoing}
                                     handleRemoveEvent={handleRemoveEvent}
+                                    handleUpdateEvent={handleUpdateEvent}
                                     isMyCalendar={isMyCalendar}
                                 />
                             </Box>

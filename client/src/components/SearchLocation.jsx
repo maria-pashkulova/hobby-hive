@@ -10,9 +10,9 @@ import checkIsObjectEmpty from "../utils/checkIsObjectEmpty";
 
 const OPENSTREET_MAP_BASE_URL = 'https://nominatim.openstreetmap.org/search?';
 
-const SearchLocation = () => {
+const SearchLocation = ({ initialEventLocationName }) => {
 
-    const [search, setSearch] = useState('');
+    const [search, setSearch] = useState(initialEventLocationName);
     const [searchResult, setSearchResult] = useState([]);
     const [showNoResults, setShowNoResults] = useState(false);
     const [requiredSearchValueErr, setRequiredSearchValueErr] = useState(false);
@@ -160,7 +160,7 @@ const SearchLocation = () => {
                     p={2}
                     borderRadius={6}
                 >
-                    <Text color={'gray.700'}>Не бяха намерени резултати от търсенето. Опитайте с по-детайлно търсене!</Text>
+                    <Text color={'gray.700'}>Не бяха намерени резултати от търсенето. Проверете валидността на търсената локация или опитайте с по-детайлно търсене!</Text>
                 </Box>
 
             }

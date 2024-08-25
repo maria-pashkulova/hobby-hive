@@ -1,5 +1,5 @@
 import { Button, Flex, Icon, IconButton, Menu, MenuButton, MenuItem, MenuList, useBreakpointValue, useDisclosure, useToast } from "@chakra-ui/react"
-import { BsInfoLg, BsThreeDots } from "react-icons/bs";
+import { BsThreeDots } from "react-icons/bs";
 
 import * as eventService from '../../services/eventService';
 import { useNavigate } from "react-router-dom";
@@ -7,18 +7,19 @@ import { useContext, useState } from "react";
 import AuthContext from "../../contexts/authContext";
 import RequestEventChangeModal from "./RequestEventChangeModal";
 import DeleteEventModal from "../DeleteEventModal";
+import UpdateEventModal from "../UpdateEventModal";
 
 //Attend / Decline attend buttons
 // Event actions : update, delete, request change according to user role in a group
 //Future events are considered events with start date after the current date and time. 
 //Today's events are considered as future or past depending on their start time compared to the current time
-const EventButtons = ({ isCurrUserAttending, groupId, eventId, eventTitle, eventOwner, groupAdmin, handleAddMemberGoing, handleRemoveMemberGoing, handleRemoveEvent, isMyCalendar = false, isFutureEvent }) => {
+const EventButtons = ({ isCurrUserAttending, groupId, eventId, eventTitle, eventOwner, groupAdmin, groupRegionCity, groupActivityTags, existingEvents, handleAddMemberGoing, handleRemoveMemberGoing, handleRemoveEvent, handleUpdateEvent, isMyCalendar = false, isFutureEvent }) => {
 
     const navigate = useNavigate();
     const { logoutHandler, userId, fullName, email, profilePic } = useContext(AuthContext);
     const toast = useToast();
 
-    const editEventModal = useDisclosure();
+    const updateEventModal = useDisclosure();
     const deleteEventModal = useDisclosure();
     const requestEventChangeModal = useDisclosure();
 
@@ -226,7 +227,7 @@ const EventButtons = ({ isCurrUserAttending, groupId, eventId, eventTitle, event
 
                                 <MenuItem
                                     isDisabled={!isFutureEvent}
-                                    onClick={editEventModal.onOpen}
+                                    onClick={updateEventModal.onOpen}
                                 >
                                     Редактирай
                                 </MenuItem>
@@ -260,6 +261,20 @@ const EventButtons = ({ isCurrUserAttending, groupId, eventId, eventTitle, event
                     groupId={groupId}
                     eventIdForRequest={eventId}
                     eventTitle={eventTitle}
+                />
+            }
+
+            {
+                updateEventModal.isOpen && <UpdateEventModal
+                    isOpen={updateEventModal.isOpen}
+                    onClose={updateEventModal.onClose}
+                    groupId={groupId}
+                    eventId={eventId}
+                    groupRegionCity={groupRegionCity}
+                    groupActivityTags={groupActivityTags}
+                    handleUpdateEvent={handleUpdateEvent}
+                    existingEvents={existingEvents}
+                    isMyCalendar={isMyCalendar}
                 />
             }
 

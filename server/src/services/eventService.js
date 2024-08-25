@@ -77,6 +77,7 @@ exports.getById = (eventId) => {
 exports.getByIdToValidate = (eventId) => {
     const event = Event
         .findById(eventId)
+        .select('title color start end description specificLocation activityTags membersGoing groupId _ownerId')
 
     return event;
 }
@@ -146,20 +147,17 @@ exports.create = async (title, color, description, specificLocation, start, end,
     //Group exists and current user is a member of the group - guaranteed by middlewares
 
     //Check if there is an event in current group calendar with the same color
-    const existingEvent = await Event.findOne({ color, groupId });
-    if (!!existingEvent) {
+    const existingEventWithSameColor = await Event.findOne({ color, groupId });
+    if (!!existingEventWithSameColor) {
         const error = new Error('В груповия календар съществува събитие, обозначено с посочения цвят. Изберете друг цвят!');
         error.statusCode = 400;
         throw error;
     }
 
-    //TODO : валидиране на specificLocation - задължително трябва да има name и lat, lon и да бъде в рамките на областния град, 
-    //зададен като основна локация за групата
-
     //Check if event's activityTags are unique (client input itself)
     checkForDuplicateTags(activityTags)
 
-    //TODO: дали таговете които са зададени отговарят на таговете на текущата група
+    //дали таговете които са зададени отговарят на таговете на текущата група
     if (!validateEventTags(group.activityTags, activityTags)) {
         const error = new Error('Невалидни тагове за групова активност за текущата група!');
         error.statusCode = 400;

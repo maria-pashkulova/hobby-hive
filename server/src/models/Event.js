@@ -19,6 +19,10 @@ const eventSchema = new mongoose.Schema({
             type: String,
             default: 'Не е зададена локация за събитието'
         },
+        locationRegionCity: {
+            type: String,
+            default: ''
+        },
         coordinates: {
             type: [Number],
             default: [],

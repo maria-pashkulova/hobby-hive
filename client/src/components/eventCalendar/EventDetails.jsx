@@ -7,8 +7,9 @@ import MembersGoingModal from './MembersGoingModal';
 import { checkIsFutureEvent } from '../../utils/checkEventData';
 import { Link } from 'react-router-dom';
 
-const EventDetails = ({ event, isCurrUserAttending, groupAdmin, handleAddMemberGoing, handleRemoveMemberGoing, handleRemoveEvent, isMyCalendar }) => {
+const EventDetails = ({ event, isCurrUserAttending, groupAdmin, groupRegionCity, groupActivityTags, existingEvents, handleAddMemberGoing, handleRemoveMemberGoing, handleRemoveEvent, handleUpdateEvent, isMyCalendar }) => {
 
+    //activity Tags for current event
     const { _id, title, color, start, end, description, specificLocation, activityTags, membersGoing, groupId, _ownerId } = event;
 
     const membersGoingModal = useDisclosure();
@@ -48,9 +49,13 @@ const EventDetails = ({ event, isCurrUserAttending, groupAdmin, handleAddMemberG
                             eventTitle={title}
                             eventOwner={_ownerId}
                             groupAdmin={groupAdmin}
+                            groupRegionCity={groupRegionCity}
+                            groupActivityTags={groupActivityTags}
+                            existingEvents={existingEvents}
                             handleAddMemberGoing={handleAddMemberGoing}
                             handleRemoveMemberGoing={handleRemoveMemberGoing}
                             handleRemoveEvent={handleRemoveEvent}
+                            handleUpdateEvent={handleUpdateEvent}
                             isMyCalendar={isMyCalendar}
                             isFutureEvent={checkIsFutureEvent(start)}
                         />
@@ -161,9 +166,13 @@ const EventDetails = ({ event, isCurrUserAttending, groupAdmin, handleAddMemberG
                         eventTitle={title}
                         eventOwner={_ownerId}
                         groupAdmin={groupAdmin}
+                        groupRegionCity={groupRegionCity}
+                        groupActivityTags={groupActivityTags}
+                        existingEvents={existingEvents}
                         handleAddMemberGoing={handleAddMemberGoing}
                         handleRemoveMemberGoing={handleRemoveMemberGoing}
                         handleRemoveEvent={handleRemoveEvent}
+                        handleUpdateEvent={handleUpdateEvent}
                         isMyCalendar={isMyCalendar}
                         isFutureEvent={checkIsFutureEvent(start)}
                     />

@@ -1,4 +1,6 @@
 import * as request from '../lib/request';
+import { convertLocalToUtc } from '../utils/formatDate';
+import trimInputValues from '../utils/sanitizeUserInput';
 
 const baseUrl = 'http://localhost:5000/groups';
 
@@ -14,12 +16,34 @@ export const getById = (groupId, eventId) => request.get(`${baseUrl}/${groupId}/
 
 export const createEvent = (groupId, { title, color, description, specificLocation, start, end, activityTags }) => {
 
-    // Convert local date to UTC before sending it to the server
-    const startDateTimeUTC = new Date(start).toISOString();
-    const endDateTimeUTC = new Date(end).toISOString();
+    return request.post(`${baseUrl}/${groupId}/events`,
+        trimInputValues(
+            {
+                title,
+                color,
+                description,
+                specificLocation,
+                start: convertLocalToUtc(start),
+                end: convertLocalToUtc(end),
+                activityTags
+            }
+        )
+    );
 
-    return request.post(`${baseUrl}/${groupId}/events`, { title, color, description, specificLocation, start: startDateTimeUTC, end: endDateTimeUTC, activityTags });
+}
 
+export const updateEvent = (groupId, eventId, { title, color, description, specificLocation, start, end, activityTags }) => {
+
+    return request.put(`${baseUrl}/${groupId}/events/${eventId}`,
+        {
+            title,
+            color,
+            description,
+            specificLocation,
+            start: convertLocalToUtc(start),
+            end: convertLocalToUtc(end),
+            activityTags
+        });
 }
 
 export const deleteEvent = (groupId, eventId) => request.remove(`${baseUrl}/${groupId}/events/${eventId}`);

@@ -101,6 +101,11 @@ const GroupEvents = () => {
         showEventDetailsModal.onClose()
     }
 
+    //TODO: handle update event 
+    const handleUpdateEvent = (updatedEvent) => {
+
+    }
+
     //Join / leave group event notification for server
     //Setup event listeners for events from socket server for immediate(real-time) group calendar view change
     useEffect(() => {
@@ -130,7 +135,7 @@ const GroupEvents = () => {
                     onClose={createEventModal.onClose}
                     groupId={groupId}
                     groupRegionCity={groupRegionCity}
-                    activityTags={activityTags}
+                    groupActivityTags={activityTags}
                     selectedDate={selectedDate}
                     handleAddNewEvent={handleAddNewEvent}
                     existingEvents={groupEvents} // Pass existing events as a prop
@@ -151,7 +156,11 @@ const GroupEvents = () => {
                     onClose={showEventDetailsModal.onClose}
                     eventDetailsObj={selectedEventDetails}
                     groupAdmin={groupAdmin}
+                    groupRegionCity={groupRegionCity}
+                    groupActivityTags={activityTags}
                     handleRemoveEvent={handleRemoveEvent}
+                    handleUpdateEvent={handleUpdateEvent}
+                    existingEvents={groupEvents}
                 />
             }
 

@@ -59,7 +59,9 @@ export const eventSchema = (groupRegionCity) => yup.object().shape({
             'validate-location-region-city',
             `Локацията трябва да бъде в област ${groupRegionCity}`,
             function (specificLocation) {
-                if (checkIsObjectEmpty(specificLocation)) return true;
+                //update event case: specificLocation.locationRegionCity === '' - default value for specificLocation object in DB 
+                //has locationRegionCity:''
+                if (checkIsObjectEmpty(specificLocation) || specificLocation.locationRegionCity === '') return true;
 
                 return normalizeRegionName(specificLocation.locationRegionCity) === groupRegionCity;
             }
