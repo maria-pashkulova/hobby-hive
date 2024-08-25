@@ -4,7 +4,7 @@ import { useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import AuthContext from '../contexts/authContext'
 
-import formatDate from '../utils/formatDate';
+import { parseUtcDateString } from '../utils/formatDate';
 import * as changeRequestService from '../services/changeRequestService';
 
 const ChangeGroupEventRequestCard = ({ requestId, eventTitle, eventStart, requestDescription, requestedFrom, requestDate, groupId, setRefetch, handleCurrentPageChange }) => {
@@ -108,7 +108,7 @@ const ChangeGroupEventRequestCard = ({ requestId, eventTitle, eventStart, reques
                     <Text as="span" fontWeight="bold">Заявено от:</Text> {requestedFrom}
                 </Text>
                 <Text color='blue.600'>
-                    <Text as="span" fontWeight="bold">Заявено на:</Text> {formatDate(requestDate)}
+                    <Text as="span" fontWeight="bold">Заявено на:</Text> {parseUtcDateString(requestDate)}
                 </Text>
             </CardFooter>
         </Card >
