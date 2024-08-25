@@ -9,7 +9,6 @@ import AuthContext from '../../contexts/authContext';
 //Fetch additional event details data - description, location, activity tags, members going
 const EventDetailsModal = ({ isOpen, onClose, eventDetailsObj, groupAdmin, groupRegionCity, groupActivityTags, existingEvents, handleRemoveEvent, handleUpdateEvent, isMyCalendar }) => {
 
-    //eventTitle is available only in My Calendar page
     const { groupId, id } = eventDetailsObj;
     const [particularEvent, setParticularEvent] = useState({});
     const [isAttending, setIsAttending] = useState(false);

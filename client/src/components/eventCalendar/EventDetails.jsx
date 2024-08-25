@@ -9,8 +9,12 @@ import { Link } from 'react-router-dom';
 
 const EventDetails = ({ event, isCurrUserAttending, groupAdmin, groupRegionCity, groupActivityTags, existingEvents, handleAddMemberGoing, handleRemoveMemberGoing, handleRemoveEvent, handleUpdateEvent, isMyCalendar }) => {
 
-    //activity Tags for current event
+    //Get event data for current event and pass it to child components as prop
+    //in order to populate update event modal instead of fetching event details again
+
+    //activityTags ->  for current event
     const { _id, title, color, start, end, description, specificLocation, activityTags, membersGoing, groupId, _ownerId } = event;
+
 
     const membersGoingModal = useDisclosure();
     const goToGroupTooltipPlacement = useBreakpointValue({ base: 'right-start', md: 'bottom-end' });
@@ -58,6 +62,7 @@ const EventDetails = ({ event, isCurrUserAttending, groupAdmin, groupRegionCity,
                             handleUpdateEvent={handleUpdateEvent}
                             isMyCalendar={isMyCalendar}
                             isFutureEvent={checkIsFutureEvent(start)}
+                            currentEventDataForUpdateModal={event}
                         />
                     </Flex>
                 </Flex>
@@ -175,6 +180,7 @@ const EventDetails = ({ event, isCurrUserAttending, groupAdmin, groupRegionCity,
                         handleUpdateEvent={handleUpdateEvent}
                         isMyCalendar={isMyCalendar}
                         isFutureEvent={checkIsFutureEvent(start)}
+                        currentEventDataForUpdateModal={event}
                     />
                 </Flex>
             </Flex>

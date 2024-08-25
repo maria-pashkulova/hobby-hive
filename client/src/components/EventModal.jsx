@@ -19,11 +19,11 @@ import { formatDateForDatetimeLocalField } from '../utils/formatDate';
 
 
 //Abstract component for event create and update functionality
-const EventModal = ({ isOpen, onClose, groupId, groupRegionCity, groupActivityTags, selectedDate, handleEventsChange, existingEvents, currentEventData = null, loadingEventData = false }) => {
+const EventModal = ({ isOpen, onClose, groupId, groupRegionCity, groupActivityTags, selectedDate, handleEventsChange, existingEvents, currentEventData = null }) => {
 
     //groupActivity tags - used for select's options
     const tagsOptions = groupActivityTags.map(tag => ({ label: tag, value: tag }));
-    const initialEventLocationName = currentEventData?.[EventKeys.SpecificLocation]?.name || '';
+    const initialEventLocationName = currentEventData?.[EventKeys.SpecificLocation].name || '';
     //If event data was sent as prop, the action is update event
     const isUpdateAction = !!currentEventData;
 
@@ -80,10 +80,22 @@ const EventModal = ({ isOpen, onClose, groupId, groupRegionCity, groupActivityTa
             if (error.status === 401) {
                 logoutHandler();
                 navigate('/login');
-            } else {
-                //TODO: handle edge cases - error status code possible from server
+            } else if (error.status === 403) {
+                //Handle case : user trying to create / update event in a group but group admin removed him from group members during that time
+                navigate(`/my-groups`);
+
                 toast({
-                    title: error.message,
+                    title: 'Не сте член на групата!',
+                    description: `За да създавате и редактирате събития в групата, присъединете се отново!`,
+                    status: "info",
+                    duration: 10000,
+                    isClosable: true,
+                    position: "bottom",
+                })
+            } else {
+                //handle case : error connecting with server or other possible server errors
+                toast({
+                    title: error.message || 'Възникна грешка при свързване!',
                     status: "error",
                     duration: 5000,
                     isClosable: true,
@@ -104,113 +116,98 @@ const EventModal = ({ isOpen, onClose, groupId, groupRegionCity, groupActivityTa
             >
                 <ModalHeader>{isUpdateAction ? 'Редактиране на събитие' : 'Попълнете данни за събитието'}</ModalHeader>
                 <ModalCloseButton />
-                {loadingEventData ?
-                    (
-                        //show Loading spinner until event details are fetched (updateEvent)
-                        //needed for setting Formik initial states with event data as well
-                        <ModalBody>
-                            <Flex justifyContent={'center'} my={5}>
-                                <Spinner size='xl' />
-                            </Flex>
-                        </ModalBody>
-                    )
-                    : (
-                        <Formik
-                            initialValues={{
-                                [EventKeys.Title]: currentEventData?.[EventKeys.Title] || '',
-                                [EventKeys.Color]: currentEventData?.[EventKeys.Color] || '#3788d8', //default color for color picker control on event create
-                                [EventKeys.Description]: currentEventData?.[EventKeys.Description] || '',
-                                [EventKeys.StartDateTime]: (currentEventData && formatDateForDatetimeLocalField(currentEventData[EventKeys.StartDateTime])) || selectedDate,
-                                [EventKeys.EndDateTime]: (currentEventData && formatDateForDatetimeLocalField(currentEventData[EventKeys.EndDateTime])) || '',
-                                [EventKeys.SpecificLocation]: currentEventData?.[EventKeys.SpecificLocation] || {},
-                                [EventKeys.ActivityTags]: currentEventData?.[EventKeys.ActivityTags] || []
-                            }}
-                            validationSchema={eventSchema(groupRegionCity)}
-                            onSubmit={handleFormSubmit}
-                        >
-                            {({ isSubmitting, values, setFieldValue }) => (
-                                <Form noValidate>
-                                    <ModalBody>
-                                        <CustomInput
-                                            type='text'
-                                            name={EventKeys.Title}
-                                            placeholder='Име на събитието'
-                                            label='Име'
-                                        />
-                                        <CustomInput
-                                            type='color'
-                                            name={EventKeys.Color}
-                                            label='Изберете цвят за обозначение на събитието в календара'
-                                            maxWidth='20%'
-                                            mt={4}
-                                        />
-                                        <TextArea
-                                            name={EventKeys.Description}
-                                            placeholder='Описание за групово събитие...'
-                                            label='Опишете дейността на събитието'
-                                            mt={4}
-                                        />
 
-                                        <SearchLocation
-                                            initialEventLocationName={initialEventLocationName}
-                                        />
+                <Formik
+                    initialValues={{
+                        [EventKeys.Title]: currentEventData?.[EventKeys.Title] || '',
+                        [EventKeys.Color]: currentEventData?.[EventKeys.Color] || '#3788d8', //default color for color picker control on event create
+                        [EventKeys.Description]: currentEventData?.[EventKeys.Description] || '',
+                        [EventKeys.StartDateTime]: (currentEventData && formatDateForDatetimeLocalField(currentEventData[EventKeys.StartDateTime])) || selectedDate,
+                        [EventKeys.EndDateTime]: (currentEventData && formatDateForDatetimeLocalField(currentEventData[EventKeys.EndDateTime])) || '',
+                        [EventKeys.SpecificLocation]: currentEventData?.[EventKeys.SpecificLocation] || {},
+                        [EventKeys.ActivityTags]: currentEventData?.[EventKeys.ActivityTags] || []
+                    }}
+                    validationSchema={eventSchema(groupRegionCity)}
+                    onSubmit={handleFormSubmit}
+                >
+                    {({ isSubmitting, values, setFieldValue }) => (
+                        <Form noValidate>
+                            <ModalBody>
+                                <CustomInput
+                                    type='text'
+                                    name={EventKeys.Title}
+                                    placeholder='Име на събитието'
+                                    label='Име'
+                                />
+                                <CustomInput
+                                    type='color'
+                                    name={EventKeys.Color}
+                                    label='Изберете цвят за обозначение на събитието в календара'
+                                    maxWidth='20%'
+                                    mt={4}
+                                />
+                                <TextArea
+                                    name={EventKeys.Description}
+                                    placeholder='Описание за групово събитие...'
+                                    label='Опишете дейността на събитието'
+                                    mt={4}
+                                />
 
-                                        <CustomInput
-                                            type='datetime-local'
-                                            name={EventKeys.StartDateTime}
-                                            label='Кога започва събитието'
-                                            mt={4}
-                                        />
+                                <SearchLocation
+                                    initialEventLocationName={initialEventLocationName}
+                                />
 
-                                        <CustomInput
-                                            type='datetime-local'
-                                            name={EventKeys.EndDateTime}
-                                            label='Кога приключва събитието'
-                                            mt={4}
-                                        />
+                                <CustomInput
+                                    type='datetime-local'
+                                    name={EventKeys.StartDateTime}
+                                    label='Кога започва събитието'
+                                    mt={4}
+                                />
 
-                                        <FormControl mt={4}>
-                                            <FormLabel>Тагове за дейността на събитието</FormLabel>
-                                            {/* onChange - selectedOptions parameter holds all selected values (isMulti -true) in format [{ label: string, value: string },...]
+                                <CustomInput
+                                    type='datetime-local'
+                                    name={EventKeys.EndDateTime}
+                                    label='Кога приключва събитието'
+                                    mt={4}
+                                />
+
+                                <FormControl mt={4}>
+                                    <FormLabel>Тагове за дейността на събитието</FormLabel>
+                                    {/* onChange - selectedOptions parameter holds all selected values (isMulti -true) in format [{ label: string, value: string },...]
                                             or is empty array if there are no selected values */}
-                                            <Select
-                                                options={tagsOptions}
-                                                onChange={(selectedOptions) => setFieldValue(EventKeys.ActivityTags, selectedOptions.map(tag => tag.value))}
-                                                value={values[EventKeys.ActivityTags].map(tag => ({ label: tag, value: tag }))} // Pre-select the existing tags for current event (update event) / [] (create event or update event without added tags upon creation)
-                                                isMulti
-                                                placeholder="Категоризирайте събитието за повече детайли"
-                                                noOptionsMessage={() => "Администраторът на групата не е създал (повече) тагове"}
-                                                closeMenuOnSelect={false}
-                                            />
+                                    <Select
+                                        options={tagsOptions}
+                                        onChange={(selectedOptions) => setFieldValue(EventKeys.ActivityTags, selectedOptions.map(tag => tag.value))}
+                                        value={values[EventKeys.ActivityTags].map(tag => ({ label: tag, value: tag }))} // Pre-select the existing tags for current event (update event) / [] (create event or update event without added tags upon creation)
+                                        isMulti
+                                        placeholder="Категоризирайте събитието за повече детайли"
+                                        noOptionsMessage={() => "Администраторът на групата не е създал (повече) тагове"}
+                                        closeMenuOnSelect={false}
+                                    />
 
-                                        </FormControl>
+                                </FormControl>
 
-                                    </ModalBody>
+                            </ModalBody>
 
-                                    <ModalFooter>
-                                        <Button
-                                            type='submit'
-                                            mr={3}
-                                            colorScheme='blue'
-                                            isLoading={isSubmitting}
-                                            loadingText={isUpdateAction ? 'Запис...' : 'Създаване'}
-                                        >
-                                            {isUpdateAction ? 'Запис' : 'Създай'}
-                                        </Button>
-                                        <Button variant='ghost' onClick={onClose}>
-                                            Отмяна
-                                        </Button>
-                                    </ModalFooter>
+                            <ModalFooter>
+                                <Button
+                                    type='submit'
+                                    mr={3}
+                                    colorScheme='blue'
+                                    isLoading={isSubmitting}
+                                    loadingText={isUpdateAction ? 'Запис...' : 'Създаване'}
+                                >
+                                    {isUpdateAction ? 'Запис' : 'Създай'}
+                                </Button>
+                                <Button variant='ghost' onClick={onClose}>
+                                    Отмяна
+                                </Button>
+                            </ModalFooter>
 
-                                </Form>
-                            )}
+                        </Form>
+                    )}
 
-
-                        </Formik >
-                    )
-
-                }
-
+                </Formik >
 
             </ModalContent>
 

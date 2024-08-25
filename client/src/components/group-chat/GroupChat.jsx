@@ -52,8 +52,10 @@ const GroupChat = () => {
                         position: "bottom",
                     })
                 } else {
+
+                    //handle case : error connecting with server or other possible server errors
                     toast({
-                        title: error.message,
+                        title: error.message || 'Възникна грешка при свързване!',
                         status: "error",
                         duration: 5000,
                         isClosable: true,

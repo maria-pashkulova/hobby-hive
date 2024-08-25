@@ -11,7 +11,7 @@ export const eventSchema = (groupRegionCity) => yup.object().shape({
     [EventKeys.Description]: yup.string().trim().required('Опишете дейността на събитието!').max(300, 'Описанието е твърде дълго!'),
     [EventKeys.StartDateTime]: yup
         .date()
-        .required('Въведете начална дата и час')
+        .required('Въведете валидни начална дата и час') //invalid month duration case is also handled; invalid year and date case is also handled
         .min(new Date(), 'Събитието може да се проведе най-рано днес, задължително след текущия час!')
         .test(
             'validate-time',
@@ -29,7 +29,7 @@ export const eventSchema = (groupRegionCity) => yup.object().shape({
         ),
     [EventKeys.EndDateTime]: yup
         .date()
-        .required('Въведете крайна дата и час')
+        .required('Въведете валидни крайна дата и час') //invalid month duration case is also handled ; invalid year and date case is also handled
         .min(yup.ref(EventKeys.StartDateTime), 'Крайната дата и час трябва да са след началните дата и час')
         .test(
             'min-duration',

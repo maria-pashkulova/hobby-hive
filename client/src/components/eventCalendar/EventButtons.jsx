@@ -13,7 +13,7 @@ import UpdateEventModal from "../UpdateEventModal";
 // Event actions : update, delete, request change according to user role in a group
 //Future events are considered events with start date after the current date and time. 
 //Today's events are considered as future or past depending on their start time compared to the current time
-const EventButtons = ({ isCurrUserAttending, groupId, eventId, eventTitle, eventOwner, groupAdmin, groupRegionCity, groupActivityTags, existingEvents, handleAddMemberGoing, handleRemoveMemberGoing, handleRemoveEvent, handleUpdateEvent, isMyCalendar = false, isFutureEvent }) => {
+const EventButtons = ({ isCurrUserAttending, groupId, eventId, eventTitle, eventOwner, groupAdmin, groupRegionCity, groupActivityTags, existingEvents, handleAddMemberGoing, handleRemoveMemberGoing, handleRemoveEvent, handleUpdateEvent, isMyCalendar = false, isFutureEvent, currentEventDataForUpdateModal }) => {
 
     const navigate = useNavigate();
     const { logoutHandler, userId, fullName, email, profilePic } = useContext(AuthContext);
@@ -292,12 +292,12 @@ const EventButtons = ({ isCurrUserAttending, groupId, eventId, eventTitle, event
                     isOpen={updateEventModal.isOpen}
                     onClose={updateEventModal.onClose}
                     groupId={groupId}
-                    eventId={eventId}
                     groupRegionCity={groupRegionCity}
                     groupActivityTags={groupActivityTags}
                     handleUpdateEvent={handleUpdateEvent}
                     existingEvents={existingEvents}
                     isMyCalendar={isMyCalendar}
+                    currentEventData={currentEventDataForUpdateModal}
                 />
             }
 
