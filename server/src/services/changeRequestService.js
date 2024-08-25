@@ -38,7 +38,7 @@ exports.getById = (requestId) => {
 
 exports.create = async (currUserId, isCurrUserGroupAdmin, groupId, eventId, eventOwnerId, description) => {
     if (isCurrUserGroupAdmin) {
-        const error = new Error('Aдминистраторът на групата не може да прави заявки за промяна на събития в групата!');
+        const error = new Error('Предишният администратор на групата е напуснал и Вие сте били избран за новия групов администратор. Вече вие може да редактирате събитията на групата и да управлявате заявките за тяхната промяна.');
         error.statusCode = 403;
         throw error;
     }

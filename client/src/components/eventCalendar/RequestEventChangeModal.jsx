@@ -51,13 +51,16 @@ const RequestEventChangeModal = ({ isOpen, onClose, groupId, eventIdForRequest, 
                     position: "bottom",
                 });
             } else if (error.status === 403) {
-                //user has been automatically selected to be new group admin, after the previous admin has left the group
+                // case 1: user has been automatically selected to be new group admin, after the previous admin has left the group
                 //and his UI has not been refreshed
+
+                //case 2 : user has been removed by group admin while trying to create request for event change
+
                 navigate(`/my-groups`); //redirect to another page for refresh members data upon going back to current group page
 
                 toast({
-                    title: 'Вие сте новият администратор на групата',
-                    description: 'Вече вие може да редактирате събитията на групата и да управлявате заявките за тяхната промяна',
+                    title: 'Възникна грешка!',
+                    description: error.message, //user-friendly message depending on case
                     status: "info",
                     duration: 10000,
                     isClosable: true,
