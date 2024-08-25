@@ -39,7 +39,10 @@ const GroupChat = () => {
                     logoutHandler(); //invalid or missing token
                     navigate('/login');
                 } else if (error.status === 403) {
-                    navigate(`/groups/${groupId}`);
+                    //Handle case : user trying to access group chat in a group he was removed from (outdated ui)
+                    //Handle case : user opens old notification for a group he left
+                    navigate(`/my-groups`);
+
                     toast({
                         title: 'Не сте член на групата!',
                         description: `За да достъпите груповия разговор, присъединете се отново!`,

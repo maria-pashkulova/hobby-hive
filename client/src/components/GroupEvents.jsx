@@ -40,10 +40,11 @@ const GroupEvents = () => {
                     navigate('/login');
                 } else if (error.status === 403) {
                     //handle edge case : user opens notification for group event after he was removed or left this group
-                    navigate(`/groups/${groupId}`); //redirect to group posts
+                    //handle edge case : user was removed from group admin but has outdated UI
+                    navigate(`/my-groups`); //redirect to My Groups page to refresh UI for sure
                     toast({
                         title: 'Не сте член на групата!',
-                        description: 'Присъдинете се към групата отново, за да получите достъп.',
+                        description: 'Присъдинете се отново, за да получите достъп до груповия календар.',
                         status: "info",
                         duration: 10000,
                         isClosable: true,

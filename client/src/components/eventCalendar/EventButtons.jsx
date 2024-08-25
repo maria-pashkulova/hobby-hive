@@ -66,6 +66,17 @@ const EventButtons = ({ isCurrUserAttending, groupId, eventId, eventTitle, event
                     isClosable: true,
                     position: "bottom",
                 });
+            } else if (error.status === 403) {
+                //Handle case : user trying to change attendance in a group he was removed from (outdated ui)
+                navigate(`/my-groups`);
+                toast({
+                    title: 'Не сте член на групата!',
+                    description: `Администраторът на групата Ви е премахнал. Присъдинете се отново, за да имате достъп до груповия календар и да заявявате присъствия за събития!`,
+                    status: "info",
+                    duration: 10000,
+                    isClosable: true,
+                    position: "bottom",
+                })
             } else if (error.status === 404) {
                 //handle case : concurrently manipulated event from group administrator and a group member
                 //User is trying to mark attendance for an event that was deleted by admin during the time the other user was viwing event's details
@@ -131,6 +142,17 @@ const EventButtons = ({ isCurrUserAttending, groupId, eventId, eventTitle, event
                     isClosable: true,
                     position: "bottom",
                 });
+            } else if (error.status === 403) {
+                //Handle case : user trying to change attendance in a group he was removed from (outdated ui)
+                navigate(`/my-groups`);
+                toast({
+                    title: 'Не сте член на групата!',
+                    description: `Администраторът на групата Ви е премахнал. Присъдинете се отново, за да имате достъп до груповия календар и да заявявате присъствия за събития!`,
+                    status: "info",
+                    duration: 10000,
+                    isClosable: true,
+                    position: "bottom",
+                })
             } else if (error.status === 404) {
 
                 //handle case : concurrently manipulated event from group administrator and a group member

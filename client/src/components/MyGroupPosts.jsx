@@ -1,7 +1,7 @@
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import AuthContext from "../contexts/authContext";
-import { Box, Container, Flex, Spinner, Text, useToast } from "@chakra-ui/react";
+import { Container, Flex, Spinner, Text, useToast } from "@chakra-ui/react";
 import Post from "./Post";
 
 import * as postService from '../services/postService';
@@ -63,16 +63,16 @@ const MyGroupPosts = () => {
             })
             .catch(error => {
                 if (error.status === 401) {
-                    logoutHandler(); //invalid or missing token - пр логнал си се, седял си опр време, изтича ти токена - сървъра връща unauthorized - изчистваш стейта
-                    //и localStorage за да станеш неаутентикиран и за клиента и тогава редиректваш
+                    logoutHandler(); //invalid or missing token
                     navigate('/login');
                 } else if (error.status === 404) {
                     navigate('/not-found');
                 } else if (error.status === 403) {
-                    navigate(`/groups/${groupId}`); //redirect to group posts
+                    //handle edge case : user was removed from group admin but has outdated UI
+                    navigate(`/my-groups`); //redirect to My Groups page to refresh UI for sure
                     toast({
                         title: 'Не сте член на групата!',
-                        description: 'Присъдинете се към групата за да можете да създавате публикации!',
+                        description: 'Присъдинете се, за да можете да създавате публикации!',
                         status: "info",
                         duration: 10000,
                         isClosable: true,

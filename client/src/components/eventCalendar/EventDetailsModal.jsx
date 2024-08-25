@@ -10,7 +10,7 @@ import AuthContext from '../../contexts/authContext';
 const EventDetailsModal = ({ isOpen, onClose, eventDetailsObj, groupAdmin, groupRegionCity, groupActivityTags, existingEvents, handleRemoveEvent, handleUpdateEvent, isMyCalendar }) => {
 
     //eventTitle is available only in My Calendar page
-    const { groupId, id, eventTitle } = eventDetailsObj;
+    const { groupId, id } = eventDetailsObj;
     const [particularEvent, setParticularEvent] = useState({});
     const [isAttending, setIsAttending] = useState(false);
     const [loading, setLoading] = useState(true);
@@ -61,10 +61,11 @@ const EventDetailsModal = ({ isOpen, onClose, eventDetailsObj, groupAdmin, group
 
                 } else if (error.status === 403) {
                     //Handle case : user attending on an event in a group he left, trying to get event details from My calendar page
-                    navigate(`/groups/${groupId}`);
+                    //Handle case : user trying to get event details in a group he was removed from (outdated ui)
+                    navigate(`/my-groups`);
                     toast({
                         title: 'Не сте член на групата!',
-                        description: `Напуснали сте група, в която сте заявили присъствие за събитие: ${eventTitle}. Присъдинете се към групата отново, за да достъпите събитието.`,
+                        description: `Напуснали сте групата или сте били премахнати от администратора. Присъдинете се отново, за да имате достъп до груповия календар!`,
                         status: "info",
                         duration: 10000,
                         isClosable: true,
