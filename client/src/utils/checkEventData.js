@@ -13,26 +13,42 @@ const normalizeLocationCoordinates = ([lat, lon]) => {
 }
 
 
-//Used upon event creation only
-export const checkForOverlappingEvents = (events, newEventStart, newEventEnd, newEventLocation, newEventTitle) => {
+//Used upon event create / update
+//Upon event create updatedEventId is undefined
+//Upon event update updatedEventId is id of the event being edited
+//it is needed to exclude current event from existing events because the event being edited will be found as already existing event
+//if it has prevously had its location set and its title and start / end times were not changed in a way that passes the check
+
+export const checkForOverlappingEvents = (events, newEventStart, newEventEnd, newEventLocation, newEventTitle, updatedEventId) => {
 
     //Location field for events is not required so it can be an empty object if no location was selected from
     //Openstreet map results
     //Events in DB always have name, locationRegionCity and coordinates properties with default values if no location
     // was set upon their creation!
     //For new event if no location was selected, there is no conflict and no need to check event time and title
-    if (checkIsObjectEmpty(newEventLocation)) {
+    //Also upon event update it could be the default No location object
+    if (checkIsObjectEmpty(newEventLocation) || newEventLocation.name === 'Не е зададена локация за събитието') {
         return false;
     }
 
     const roundedLocationCoordinates = normalizeLocationCoordinates(newEventLocation.coordinates);
 
-    return events.some(event => {
+    //not mutating reference values (arrays in this case) is considered a good practice, new reference is created to be modified
+    //upon event creation - all events in current visible date range
+    //upon event update - all events in current visibl date range except the one being edited at the moment
+    let existingEventsDependingOnAction = [...events];
+    //Update action
+    if (updatedEventId) {
+        existingEventsDependingOnAction = existingEventsDependingOnAction.filter((event => event._id !== updatedEventId));
+    }
+
+    return existingEventsDependingOnAction.some(event => {
         const eventStart = new Date(event.start);
         const eventEnd = new Date(event.end);
-        const eventLocation = event.specificLocation; //events locations coordinates are saved in DB rounded to 5 decimal places (if set)
+        const eventLocation = event.specificLocation; //events locations coordinates are saved in DB rounded to 5 decimal places (if set - otherwise the default specificLocation object's coordinates prop is an empty array)
 
         let isSameLocation = false;
+        //compare only events with set location, skip events with default location from DB
         if (eventLocation.coordinates.length > 0) {
             isSameLocation = eventLocation.coordinates[0] === roundedLocationCoordinates[0]
                 && eventLocation.coordinates[1] === roundedLocationCoordinates[1];

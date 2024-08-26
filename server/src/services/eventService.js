@@ -2,7 +2,7 @@ const Event = require('../models/Event');
 const Group = require('../models/Group');
 const EventChangeRequest = require('../models/EventChangeRequest');
 const { checkForDuplicateTags } = require('../utils/validateGroupData');
-const { validateEventTags, normalizeLocationCoordinates } = require('../utils/validateEventData');
+const { validateEventTags, normalizeLocationCoordinates, checkIsFutureEvent } = require('../utils/validateEventData');
 const checkIsObjectEmpty = require('../utils/checkIsObjectEmpty');
 
 
@@ -74,7 +74,7 @@ exports.getById = (eventId) => {
 
 
 //used in eventMiddleware only - for : event details fetched from both group and my calendar pages
-//and for event update 
+
 exports.getByIdToValidate = (eventId) => {
     const event = Event
         .findById(eventId)
@@ -143,10 +143,6 @@ exports.getUserAttendingEventsInRange = (currUserId, startISO, endISO) => {
 
 exports.create = async (title, color, description, specificLocation, start, end, activityTags, groupId, _ownerId) => {
 
-    const group = await Group.findById(groupId);
-
-    //Group exists and current user is a member of the group - guaranteed by middlewares
-
     //Check if there is an event in current group calendar with the same color
     const existingEventWithSameColor = await Event.findOne({ color, groupId });
     if (!!existingEventWithSameColor) {
@@ -160,7 +156,12 @@ exports.create = async (title, color, description, specificLocation, start, end,
     //Check if event's activityTags are unique (client input itself)
     checkForDuplicateTags(activityTags)
 
-    //дали таговете които са зададени отговарят на таговете на текущата група
+    //Group exists and current user is a member of the group - guaranteed by middlewares
+    const group = await Group
+        .findById(groupId)
+        .select('name members._id activityTags');
+
+    //Check if added activity tags for event correspond with group activity tags
     if (!validateEventTags(group.activityTags, activityTags)) {
         const error = new Error('Невалидни тагове за групова активност за текущата група!');
         error.statusCode = 400;
@@ -192,6 +193,7 @@ exports.create = async (title, color, description, specificLocation, start, end,
     let newEvent = await Event.create(newEventData);
 
     //Populated group info is needed for notifications
+    //TODO : manually
     newEvent = await newEvent
         .populate({
             path: 'groupId',
@@ -202,7 +204,108 @@ exports.create = async (title, color, description, specificLocation, start, end,
 
 }
 
+//UPDATE EVENT
+//Group administrator and event creator can update event
+exports.update = async (eventIdToUpdate, existingEvent, newEventData, groupId, currUserId, isCurrUserGroupAdmin) => {
+
+    const { title, color, description, start, end, activityTags } = newEventData;
+    let { specificLocation } = newEventData;
+
+    if (!checkIsFutureEvent(existingEvent.start)) {
+        const error = new Error('Датата на провеждане на събитието е минала! Не можете да редактирате минали събития, те могат да бъдат единствено изтрити от администратора на групата!');
+        error.statusCode = 400;
+        throw error;
+    }
+
+    if ((existingEvent._ownerId.toString() !== currUserId && !isCurrUserGroupAdmin)) {
+        const error = new Error('Само администраторът на групата и потребителят, създал събитието могат да го редактират!');
+        error.statusCode = 403;
+        throw error;
+    }
+
+    //Check if there is an event in current group calendar with the same color - except the current event being validated
+    const existingEventWithSameColor = await Event.findOne({ _id: { $ne: eventIdToUpdate }, color, groupId });
+    if (!!existingEventWithSameColor) {
+        const error = new Error('В груповия календар съществува събитие, обозначено с посочения цвят. Изберете друг цвят!');
+        error.statusCode = 400;
+        throw error;
+    }
+
+    //TODO: валидна дата която е преди текущото време
+
+    //Check if event's activityTags are unique (client input itself)
+    checkForDuplicateTags(activityTags)
+
+    //Group exists and current user is a member of the group - guaranteed by middlewares
+    const group = await Group
+        .findById(groupId)
+        .select('name activityTags');
+
+    //Check if added activity tags for event correspond with group activity tags
+    if (!validateEventTags(group.activityTags, activityTags)) {
+        const error = new Error('Невалидни тагове за групова активност за текущата група!');
+        error.statusCode = 400;
+        throw error;
+    }
+
+    //Round lat and lon values for location to 5 decimal places before storing it to DB (if location from Openstreet API is set)
+    let locationObjWithRoundedCoordinates;
+
+    //Possible cases : user has removed previous location -> specificLocation = {}
+    //user has not changed location and if was the default 'No location set' object -> specificLocation = {name:'Не е зададена локация за събитието', locationRegionCity:'', coordinates:[]}
+    //user has not changed location and it was some valid location from Openstreet map -> specific location ={object with rounded lat and lon}
+
+    //Check if new location is the default 'No location set' object - then skip normalizing lat and lon because it is empty array
+    //and error wil be thrown
+    if (!checkIsObjectEmpty(specificLocation) && specificLocation.name !== 'Не е зададена локация за събитието') {
+
+        const roundedLocationCoordinates = normalizeLocationCoordinates(specificLocation.coordinates)
+        locationObjWithRoundedCoordinates = { ...specificLocation, coordinates: roundedLocationCoordinates };
+    }
+
+    //If user has removed location and has not selected new one , specificLocation = {}
+    //Replace it with default 'No selected location' object, otherwise the field will be removed from event document
+    if (checkIsObjectEmpty(specificLocation)) {
+        specificLocation = {
+            name: 'Не е зададена локация за събитието',
+            locationRegionCity: '',
+            coordinates: []
+        }
+    }
+
+    existingEvent.title = title;
+    existingEvent.color = color;
+    existingEvent.description = description;
+    existingEvent.specificLocation = locationObjWithRoundedCoordinates || specificLocation //if no location was selected default object is saved in DB
+    existingEvent.start = start;
+    existingEvent.end = end;
+    existingEvent.activityTags = activityTags;
+
+    //membersGoing, groupId and ownerId are left unchanged
+
+    //Save changes
+    const updatedEvent = await existingEvent.save();
+
+
+    return {
+        title: updatedEvent.title,
+        color: updatedEvent.color,
+        description: updatedEvent.description,
+        specificLocation: updatedEvent.specificLocation,
+        start: updatedEvent.start,
+        end: updatedEvent.end,
+        activityTags: updatedEvent.activityTags,
+        _ownerId: updatedEvent._ownerId,
+        groupId: {
+            _id: group._id,
+            name: group.name
+        }
+    }
+
+}
+
 //DELETE EVENT 
+//Only group administrator can delete group events
 exports.delete = async (eventIdToDelete, isCurrUserGroupAdmin) => {
 
     if (!isCurrUserGroupAdmin) {
@@ -240,7 +343,7 @@ exports.delete = async (eventIdToDelete, isCurrUserGroupAdmin) => {
     - the group is valid
     - current user is member of the group
  */
-
+//getEventForAttendance guarantees requested even is future event
 //currEvent format : {_id: eventId (of type ObjectId) , membersGoing [member ids (of type ObjectId)]}
 exports.markAsGoing = async (currUserId, currEvent) => {
 

@@ -66,8 +66,29 @@ router.post('/', async (req, res) => {
 
 });
 
+//UPDATE EVENT
+
+router.put('/:eventId', isAdminMiddleware, getEvent, async (req, res) => {
+    const currUserId = req.user._id;
+    const isCurrUserGroupAdmin = req.isAdmin;
+    const eventIdToUpdate = req.params.eventId;
+    const existingEvent = req.event // Mongoose document with all event current data (from getEvent)
+    const newEventData = req.body;
+    const groupId = req.groupId; //comes from getGroup middleware
+
+
+    try {
+        const updatedEvent = await eventService.update(eventIdToUpdate, existingEvent, newEventData, groupId, currUserId, isCurrUserGroupAdmin);
+
+        res.json(updatedEvent);
+    } catch (error) {
+        res.status(error.statusCode || 500).json({ message: error.message });
+        console.log('Error in update event:', error.message);
+    }
+
+})
+
 //DELETE EVENT
-//Only group administrator can delete group events
 
 router.delete('/:eventId', isAdminMiddleware, getEventWithOwner, async (req, res) => {
     const isCurrUserGroupAdmin = req.isAdmin;

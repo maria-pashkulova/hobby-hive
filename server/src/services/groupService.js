@@ -136,10 +136,6 @@ exports.create = async (name, category, location, description, imageUrl, members
         imageUrl = await uploadToCloudinary(imageUrl, GROUP_PICS_FOLDER);
     }
 
-
-    //createdAt, editedAt...
-    //TODO: add validation
-
     const newGroupData = {
         name,
         category,

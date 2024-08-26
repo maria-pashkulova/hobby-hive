@@ -5,7 +5,7 @@ const eventService = require('../services/eventService');
 //Attach event to req object
 
 //Used for: event details fetching from both group and my calendar pages
-
+//Used for event update
 const getEvent = async (req, res, next) => {
     const requestedEventId = req.params.eventId;
 

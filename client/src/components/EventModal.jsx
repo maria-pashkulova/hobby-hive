@@ -40,8 +40,8 @@ const EventModal = ({ isOpen, onClose, groupId, groupRegionCity, groupActivityTa
         const newEventLocation = formValues[EventKeys.SpecificLocation];
         const newEventTitle = formValues[EventKeys.Title];
 
-        //Skip this check upon event update because the event being edited will be found as already existing event
-        if (!isUpdateAction && checkForOverlappingEvents(existingEvents, newEventStart, newEventEnd, newEventLocation, newEventTitle)) {
+        //Check for conflicting events upon event create / update
+        if (checkForOverlappingEvents(existingEvents, newEventStart, newEventEnd, newEventLocation, newEventTitle, currentEventData?._id)) {
 
             actions.setSubmitting(false);
             toast({
@@ -80,6 +80,16 @@ const EventModal = ({ isOpen, onClose, groupId, groupRegionCity, groupActivityTa
             if (error.status === 401) {
                 logoutHandler();
                 navigate('/login');
+            } else if (error.status === 400) {
+                //edge case : try to update past event before UI disabled it
+                onClose();
+                toast({
+                    title: error.message, // message comes from server in user-friendly format
+                    status: "error",
+                    duration: 10000,
+                    isClosable: true,
+                    position: "bottom",
+                });
             } else if (error.status === 403) {
                 //Handle case : user trying to create / update event in a group but group admin removed him from group members during that time
                 navigate(`/my-groups`);

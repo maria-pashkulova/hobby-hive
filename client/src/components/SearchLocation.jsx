@@ -111,10 +111,15 @@ const SearchLocation = ({ initialEventLocationName }) => {
     return (
         <>
             <FormControl my={4} isInvalid={errors[EventKeys.SpecificLocation] || requiredSearchValueErr}>
-                <FormLabel>Потърси локация</FormLabel>
+                <FormLabel>Потърсете и изберете локация</FormLabel>
                 <FormHelperText mb={4} color={'teal.600'}>
-                    * В случай че не намирате желаната от Вас локация, дайте детайли за нея в описанието на събитието.
-                    Ако не изберете локация, събитието ще бъде запазено без зададена локация.
+                    <Text>
+                        {initialEventLocationName
+                            ? '* Ако не изберете локация, събитието ще бъде запазено без зададена локация или с предходната локация, ако е била зададена такава.'
+                            : '* Ако не изберете локация, събитието ще бъде запазено без зададена локация.'
+                        }
+                    </Text>
+                    <Text mt={1}>* В случай че не намирате желаната от Вас локация, можете да дадете детайли за нея в описанието на събитието.</Text>
                 </FormHelperText>
                 <InputGroup>
 
