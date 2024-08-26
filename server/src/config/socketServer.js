@@ -73,6 +73,8 @@ function setupSocketServer(expressServer) {
             const groupInfo = newMessageReceived.groupId;
 
             // Send the new message to users currently viewing the chat (except the user who has sent the message)
+            //default socket.to() behaviour (room-based event emission)
+
             socket.to(groupInfo._id).emit('message received', newMessageReceived);
 
             // Notify individual group members who are logged in
@@ -123,7 +125,7 @@ function setupSocketServer(expressServer) {
         //ON CREATE POST
         socket.on('new group post created', (groupId) => {
             //notify all sockets currently viewing group posts (except the owner of the post) so UI refresh is triggered
-            //socket.to(...) excludes the user who created the post by default
+            //socket.to(...) excludes the user who created the post by default; default socket.to() behaviour (room-based event emission)
             socket.to(`posts-${groupId}`).emit('update group posts');
 
         })
@@ -152,29 +154,22 @@ function setupSocketServer(expressServer) {
 
             //Notify individual group members which are logged in
             //for the new event - no matter if they are currently viewing the group event calendar or not (in which the new event was created by another user)
+            //exclude the creator of the event - default socket.to() behaviour (room-based event emission)
 
             groupInfo.members.forEach((member) => {
-                // Skip sending a notification to the user who created the event
-                if (member._id !== newEventData._ownerId) {
 
-                    // Get the list of sockets for the current member or an empty array if the member has no sockets (he is not logged in)
-                    const memberSockets = userSockets.get(member._id) || [];
+                socket.to(member._id).emit('new event notification', {
+                    notificationAbout: 'Ново събитие',
+                    notificationColor: newEventData.color,
+                    fromGroup: groupInfo._id,
+                    groupName: groupInfo.name,
+                    eventName: newEventData.title,
+                    eventStart: newEventData.start,
+                    uniqueIdentifier: `event-${newEventData._id}`, //used only for React unique key
+                    type: 'event',
+                    isMemberFromNotification: true
+                })
 
-                    //if current group member is logged in, send him a notification
-                    if (memberSockets.length > 0) {
-                        socket.to(member._id).emit('new event notification', {
-                            notificationAbout: 'Ново събитие',
-                            notificationColor: newEventData.color,
-                            fromGroup: groupInfo._id,
-                            groupName: groupInfo.name,
-                            eventName: newEventData.title,
-                            eventStart: newEventData.start,
-                            uniqueIdentifier: `event-${newEventData._id}`, //used only for React unique key
-                            type: 'event',
-                            isMemberFromNotification: true
-                        })
-                    }
-                }
             });
 
             // Send the new event data to users currently viewing the group event calendar(in which the new event was created by another user)
@@ -187,65 +182,55 @@ function setupSocketServer(expressServer) {
         socket.on('updated event', (updatedEventData) => {
             const groupInfo = updatedEventData.groupId;
 
-            //Notify individual group members who are logged in 
+            //Notify individual group members who are logged in (connected to a room)
             //who were marked as going (even if they has left the group / has been removed from group)
-            //except group admin / event owner depending on who updated it - default socket.to()
+            //except group admin / event owner depending on who updated it - default socket.to() behaviour (room-based event emission)
             updatedEventData.membersToNotify.forEach((memberId) => {
-                //Determine conncection status: only connected users receive notification
-                const attendeeSockets = userSockets.get(memberId) || [];
 
-                //if current event attendee is logged in, send him a notification
-                //All attendees are considered group members (used in ProtectedRouteMembers)
-                //Edge case - user has left a group, but is marked as going to a group event
-                if (attendeeSockets.length > 0) {
-                    socket.to(memberId).emit('updated event notification', {
-                        notificationAbout: `Редактирано събитие`,
-                        notificationColor: updatedEventData.color,
-                        fromGroup: groupInfo._id,
-                        groupName: groupInfo.name,
-                        eventName: updatedEventData.title,
-                        eventStart: updatedEventData.start,
-                        uniqueIdentifier: `event-${updatedEventData._id}-update`,
-                        type: 'event',
-                        isMemberFromNotification: true
-                    })
-                }
+                socket.to(memberId).emit('updated event notification', {
+                    notificationAbout: `Редактирано събитие`,
+                    notificationColor: updatedEventData.color,
+                    fromGroup: groupInfo._id,
+                    groupName: groupInfo.name,
+                    eventName: updatedEventData.title,
+                    eventStart: updatedEventData.start,
+                    uniqueIdentifier: `event-${updatedEventData._id}-update`,
+                    type: 'event',
+                    isMemberFromNotification: true
+                })
+
             })
 
             //Update group events for members currently viewing group calendar
-            //socket.to(...) excludes the user who updated the event a.k.a group administrator or event creator
+            //socket.to(...) excludes the user who updated the event a.k.a group administrator or event owner (room-based event emission)
             socket.to(`events-${groupInfo._id}`).emit('update existing event in calendar', updatedEventData);
         })
 
         //ON DELETE EVENT
-        socket.on('group event deleted', ({ groupId, eventId, eventName, eventColor, eventStart, groupName, groupAdmin, membersToNotify }) => {
+        socket.on('group event deleted', ({ groupId, eventId, eventName, eventColor, eventStart, groupName, membersToNotify }) => {
 
             //Notify individual group members who are logged in 
             //who were marked as going (even if they has left the group / has been removed from group)
-            //except group admin
+            //except group admin - default socket.to() behaviour (room-based event emission)
+
             membersToNotify.forEach((memberId) => {
-                if (memberId !== groupAdmin) {
 
-                    //Determine conncection status: only connected users receive notification
-                    const attendeeSockets = userSockets.get(memberId) || [];
+                //All attendees are considered group members (used in ProtectedRouteMembers)
+                //Edge case - user has left a group, but is marked as going to a group event
 
-                    //if current event attendee is logged in, send him a notification
-                    //All attendees are considered group members (used in ProtectedRouteMembers)
-                    //Edge case - user has left a group, but is marked as going to a group event
-                    if (attendeeSockets.length > 0) {
-                        socket.to(memberId).emit('deleted event notification', {
-                            notificationAbout: `Премахнато събитие`,
-                            notificationColor: eventColor,
-                            fromGroup: groupId,
-                            groupName: groupName,
-                            eventName: eventName,
-                            eventStart: eventStart,
-                            uniqueIdentifier: `event-${eventId}-delete`,
-                            type: 'event',
-                            isMemberFromNotification: true
-                        })
-                    }
-                }
+                socket.to(memberId).emit('deleted event notification', {
+                    notificationAbout: `Премахнато събитие`,
+                    notificationColor: eventColor,
+                    fromGroup: groupId,
+                    groupName: groupName,
+                    eventName: eventName,
+                    eventStart: eventStart,
+                    uniqueIdentifier: `event-${eventId}-delete`,
+                    type: 'event',
+                    isMemberFromNotification: true
+                })
+
+
             })
 
             //Update group events for members currently viewing group calendar
@@ -270,26 +255,17 @@ function setupSocketServer(expressServer) {
             const groupAdminId = groupInfo.groupAdmin;
             const eventInfo = newRequestData.eventId;
 
-            //Notify current group admin if he is logged in
-            //Determine conncection status: it identifies if the group admin is connected to the server
-            //which ensures that only then he receives notifications
 
-            const groupAdminSockets = userSockets.get(groupAdminId) || [];
-
-            //if current group admin is logged in, send him a notification for newly created request - no matter if he is currently viewing the requests page for events
-            //in current group or not
-            if (groupAdminSockets.length > 0) {
-                socket.to(groupAdminId).emit('new request notification', {
-                    notificationAbout: 'Нова заявка за промяна на събитие',
-                    notificationColor: 'green.300',
-                    fromGroup: groupInfo._id,
-                    groupName: groupInfo.name,
-                    eventName: eventInfo.title,
-                    uniqueIdentifier: `request-${newRequestData._id}`, //used only for React unique key
-                    type: 'request',
-                    isGroupAdminFromNotifications: true
-                })
-            }
+            socket.to(groupAdminId).emit('new request notification', {
+                notificationAbout: 'Нова заявка за промяна на събитие',
+                notificationColor: 'green.300',
+                fromGroup: groupInfo._id,
+                groupName: groupInfo.name,
+                eventName: eventInfo.title,
+                uniqueIdentifier: `request-${newRequestData._id}`, //used only for React unique key
+                type: 'request',
+                isGroupAdminFromNotifications: true
+            })
 
 
             // Send event to trigger UI update if the group admin is currently viewing the group event change requests page
