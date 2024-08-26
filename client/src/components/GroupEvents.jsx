@@ -105,12 +105,38 @@ const GroupEvents = () => {
     //Remove deleted event from local state of group admin + update other members' calendars who are viewing event calendar for the current group in the moment of event deletion
     const handleRemoveEvent = (deletedEventId) => {
         setGroupEvents((prevGroupEvents) => prevGroupEvents.filter((currEvent) => currEvent._id !== deletedEventId));
-        showEventDetailsModal.onClose()
+        showEventDetailsModal.onClose() //Closes current user event details modal and other users' viewing event details in the moment
     }
 
-    //TODO: handle update event 
+    //Update edited event in local state + update other members' calendars who are viewing event calendar for the current group in the moment of event update
     const handleUpdateEvent = (updatedEvent) => {
 
+        //Use functional update form of setState() to avoid stale state closure problem!
+        setGroupEvents((prevGroupEvents) => {
+
+            //find the index of edited event object
+            const updatedIndex = prevGroupEvents.findIndex((event) => event._id === updatedEvent._id);
+
+            // If the event is found, update it
+            if (updatedIndex !== -1) {
+
+                //Unify updatedEvent with other events format (because groupId field of updatedEvent is populated because of notifications)
+                //Extract groupId from the updated event and override it in updatedEventWithGroupIdOnly object
+                //Exclude membersToNotify field
+                const { _id: groupId } = updatedEvent.groupId;
+                const { membersToNotify, ...updatedEventWithoutMembersToNotify } = updatedEvent;
+                const updatedEventWithGroupIdOnly = { ...updatedEventWithoutMembersToNotify, groupId };
+
+                //Create new array wih the updated event (new reference for state of reference type )
+                const newGroupEvents = [...prevGroupEvents];
+                newGroupEvents[updatedIndex] = updatedEventWithGroupIdOnly //new reference (object ref type in the array)
+
+                return newGroupEvents;
+            }
+            // If event is not found (race conditions), return the previous state as is (no re-render is triggered in this case)
+            return prevGroupEvents;
+        });
+        showEventDetailsModal.onClose();//Closes current user event details modal and other users' viewing event details in the moment
     }
 
     //Join / leave group event notification for server
@@ -118,14 +144,16 @@ const GroupEvents = () => {
     useEffect(() => {
 
         socket?.emit('visit event calendar', groupId);
-        socket?.on('update event calendar', handleAddNewEvent);
+        socket?.on('add new event to calendar', handleAddNewEvent);
+        socket?.on('update existing event in calendar', handleUpdateEvent);
         socket?.on('delete event from calendar', handleRemoveEvent);
 
         //Cleanup the event listener on component unmount or when groupId / socket changes and use effect is triggered again
         return () => {
 
             socket?.emit('leave event calendar', groupId);
-            socket?.off('update event calendar', handleAddNewEvent);
+            socket?.off('add new event to calendar', handleAddNewEvent);
+            socket?.off('update existing event in calendar', handleUpdateEvent);
             socket?.off('delete event from calendar', handleRemoveEvent);
 
         }

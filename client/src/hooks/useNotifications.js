@@ -6,7 +6,7 @@ export default function useNotifications() {
     const [notificationsCount, setNotificationsCount] = useState(0);
     const { socket } = useContext(AuthContext);
 
-    // Receive event,message or request for event change (group admin only) notification
+    // Receive event(create,update,delete),message or request for event change (group admin only) notification
     useEffect(() => {
 
         //*hook with state dependencies -> use functional update form of setState() to avoid stale state closure problem!
@@ -45,12 +45,14 @@ export default function useNotifications() {
 
         socket?.on('message notification', handleNotification);
         socket?.on('new event notification', handleNotification);
+        socket?.on('updated event notification', handleNotification);
         socket?.on('deleted event notification', handleNotification);
         socket?.on('new request notification', handleNotification);
 
         return () => {
             socket?.off('message notification', handleNotification);
             socket?.off('new event notification', handleNotification);
+            socket?.off('updated event notification', handleNotification);
             socket?.off('deleted event notification', handleNotification);
             socket?.off('new request notification', handleNotification);
 

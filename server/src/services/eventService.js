@@ -161,6 +161,7 @@ exports.create = async (title, color, description, specificLocation, start, end,
         .findById(groupId)
         .select('name members._id activityTags');
 
+
     //Check if added activity tags for event correspond with group activity tags
     if (!validateEventTags(group.activityTags, activityTags)) {
         const error = new Error('Невалидни тагове за групова активност за текущата група!');
@@ -190,17 +191,23 @@ exports.create = async (title, color, description, specificLocation, start, end,
         membersGoing: [_ownerId] // Add the event creator to membersGoing by default upon event creation
     }
 
-    let newEvent = await Event.create(newEventData);
+    const newEvent = await Event.create(newEventData);
 
-    //Populated group info is needed for notifications
-    //TODO : manually
-    newEvent = await newEvent
-        .populate({
-            path: 'groupId',
-            select: 'name members._id'
-        });
-
-    return newEvent;
+    return {
+        _id: newEvent._id,
+        title: newEvent.title,
+        color: newEvent.color,
+        start: newEvent.start,
+        end: newEvent.end,
+        specificLocation: newEvent.specificLocation,
+        _ownerId: newEvent._ownerId,
+        // group data used for new event notifications
+        groupId: {
+            _id: group._id,
+            name: group.name,
+            members: group.members,
+        }
+    }
 
 }
 
@@ -286,20 +293,21 @@ exports.update = async (eventIdToUpdate, existingEvent, newEventData, groupId, c
     //Save changes
     const updatedEvent = await existingEvent.save();
 
-
     return {
+        _id: updatedEvent._id,
         title: updatedEvent.title,
         color: updatedEvent.color,
-        description: updatedEvent.description,
-        specificLocation: updatedEvent.specificLocation,
         start: updatedEvent.start,
         end: updatedEvent.end,
-        activityTags: updatedEvent.activityTags,
+        specificLocation: updatedEvent.specificLocation,
         _ownerId: updatedEvent._ownerId,
+        // group data used for new event notifications
         groupId: {
             _id: group._id,
             name: group.name
-        }
+        },
+        //used for notifications only
+        membersToNotify: updatedEvent.membersGoing
     }
 
 }

@@ -57,8 +57,7 @@ const EventModal = ({ isOpen, onClose, groupId, groupRegionCity, groupActivityTa
             let event;
             if (isUpdateAction) {
                 event = await eventService.updateEvent(groupId, currentEventData._id, formValues);
-
-                //TODO real-time update 
+                socket.emit('updated event', event);
             } else {
                 event = await eventService.createEvent(groupId, formValues);
                 //notify other group members for new event

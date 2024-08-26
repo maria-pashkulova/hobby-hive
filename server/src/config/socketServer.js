@@ -179,16 +179,46 @@ function setupSocketServer(expressServer) {
 
             // Send the new event data to users currently viewing the group event calendar(in which the new event was created by another user)
             //socket.to(...) excludes the user who created the event
-            socket.to(`events-${groupInfo._id}`).emit('update event calendar', newEventData);
+            socket.to(`events-${groupInfo._id}`).emit('add new event to calendar', newEventData);
 
         });
 
-        //ON DELETE EVENT
-        socket.on('group event deleted', ({ groupId, eventId, eventName, eventColor, eventStart, groupName, groupAdmin, membersToNotify }) => {
+        //ON UPDATE EVENT
+        socket.on('updated event', (updatedEventData) => {
+            const groupInfo = updatedEventData.groupId;
+
+            //Notify individual group members who are logged in 
+            //who were marked as going (even if they has left the group / has been removed from group)
+            //except group admin / event owner depending on who updated it - default socket.to()
+            updatedEventData.membersToNotify.forEach((memberId) => {
+                //Determine conncection status: only connected users receive notification
+                const attendeeSockets = userSockets.get(memberId) || [];
+
+                //if current event attendee is logged in, send him a notification
+                //All attendees are considered group members (used in ProtectedRouteMembers)
+                //Edge case - user has left a group, but is marked as going to a group event
+                if (attendeeSockets.length > 0) {
+                    socket.to(memberId).emit('updated event notification', {
+                        notificationAbout: `Редактирано събитие`,
+                        notificationColor: updatedEventData.color,
+                        fromGroup: groupInfo._id,
+                        groupName: groupInfo.name,
+                        eventName: updatedEventData.title,
+                        eventStart: updatedEventData.start,
+                        uniqueIdentifier: `event-${updatedEventData._id}-update`,
+                        type: 'event',
+                        isMemberFromNotification: true
+                    })
+                }
+            })
 
             //Update group events for members currently viewing group calendar
-            //socket.to(...) excludes the user who deleted the event a.k.a group administrator
-            socket.to(`events-${groupId}`).emit('delete event from calendar', eventId);
+            //socket.to(...) excludes the user who updated the event a.k.a group administrator or event creator
+            socket.to(`events-${groupInfo._id}`).emit('update existing event in calendar', updatedEventData);
+        })
+
+        //ON DELETE EVENT
+        socket.on('group event deleted', ({ groupId, eventId, eventName, eventColor, eventStart, groupName, groupAdmin, membersToNotify }) => {
 
             //Notify individual group members who are logged in 
             //who were marked as going (even if they has left the group / has been removed from group)
@@ -200,7 +230,8 @@ function setupSocketServer(expressServer) {
                     const attendeeSockets = userSockets.get(memberId) || [];
 
                     //if current event attendee is logged in, send him a notification
-                    //All attendees are group members (used in ProtectedRouteMembers)
+                    //All attendees are considered group members (used in ProtectedRouteMembers)
+                    //Edge case - user has left a group, but is marked as going to a group event
                     if (attendeeSockets.length > 0) {
                         socket.to(memberId).emit('deleted event notification', {
                             notificationAbout: `Премахнато събитие`,
@@ -216,6 +247,10 @@ function setupSocketServer(expressServer) {
                     }
                 }
             })
+
+            //Update group events for members currently viewing group calendar
+            //socket.to(...) excludes the user who deleted the event a.k.a group administrator
+            socket.to(`events-${groupId}`).emit('delete event from calendar', eventId);
 
         })
 
