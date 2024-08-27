@@ -45,12 +45,23 @@ const GroupMembersModal = ({ isOpen, onClose, groupMembers, groupAdmin, isMember
         } catch (error) {
 
             if (error.status === 401) {
-                logoutHandler(); //invalid or missing token - пр логнал си се, седял си опр време, изтича ти токена - сървъра връща unauthorized - изчистваш стейта
-                //и localStorage за да станеш неаутентикиран и за клиента и тогава редиректваш
+                logoutHandler(); //invalid or missing token
                 navigate('/login');
-            } else {
+            } else if (error.status === 403) {
                 toast({
-                    title: error.message,
+                    title: 'Администраторът Ви е премахнал от групата!',
+                    description: error.message,
+                    status: "error",
+                    duration: 5000,
+                    isClosable: true,
+                    position: "bottom",
+                });
+                navigate('/my-groups');
+
+            } else {
+                //error connecting with server or other possible errors
+                toast({
+                    title: error.message || 'Възникна грешка при свързване!',
                     status: "error",
                     duration: 5000,
                     isClosable: true,

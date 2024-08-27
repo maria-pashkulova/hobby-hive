@@ -72,7 +72,7 @@ const DeleteEventModal = ({ eventIdToDelete, updateLocalStateOnDelete, groupId, 
         <DeleteModal
             confirmQuestion='Сигурни ли сте, че искате да изтриете събитието от груповия календар?'
             additionalDescriptionOne='Всички заявки за промяна на събитието също ще бъдат изтрити.'
-            additionalDescriptionTwo='Вашето действие ще се отрази в календарите на всички членове, отбелязали своето присъствие за събитието! Събитията ще бъдат премахнати както от календара им в Хоби Кошер, така и в техните Гугъл календари (при позволена синхронизация).'
+            additionalDescriptionTwo='Вашето действие ще се отрази в календарите на всички членове, отбелязали своето присъствие за събитието! То ще бъде премахнато от техните календари в Хоби Кошер! '
             loading={loading}
             handleDeleteAction={handleDeleteEvent}
             isOpen={isOpen}

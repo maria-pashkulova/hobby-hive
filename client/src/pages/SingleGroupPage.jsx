@@ -64,6 +64,14 @@ const SingleGroupPage = () => {
 
             setIsMember(true);
 
+            toast({
+                title: `Присъединихте се към група: ${group.name}. Можете да участвате в планирането на събития и в груповия разговор.`,
+                status: "success",
+                duration: 10000,
+                isClosable: true,
+                position: "bottom",
+            });
+
         } catch (error) {
 
             if (error.status === 401) {
@@ -106,6 +114,14 @@ const SingleGroupPage = () => {
             await groupService.removeMember(groupId, userId);
 
             navigate('/my-groups');
+
+            toast({
+                title: `Напуснахте група: ${group.name}. Вече няма да имате достъп до груповия календар и разговор!`,
+                status: "success",
+                duration: 10000,
+                isClosable: true,
+                position: "bottom",
+            });
 
         } catch (error) {
 

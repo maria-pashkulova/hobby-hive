@@ -50,9 +50,9 @@ const DeletePostModal = ({ postIdToDelete, refetchOnDelete, groupId, isOpen, onC
                     position: "bottom",
                 });
             } else {
-                //error connecting with server
+                //error connecting with server or other possible errors
                 toast({
-                    title: 'Възникна грешка при свързване!',
+                    title: error.message || 'Възникна грешка при свързване!',
                     status: "error",
                     duration: 5000,
                     isClosable: true,

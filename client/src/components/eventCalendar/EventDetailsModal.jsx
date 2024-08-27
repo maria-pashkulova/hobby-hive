@@ -52,7 +52,7 @@ const EventDetailsModal = ({ isOpen, onClose, eventDetailsObj, groupAdmin, group
                     //user-friendly error message comes from server
                     toast({
                         title: error.message,
-                        status: "error",
+                        status: "info",
                         duration: 10000,
                         isClosable: true,
                         position: "bottom",

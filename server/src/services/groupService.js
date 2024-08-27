@@ -292,7 +292,7 @@ exports.addMember = async (groupId, userIdToAdd, currUserId) => {
         const currUserIsMember = group.members.find(member => member._id.toString() === currUserId);
 
         if (!currUserIsMember) {
-            const error = new Error('За да добавите друг потребител първо трябва да те член на групата!');
+            const error = new Error('За да добавите друг потребител първо трябва да те член на групата! Прегледайте отново групите, в които членувате!');
             error.statusCode = 403;
             throw error;
         }
