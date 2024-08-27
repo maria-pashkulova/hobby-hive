@@ -110,10 +110,8 @@ router.put('/:eventId/markAttendance', getEventForAttendance, async (req, res) =
     const currUserId = req.user._id;
 
     try {
-        await eventService.markAsGoing(currUserId, fetchedEvent);
-        res.status(200).json({
-            message: 'Успешно отбелязахте своето присъствие!'
-        })
+        const response = await eventService.markAsGoing(currUserId, fetchedEvent);
+        res.status(200).json(response);
     } catch (error) {
         res.status(error.statusCode || 500).json({
             message: error.message,

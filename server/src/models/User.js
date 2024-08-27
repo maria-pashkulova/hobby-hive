@@ -29,6 +29,10 @@ const userSchema = new mongoose.Schema({
     groups: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Group'
+    }],
+    attendingEvents: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Event'
     }]
 
 }, { timestamps: true });

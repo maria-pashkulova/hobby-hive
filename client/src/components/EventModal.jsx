@@ -122,6 +122,7 @@ const EventModal = ({ isOpen, onClose, groupId, groupRegionCity, groupActivityTa
             <ModalOverlay />
             <ModalContent
                 maxWidth={{ base: '90vw', md: '80vw', lg: '50vw', xl: '35vw' }}
+                minW={'50vw'}
             >
                 <ModalHeader>{isUpdateAction ? 'Редактиране на събитие' : 'Попълнете данни за събитието'}</ModalHeader>
                 <ModalCloseButton />

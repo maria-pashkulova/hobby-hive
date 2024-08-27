@@ -6,6 +6,7 @@ const DeleteModal = ({ confirmQuestion, additionalDescriptionOne, additionalDesc
             <ModalOverlay />
             <ModalContent
                 maxWidth={{ base: '90vw', md: '80vw', lg: '50vw', xl: '35vw' }}
+                minW={'50vw'}
             >
                 <ModalHeader>Внимание!</ModalHeader>
                 <ModalCloseButton />

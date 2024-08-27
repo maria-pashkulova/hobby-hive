@@ -35,7 +35,7 @@ const GroupMembersModal = ({ isOpen, onClose, groupMembers, groupAdmin, isMember
             handleAddMember(userToAdd);
 
             toast({
-                title: 'Успешно добавихте член на групата',
+                title: 'Успешно добавихте член на групата!',
                 status: "success",
                 duration: 5000,
                 isClosable: true,
@@ -80,6 +80,14 @@ const GroupMembersModal = ({ isOpen, onClose, groupMembers, groupAdmin, isMember
 
             //update group state accordingly - function comes from parent component SingleGroupPage
             handleRemoveMember(memberToRemove);
+
+            toast({
+                title: 'Успешно премахнахте член на групата!',
+                status: "success",
+                duration: 5000,
+                isClosable: true,
+                position: "bottom",
+            });
 
         } catch (error) {
 

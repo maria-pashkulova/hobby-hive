@@ -52,6 +52,3 @@ const ScrollableChat = ({ messages }) => {
 }
 
 export default ScrollableChat
-
-
-// {messages && messages.map((message, index) => <Message key={message._id} sender={message.sender} content={message.content} />)}

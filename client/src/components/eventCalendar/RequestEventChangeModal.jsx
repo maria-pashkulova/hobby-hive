@@ -101,6 +101,7 @@ const RequestEventChangeModal = ({ isOpen, onClose, groupId, eventIdForRequest, 
             <ModalOverlay />
             <ModalContent
                 maxWidth={{ base: '90vw', md: '80vw', lg: '50vw', xl: '35vw' }}
+                minW={'50vw'}
             >
                 <ModalHeader>Заявка за промяна на събитие</ModalHeader>
                 <ModalCloseButton />

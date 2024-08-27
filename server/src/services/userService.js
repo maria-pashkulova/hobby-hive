@@ -227,6 +227,7 @@ exports.updateUser = async (currUserId, userIdToUpdate, firstName, lastName, ema
     }
 }
 
+//My groups page
 exports.getGroupsWithMembership = async (userId, page, limit) => {
 
     const skip = page * limit;
@@ -299,6 +300,31 @@ exports.getGroupsWithMembership = async (userId, page, limit) => {
 
 }
 
+//My calendar
+//Events fully within the range
+//Events starting before the range but ending within it
+//Events starting within the range but ending after it:
+exports.getUserAttendingEventsInRange = async (currUserId, startISO, endISO) => {
+
+    const userWithAttendingEvents = await User.findById(currUserId)
+        .select('attendingEvents')
+        .populate({
+            path: 'attendingEvents',
+            select: '_id title color start end groupId _ownerId',
+            match: {
+                start: { $lt: endISO },
+                end: { $gt: startISO }
+            },
+            populate: {
+                path: 'groupId',
+                select: 'name'
+            } //show group name with events
+        })
+        .lean();
+
+    return userWithAttendingEvents.attendingEvents;
+
+}
 
 async function getAuthResult(user) {
     //create token

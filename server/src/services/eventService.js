@@ -1,43 +1,25 @@
 const Event = require('../models/Event');
 const Group = require('../models/Group');
+const User = require('../models/User');
 const EventChangeRequest = require('../models/EventChangeRequest');
 const { checkForDuplicateTags } = require('../utils/validateGroupData');
 const { validateEventTags, normalizeLocationCoordinates, checkIsFutureEvent } = require('../utils/validateEventData');
 const checkIsObjectEmpty = require('../utils/checkIsObjectEmpty');
 
 
+//Events fully within the range
+//Events starting before the range but ending within it
+//Events starting within the range but ending after it:
 exports.getAllGroupEvents = (groupId, startISO, endISO) => {
 
-    let query = { groupId }
-
-    if (startISO && endISO) {
-        query = {
+    return Event
+        .find({
             groupId,
-            $or: [
-                {
-                    //Events fully within the range
-                    start: { $gte: startISO },
-                    end: { $lte: endISO }
-                },
-                {
-                    //Events starting before the range but ending within it
-                    start: { $lt: startISO },
-                    end: { $gte: startISO }
-                },
-                {
-                    //Events starting within the range but ending after it:
-                    start: { $lte: endISO },
-                    end: { $gt: endISO }
-                }
-            ]
-        }
-    }
-    const events = Event
-        .find(query)
-        .select('_id title color start end groupId _ownerId specificLocation ')
+            start: { $lt: endISO },
+            end: { $gt: startISO }
+        })
+        .select('_id title color start end groupId _ownerId specificLocation')
         .lean();
-
-    return events;
 }
 
 //Used for fetching event details
@@ -87,7 +69,7 @@ exports.getByIdToValidate = (eventId) => {
 exports.getByIdToValidateForAttendance = (eventId) => {
     const event = Event
         .findById(eventId)
-        .select('membersGoing start');
+        .select('membersGoing start end');
 
     return event;
 
@@ -102,44 +84,6 @@ exports.getByIdToValidatePastEventActions = (eventId) => {
 }
 // -------------------------------------
 
-//My calendar functionality
-exports.getUserAttendingEventsInRange = (currUserId, startISO, endISO) => {
-    let query = { membersGoing: currUserId }
-    if (startISO && endISO) {
-        query = {
-            membersGoing: currUserId,
-            $or: [
-                {
-                    //Events fully within the range
-                    start: { $gte: startISO },
-                    end: { $lte: endISO }
-                },
-                {
-                    //Events starting before the range but ending within it
-                    start: { $lt: startISO },
-                    end: { $gte: startISO }
-                },
-                {
-                    //Events starting within the range but ending after it:
-                    start: { $lte: endISO },
-                    end: { $gt: endISO }
-                }
-            ]
-        };
-    }
-
-    const events = Event
-        .find(query)
-        .select('_id title color start end groupId _ownerId')
-        .populate({
-            path: 'groupId',
-            select: 'name'
-        }) //show group name with events
-        .lean();
-
-    return events;
-
-}
 
 exports.create = async (title, color, description, specificLocation, start, end, activityTags, groupId, _ownerId) => {
 
@@ -192,6 +136,12 @@ exports.create = async (title, color, description, specificLocation, start, end,
     }
 
     const newEvent = await Event.create(newEventData);
+
+    //TODO: Transaction
+    //Update the user's attendingEvents array of event creator
+    await User.findByIdAndUpdate(
+        _ownerId,
+        { $push: { attendingEvents: newEvent._id } })
 
     return {
         _id: newEvent._id,
@@ -331,6 +281,13 @@ exports.delete = async (eventIdToDelete, isCurrUserGroupAdmin) => {
     //Delete all requests for change for the deleted event
     await EventChangeRequest.deleteMany({ eventId: eventIdToDelete })
 
+    // Remove id of the deleted event from users' attendingEvents arrays
+    await User.updateMany(
+        { attendingEvents: eventIdToDelete },
+        { $pull: { attendingEvents: eventIdToDelete } }
+    )
+
+
     return {
         eventName: deletedEventInfo.title,
         eventColor: deletedEventInfo.color,
@@ -364,9 +321,38 @@ exports.markAsGoing = async (currUserId, currEvent) => {
         throw error;
     }
 
+    //Get events current user is attending to (Mongoose document)
+    const userWithAttendingEvents = await User
+        .findById(currUserId)
+        .select('attendingEvents');
+
+    //Check if user is marked as going to other events during the same time as current event
+    //(for all groups)
+    const attendingOverlappingEvents = await userWithAttendingEvents.populate({
+        path: 'attendingEvents',
+        select: 'title start end color',
+        match: {
+            start: { $lt: currEvent.end },
+            end: { $gt: currEvent.start }
+        }
+    });
+
+    const response = { conflict: false }
+
+    if (attendingOverlappingEvents.attendingEvents.length > 0) {
+        response.conflict = true;
+        response.overlappingEvents = attendingOverlappingEvents.attendingEvents;
+    }
+
+    //Update the user's attendingEvents array
+    userWithAttendingEvents.attendingEvents.push(currEvent._id);
+    // Proceed to update the event with the user marked as going
     currEvent.membersGoing.push(currUserId);
 
+    await userWithAttendingEvents.save();
     await currEvent.save();
+
+    return response;
 }
 
 exports.markAsAbsent = async (currUserId, currEvent) => {
@@ -385,5 +371,10 @@ exports.markAsAbsent = async (currUserId, currEvent) => {
     currEvent.membersGoing = newMembersGoing;
 
     await currEvent.save();
+
+    //Update the user's attendingEvents array
+    await User.findByIdAndUpdate(
+        currUserId,
+        { $pull: { attendingEvents: currEvent._id } })
 
 }

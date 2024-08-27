@@ -76,7 +76,7 @@ const NotificationsMenuList = () => {
             >
               <Heading as='h3' size='sm'>{notification.notificationAbout}</Heading>
               {notification.eventName && <Text fontStyle={'italic'}>{notification.eventName}</Text>}
-              <Tag p={2} flexShrink='0' variant='outline'>
+              <Tag p={2} variant='outline'>
                 Група: {notification.groupName}
               </Tag>
               {notification.additionalInfo &&

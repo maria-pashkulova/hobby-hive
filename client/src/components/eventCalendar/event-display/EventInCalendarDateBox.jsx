@@ -33,7 +33,7 @@ const EventInCalendarDateBox = ({ event }) => {
             padding={1}
             fontSize={{ base: '14px', md: '16px' }}
             width={'100%'}
-            opacity={isFutureEvent ? 1 : 0.5}
+            opacity={isFutureEvent ? 1 : 0.2}
         >
             <Heading as={'h5'} size={'1em'}>{title}</Heading>
 

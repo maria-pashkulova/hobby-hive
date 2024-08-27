@@ -1,10 +1,12 @@
 const router = require('express').Router();
 
 const userService = require('../services/userService');
-const eventService = require('../services/eventService');
 
 //middlewares
 const auth = require('../middlewares/authenticationMiddleware');
+
+
+//Hobby hive authentication related
 
 router.post('/login', async (req, res) => {
     const { email, password } = req.body;
@@ -74,13 +76,13 @@ router.post('/register', async (req, res) => {
 });
 
 
-//protected route- дори и да направя заявка без куки ппц не гърми и си връща просто response
-//но засега го правя да е protected въпреки че за момента няма разлика дали е protected или не
 router.get('/logout', auth, (req, res) => {
     //TO DO - invalidate token - да се измисли механизъм за инвалидиране на токена
     res.clearCookie(process.env.COOKIE_NAME);
     res.status(204).end();
 });
+
+//TODO: Google API authentication related
 
 
 //users?search=Мария
@@ -136,7 +138,7 @@ router.get('/my-calendar', auth, async (req, res) => {
     const { start, end } = req.query;
 
     try {
-        const userEvents = await eventService.getUserAttendingEventsInRange(currUserId, start, end);
+        const userEvents = await userService.getUserAttendingEventsInRange(currUserId, start, end);
         res.json(userEvents);
 
     } catch (error) {

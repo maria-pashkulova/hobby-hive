@@ -8,12 +8,15 @@ import AuthContext from "../../contexts/authContext";
 import RequestEventChangeModal from "./RequestEventChangeModal";
 import DeleteEventModal from "../DeleteEventModal";
 import UpdateEventModal from "../UpdateEventModal";
+import ConflictModal from "../ConflictModal";
 
 //Attend / Decline attend buttons
 // Event actions : update, delete, request change according to user role in a group
 //Future events are considered events with start date after the current date and time. 
 //Today's events are considered as future or past depending on their start time compared to the current time
 const EventButtons = ({ isCurrUserAttending, groupId, eventId, eventTitle, eventOwner, groupAdmin, groupRegionCity, groupActivityTags, existingEvents, handleAddMemberGoing, handleRemoveMemberGoing, handleRemoveEvent, handleUpdateEvent, isMyCalendar = false, isFutureEvent, currentEventDataForUpdateModal }) => {
+
+    const [conflictEvents, setConflictEvents] = useState([]);
 
     const navigate = useNavigate();
     const { logoutHandler, userId, fullName, email, profilePic } = useContext(AuthContext);
@@ -22,6 +25,7 @@ const EventButtons = ({ isCurrUserAttending, groupId, eventId, eventTitle, event
     const updateEventModal = useDisclosure();
     const deleteEventModal = useDisclosure();
     const requestEventChangeModal = useDisclosure();
+    const conflictEventsModal = useDisclosure();
 
     const [loadingChangeAttendanceStatus, setLoadingChangeAttendanceStatus] = useState(false);
 
@@ -35,7 +39,7 @@ const EventButtons = ({ isCurrUserAttending, groupId, eventId, eventTitle, event
 
         try {
             setLoadingChangeAttendanceStatus(true);
-            const markAttendanceMsg = await eventService.markAttendance(groupId, eventId);
+            const markAttendanceResponse = await eventService.markAttendance(groupId, eventId);
 
             //update members going on event state (only locally for the current user)
             handleAddMemberGoing({
@@ -46,12 +50,17 @@ const EventButtons = ({ isCurrUserAttending, groupId, eventId, eventTitle, event
             })
 
             toast({
-                title: markAttendanceMsg.message,
+                title: 'Успешно отбелязахте своето присъствие!',
                 status: "success",
                 duration: 5000,
                 isClosable: true,
                 position: "bottom",
             });
+
+            if (markAttendanceResponse.conflict) {
+                conflictEventsModal.onOpen();
+                setConflictEvents(markAttendanceResponse.overlappingEvents);
+            }
 
         } catch (error) {
             if (error.status === 401) {
@@ -310,6 +319,19 @@ const EventButtons = ({ isCurrUserAttending, groupId, eventId, eventTitle, event
                     updateLocalStateOnDelete={handleRemoveEvent}
                 />
             }
+
+            {conflictEventsModal.isOpen && <ConflictModal
+                isOpen={conflictEventsModal.isOpen}
+                onClose={conflictEventsModal.onClose}
+                conflictHeading={'Припокриващи се събития!'}
+                conflictDescription={'Заявили сте присъствие за друго/други събития по същото време. Проверете календара си!'}
+                conflictEvents={conflictEvents}
+            />
+            }
+
+
+
+
         </>
 
     )

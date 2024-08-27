@@ -117,6 +117,7 @@ const EventDetailsModal = ({ isOpen, onClose, eventDetailsObj, groupAdmin, group
             <ModalOverlay />
             <ModalContent bg="transparent" boxShadow="none"
                 maxWidth={{ base: '90vw', md: '80vw', '2xl': '50vw' }}
+                minW={'70vw'}
             >
                 <ModalBody>
 
