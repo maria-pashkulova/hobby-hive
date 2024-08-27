@@ -79,6 +79,15 @@ const NotificationsMenuList = () => {
               <Tag p={2} flexShrink='0' variant='outline'>
                 Група: {notification.groupName}
               </Tag>
+              {notification.additionalInfo &&
+                <Text
+                  mt={2}
+                  fontSize={{ base: 'sm', md: 'md' }}
+                  fontWeight='bold'
+                >
+                  {notification.additionalInfo}
+                </Text>
+              }
             </Flex>
 
           </MenuItem>)
@@ -88,7 +97,7 @@ const NotificationsMenuList = () => {
 
       </MenuList>
 
-    </Menu>
+    </Menu >
   )
 }
 

@@ -167,7 +167,8 @@ function setupSocketServer(expressServer) {
                     eventStart: newEventData.start,
                     uniqueIdentifier: `event-${newEventData._id}`, //used only for React unique key
                     type: 'event',
-                    isMemberFromNotification: true
+                    isMemberFromNotification: true,
+                    additionalInfo: 'Добавете го към календара си, като заявите присъствие!'
                 })
 
             });
@@ -188,7 +189,7 @@ function setupSocketServer(expressServer) {
             updatedEventData.membersToNotify.forEach((memberId) => {
 
                 socket.to(memberId).emit('updated event notification', {
-                    notificationAbout: `Редактирано събитие`,
+                    notificationAbout: `Редактирано събитие, за което сте заявили присъствие`,
                     notificationColor: updatedEventData.color,
                     fromGroup: groupInfo._id,
                     groupName: groupInfo.name,
@@ -196,7 +197,8 @@ function setupSocketServer(expressServer) {
                     eventStart: updatedEventData.start,
                     uniqueIdentifier: `event-${updatedEventData._id}-update`,
                     type: 'event',
-                    isMemberFromNotification: true
+                    isMemberFromNotification: true,
+                    additionalInfo: 'Промените ще бъдат отразени и във Вашия календар!'
                 })
 
             })
@@ -219,7 +221,7 @@ function setupSocketServer(expressServer) {
                 //Edge case - user has left a group, but is marked as going to a group event
 
                 socket.to(memberId).emit('deleted event notification', {
-                    notificationAbout: `Премахнато събитие`,
+                    notificationAbout: 'Премахнато събитие, за което сте заявили присъствие',
                     notificationColor: eventColor,
                     fromGroup: groupId,
                     groupName: groupName,
@@ -227,7 +229,8 @@ function setupSocketServer(expressServer) {
                     eventStart: eventStart,
                     uniqueIdentifier: `event-${eventId}-delete`,
                     type: 'event',
-                    isMemberFromNotification: true
+                    isMemberFromNotification: true,
+                    additionalInfo: 'Събитието ще бъде изтрито от Вашия календар!'
                 })
 
 
