@@ -54,7 +54,7 @@ function setupSocketServer(expressServer) {
             //Create a room with the id of the group
             //when a user click on Group chat this should create a new room with that particular
             //user and other user as well. When other users join it is going to add them to this room
-            socket.join(groupId);
+            socket.join(`chat-${groupId}`);
 
             console.log(`Socket ${socket.id} went to Group chat for group: ${groupId}`);
         })
@@ -64,7 +64,7 @@ function setupSocketServer(expressServer) {
         socket.on('leave group chat', (groupId) => {
 
             socket.currentGroupChat = null;
-            socket.leave(groupId);
+            socket.leave(`chat-${groupId}`);
             console.log(`Socket ${socket.id} left Group chat: ${groupId}`);
         })
 
@@ -72,14 +72,12 @@ function setupSocketServer(expressServer) {
         socket.on('new message', (newMessageReceived) => {
             const groupInfo = newMessageReceived.groupId;
 
-            // Send the new message to users currently viewing the chat (except the user who has sent the message)
-            //default socket.to() behaviour (room-based event emission)
-
-            socket.to(groupInfo._id).emit('message received', newMessageReceived);
-
             // Notify individual group members who are logged in
             //and are not currently viewing group chat page
             groupInfo.members.forEach((member) => {
+
+                //additional check for message sender (for multiple tabs open case)
+
                 if (member._id !== newMessageReceived.sender._id) {
 
                     //Determine conncection status: it identifies if the member is connected to the server
@@ -109,6 +107,11 @@ function setupSocketServer(expressServer) {
                 }
             });
 
+            // Send the new message to users currently viewing the chat (except the user who has sent the message)
+            //default socket.to() behaviour (room-based event emission)
+
+            socket.to(`chat-${groupInfo._id}`).emit('message received', newMessageReceived);
+
         });
 
         //Handle Group posts
@@ -125,7 +128,7 @@ function setupSocketServer(expressServer) {
         //ON CREATE POST
         socket.on('new group post created', (groupId) => {
             //notify all sockets currently viewing group posts (except the owner of the post) so UI refresh is triggered
-            //socket.to(...) excludes the user who created the post by default; default socket.to() behaviour (room-based event emission)
+            //socket.to(...) excludes the user who created the post by default (using socket.id for socket which has emmited 'new group post created' event); default socket.to() behaviour (room-based event emission)
             socket.to(`posts-${groupId}`).emit('update group posts');
 
         })
@@ -154,27 +157,33 @@ function setupSocketServer(expressServer) {
 
             //Notify individual group members which are logged in
             //for the new event - no matter if they are currently viewing the group event calendar or not (in which the new event was created by another user)
-            //exclude the creator of the event - default socket.to() behaviour (room-based event emission)
+            //exclude the creator of the event - default socket.to() behaviour (room-based event emission) + additional check for event owner (for multiple tabs open case)
 
             groupInfo.members.forEach((member) => {
 
-                socket.to(member._id).emit('new event notification', {
-                    notificationAbout: 'Ново събитие',
-                    notificationColor: newEventData.color,
-                    fromGroup: groupInfo._id,
-                    groupName: groupInfo.name,
-                    eventName: newEventData.title,
-                    eventStart: newEventData.start,
-                    uniqueIdentifier: `event-${newEventData._id}`, //used only for React unique key
-                    type: 'event',
-                    isMemberFromNotification: true,
-                    additionalInfo: 'Добавете го към календара си, като заявите присъствие!'
-                })
+                // Skip sending a notification to the user who created the event (for multiple tabs open case)
+                if (member._id !== newEventData._ownerId) {
+
+                    socket.to(member._id).emit('new event notification', {
+                        notificationAbout: 'Ново събитие',
+                        notificationColor: newEventData.color,
+                        fromGroup: groupInfo._id,
+                        groupName: groupInfo.name,
+                        eventName: newEventData.title,
+                        eventStart: newEventData.start,
+                        uniqueIdentifier: `event-${newEventData._id}`, //used only for React unique key
+                        type: 'event',
+                        isMemberFromNotification: true,
+                        additionalInfo: 'Добавете го към календара си, като заявите присъствие!'
+                    })
+                }
+
+
 
             });
 
             // Send the new event data to users currently viewing the group event calendar(in which the new event was created by another user)
-            //socket.to(...) excludes the user who created the event
+            //socket.to(...) excludes the user who created the event, but sends new event if the same user opened other tabs
             socket.to(`events-${groupInfo._id}`).emit('add new event to calendar', newEventData);
 
         });
@@ -209,35 +218,35 @@ function setupSocketServer(expressServer) {
         })
 
         //ON DELETE EVENT
-        socket.on('group event deleted', ({ groupId, eventId, eventName, eventColor, eventStart, groupName, membersToNotify }) => {
+        socket.on('group event deleted', ({ groupId, eventId, eventName, eventColor, eventStart, groupName, groupAdmin, membersToNotify }) => {
 
             //Notify individual group members who are logged in 
             //who were marked as going (even if they has left the group / has been removed from group)
-            //except group admin - default socket.to() behaviour (room-based event emission)
+            //except group admin - default socket.to() behaviour (room-based event emission) + additional check for group admin (for multiple tabs open case)
 
             membersToNotify.forEach((memberId) => {
+                if (memberId !== groupAdmin) {
+                    //All attendees are considered group members (used in ProtectedRouteMembers)
+                    //Edge case - user has left a group, but is marked as going to a group event
 
-                //All attendees are considered group members (used in ProtectedRouteMembers)
-                //Edge case - user has left a group, but is marked as going to a group event
-
-                socket.to(memberId).emit('deleted event notification', {
-                    notificationAbout: 'Премахнато събитие, за което сте заявили присъствие',
-                    notificationColor: eventColor,
-                    fromGroup: groupId,
-                    groupName: groupName,
-                    eventName: eventName,
-                    eventStart: eventStart,
-                    uniqueIdentifier: `event-${eventId}-delete`,
-                    type: 'event',
-                    isMemberFromNotification: true,
-                    additionalInfo: 'Събитието ще бъде изтрито от Вашия календар!'
-                })
-
+                    socket.to(memberId).emit('deleted event notification', {
+                        notificationAbout: 'Премахнато събитие, за което сте заявили присъствие',
+                        notificationColor: eventColor,
+                        fromGroup: groupId,
+                        groupName: groupName,
+                        eventName: eventName,
+                        eventStart: eventStart,
+                        uniqueIdentifier: `event-${eventId}-delete`,
+                        type: 'event',
+                        isMemberFromNotification: true,
+                        additionalInfo: 'Събитието ще бъде изтрито от Вашия календар!'
+                    })
+                }
 
             })
 
             //Update group events for members currently viewing group calendar
-            //socket.to(...) excludes the user who deleted the event a.k.a group administrator
+            //socket.to(...) excludes the user who deleted the event a.k.a group administrator, but refereshes UI if group admin opened other tabs
             socket.to(`events-${groupId}`).emit('delete event from calendar', eventId);
 
         })

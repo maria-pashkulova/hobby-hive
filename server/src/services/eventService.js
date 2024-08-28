@@ -131,17 +131,10 @@ exports.create = async (title, color, description, specificLocation, start, end,
         end,
         activityTags,
         groupId,
-        _ownerId,
-        membersGoing: [_ownerId] // Add the event creator to membersGoing by default upon event creation
+        _ownerId
     }
 
     const newEvent = await Event.create(newEventData);
-
-    //TODO: Transaction
-    //Update the user's attendingEvents array of event creator
-    await User.findByIdAndUpdate(
-        _ownerId,
-        { $push: { attendingEvents: newEvent._id } })
 
     return {
         _id: newEvent._id,
@@ -276,7 +269,7 @@ exports.delete = async (eventIdToDelete, isCurrUserGroupAdmin) => {
     const deletedEventInfo = await Event
         .findByIdAndDelete(eventIdToDelete)
         .select('title start color membersGoing groupId')
-        .populate('groupId', 'name');
+        .populate('groupId', 'groupAdmin name');
 
     //Delete all requests for change for the deleted event
     await EventChangeRequest.deleteMany({ eventId: eventIdToDelete })
@@ -293,6 +286,7 @@ exports.delete = async (eventIdToDelete, isCurrUserGroupAdmin) => {
         eventColor: deletedEventInfo.color,
         eventStart: deletedEventInfo.start,
         groupName: deletedEventInfo.groupId.name,
+        groupAdmin: deletedEventInfo.groupId.groupAdmin,
         membersToNotify: deletedEventInfo.membersGoing
     }
 }

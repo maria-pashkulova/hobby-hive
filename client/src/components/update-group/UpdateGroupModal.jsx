@@ -60,7 +60,7 @@ const UpdateGroupModal = ({ isOpen, onClose, groupIdToUpdate, name, category, lo
 
             onClose();
             toast({
-                title: "Успешна редакция!",
+                title: "Успешно актуализирахте основната информация за групата!",
                 status: "success",
                 duration: 5000,
                 isClosable: true,

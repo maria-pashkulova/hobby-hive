@@ -54,7 +54,8 @@ const eventSchema = new mongoose.Schema({
     },
     membersGoing: [{
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'User'
+        ref: 'User',
+        default: []
     }]
 
 }, { timestamps: true });
