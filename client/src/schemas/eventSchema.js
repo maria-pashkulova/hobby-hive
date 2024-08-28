@@ -6,9 +6,9 @@ import normalizeRegionName from "../utils/normalizeRegionName";
 
 const MINIMUM_EVENT_DURATION_MINUTES = 30;
 
-export const eventSchema = (groupRegionCity) => yup.object().shape({
+export const eventSchema = (groupRegionCity, isUpdateAction) => yup.object().shape({
     [EventKeys.Title]: yup.string().trim().required('Името на събитието е задължително!'),
-    [EventKeys.Description]: yup.string().trim().required('Опишете дейността на събитието!').max(300, 'Описанието е твърде дълго!'),
+    [EventKeys.Description]: yup.string().trim().required('Опишете дейността на събитието!').max(500, 'Описанието е твърде дълго!'),
     [EventKeys.StartDateTime]: yup
         .date()
         .required('Въведете валидни начална дата и час') //invalid month duration case is also handled; invalid year and date case is also handled
@@ -17,6 +17,10 @@ export const eventSchema = (groupRegionCity) => yup.object().shape({
             'validate-time',
             'Часът на събитието трябва да бъде поне 2 часа след текущия час!',
             (startDateTime) => {
+
+                if (isUpdateAction) {
+                    return true;
+                }
                 // Get the current time
                 const now = new Date();
 

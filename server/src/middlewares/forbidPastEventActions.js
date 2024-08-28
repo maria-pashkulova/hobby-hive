@@ -7,7 +7,7 @@ const forbidPastEventActions = async (req, res, next) => {
     const eventWithStartDate = await eventService.getByIdToValidatePastEventActions(eventId);
 
     if (!checkIsFutureEvent(eventWithStartDate.start)) {
-        return res.status(400).json({ message: 'Датата на провеждане на събитието е минала! Заявеното действие е не е възможно!' });
+        return res.status(400).json({ message: 'Събитието е вече започнало или е минало! Заявеното действие е не е възможно!' });
     }
 
     next();

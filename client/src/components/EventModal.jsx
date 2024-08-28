@@ -137,7 +137,7 @@ const EventModal = ({ isOpen, onClose, groupId, groupRegionCity, groupActivityTa
                         [EventKeys.SpecificLocation]: currentEventData?.[EventKeys.SpecificLocation] || {},
                         [EventKeys.ActivityTags]: currentEventData?.[EventKeys.ActivityTags] || []
                     }}
-                    validationSchema={eventSchema(groupRegionCity)}
+                    validationSchema={eventSchema(groupRegionCity, isUpdateAction)}
                     onSubmit={handleFormSubmit}
                 >
                     {({ isSubmitting, values, setFieldValue }) => (

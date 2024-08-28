@@ -35,15 +35,18 @@ export const createEvent = (groupId, { title, color, description, specificLocati
 export const updateEvent = (groupId, eventId, { title, color, description, specificLocation, start, end, activityTags }) => {
 
     return request.put(`${baseUrl}/${groupId}/events/${eventId}`,
-        {
-            title,
-            color,
-            description,
-            specificLocation,
-            start: convertLocalToUtc(start),
-            end: convertLocalToUtc(end),
-            activityTags
-        });
+        trimInputValues(
+            {
+                title,
+                color,
+                description,
+                specificLocation,
+                start: convertLocalToUtc(start),
+                end: convertLocalToUtc(end),
+                activityTags
+            }
+        )
+    );
 }
 
 export const deleteEvent = (groupId, eventId) => request.remove(`${baseUrl}/${groupId}/events/${eventId}`);

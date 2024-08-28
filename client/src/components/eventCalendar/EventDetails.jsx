@@ -88,7 +88,9 @@ const EventDetails = ({ event, isCurrUserAttending, groupAdmin, groupRegionCity,
                     lineHeight='24px'
                     pe='40px'
                     fontWeight='500'
-                    mb='auto'>
+                    mb='auto'
+                    whiteSpace="pre-wrap" // display new lines if any
+                >
                     {description}
                 </Text>
                 {/* event time, location and members going, go to group calendar */}

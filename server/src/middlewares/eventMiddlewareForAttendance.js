@@ -16,7 +16,7 @@ const getEventForAttendance = async (req, res, next) => {
     }
 
     if (!checkIsFutureEvent(event.start)) {
-        return res.status(400).json({ message: 'Датата на провеждане на събитието е минала! Не можете да променяте статуса за присъствие!' });
+        return res.status(400).json({ message: 'Събитието е вече започнало или е минало! Не можете да променяте статуса за присъствие!' });
     }
 
     req.event = event;
