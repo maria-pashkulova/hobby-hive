@@ -191,29 +191,35 @@ function setupSocketServer(expressServer) {
         //ON UPDATE EVENT
         socket.on('updated event', (updatedEventData) => {
             const groupInfo = updatedEventData.groupId;
+            const groupAdminOrOwnerId = updatedEventData.groupAdminOrOwnerId;
 
             //Notify individual group members who are logged in (connected to a room)
             //who were marked as going (even if they has left the group / has been removed from group)
-            //except group admin / event owner depending on who updated it - default socket.to() behaviour (room-based event emission)
+            //except group admin / event owner depending on who updated it + additional check for multiple tabs opened case           
             updatedEventData.membersToNotify.forEach((memberId) => {
 
-                socket.to(memberId).emit('updated event notification', {
-                    notificationAbout: `Редактирано събитие, за което сте заявили присъствие`,
-                    notificationColor: updatedEventData.color,
-                    fromGroup: groupInfo._id,
-                    groupName: groupInfo.name,
-                    eventName: updatedEventData.title,
-                    eventStart: updatedEventData.start,
-                    uniqueIdentifier: `event-${updatedEventData._id}-update`,
-                    type: 'event',
-                    isMemberFromNotification: true,
-                    additionalInfo: 'Промените ще бъдат отразени и във Вашия календар!'
-                })
+                //if group admin or event owner are marked as going
+                //if group admin edits an event , owner gets notified too and vice versa
+                if (memberId !== groupAdminOrOwnerId) {
+                    socket.to(memberId).emit('updated event notification', {
+                        notificationAbout: `Редактирано събитие, за което сте заявили присъствие`,
+                        notificationColor: updatedEventData.color,
+                        fromGroup: groupInfo._id,
+                        groupName: groupInfo.name,
+                        eventName: updatedEventData.title,
+                        eventStart: updatedEventData.start,
+                        uniqueIdentifier: `event-${updatedEventData._id}-update-${Date.now()}`,
+                        type: 'event',
+                        isMemberFromNotification: true,
+                        additionalInfo: 'Промените ще бъдат отразени и във Вашия календар!'
+                    })
+                }
 
             })
 
             //Update group events for members currently viewing group calendar
             //socket.to(...) excludes the user who updated the event a.k.a group administrator or event owner (room-based event emission)
+            //but updates UI if other tabs are opened
             socket.to(`events-${groupInfo._id}`).emit('update existing event in calendar', updatedEventData);
         })
 

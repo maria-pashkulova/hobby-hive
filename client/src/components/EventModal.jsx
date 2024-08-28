@@ -29,7 +29,7 @@ const EventModal = ({ isOpen, onClose, groupId, groupRegionCity, groupActivityTa
 
     const toast = useToast();
     const navigate = useNavigate();
-    const { logoutHandler, socket } = useContext(AuthContext);
+    const { userId, logoutHandler, socket } = useContext(AuthContext);
 
 
     //Controlled and validated form using Formik and Yup
@@ -57,7 +57,7 @@ const EventModal = ({ isOpen, onClose, groupId, groupRegionCity, groupActivityTa
             let event;
             if (isUpdateAction) {
                 event = await eventService.updateEvent(groupId, currentEventData._id, formValues);
-                socket.emit('updated event', event);
+                socket.emit('updated event', { groupAdminOrOwnerId: userId, ...event });
             } else {
                 event = await eventService.createEvent(groupId, formValues);
                 //notify other group members for new event
