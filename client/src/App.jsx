@@ -1,5 +1,7 @@
 import { Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './contexts/authContext.jsx';
+import { GoogleOAuthProvider } from '@react-oauth/google';
+import { CLIENT_ID } from './constants/google-calendar.js';
 
 import './App.css'
 
@@ -28,36 +30,37 @@ function App() {
 
   return (
     <AuthProvider>
-      <div className='App'>
-        <Routes>
-          {/* initial default path is /, AuthLayout is rendered and user is redirected to GuestLayout */}
-          <Route element={<AuthLayout />}>
-            <Route path='/' element={<GroupsPage />} />
-            <Route path='/my-groups' element={<MyGroupsPage />} />
-            <Route path='/my-calendar' element={<MyCalendarPage />} />
-            <Route path='/update-profile' element={<UpdateProfilePage />} />
-            <Route path='/groups/:groupId' element={<SingleGroupPage />} >
-              <Route index element={<GroupPosts />} />
-              <Route element={<ProtectedRouteMembers />}>
-                <Route path='my-posts' element={<MyGroupPosts />} />
-                <Route path='events' element={<GroupEvents />} />
-                <Route path='chat' element={<GroupChat />} />
+      <GoogleOAuthProvider clientId={CLIENT_ID}>
+        <div className='App'>
+          <Routes>
+            {/* initial default path is /, AuthLayout is rendered and user is redirected to GuestLayout */}
+            <Route element={<AuthLayout />}>
+              <Route path='/' element={<GroupsPage />} />
+              <Route path='/my-groups' element={<MyGroupsPage />} />
+              <Route path='/my-calendar' element={<MyCalendarPage />} />
+              <Route path='/update-profile' element={<UpdateProfilePage />} />
+              <Route path='/groups/:groupId' element={<SingleGroupPage />} >
+                <Route index element={<GroupPosts />} />
+                <Route element={<ProtectedRouteMembers />}>
+                  <Route path='my-posts' element={<MyGroupPosts />} />
+                  <Route path='events' element={<GroupEvents />} />
+                  <Route path='chat' element={<GroupChat />} />
+                </Route>
+                <Route element={<ProtectedRouteAdmin />}>
+                  <Route path='event-change-requests' element={<GroupEventChangeRequests />} />
+                </Route>
               </Route>
-              <Route element={<ProtectedRouteAdmin />}>
-                <Route path='event-change-requests' element={<GroupEventChangeRequests />} />
-              </Route>
+              <Route path={'/logout'} element={<Logout />} />
+            </Route >
+            <Route element={<GuestLayout />}>
+              <Route path='/login' element={<Login />} />
+              <Route path='/register' element={<Register />} />
             </Route>
-            <Route path={'/logout'} element={<Logout />} />
-          </Route >
-          <Route element={<GuestLayout />}>
-            <Route path='/login' element={<Login />} />
-            <Route path='/register' element={<Register />} />
-          </Route>
-          <Route path='*' element={<NotFoundPage />} />
-        </Routes >
+            <Route path='*' element={<NotFoundPage />} />
+          </Routes >
 
-      </div>
-
+        </div>
+      </GoogleOAuthProvider>
     </AuthProvider>
   )
 }
