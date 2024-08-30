@@ -2,7 +2,7 @@ const { isBefore } = require('date-fns');
 
 
 exports.checkIsFutureEvent = (eventStartDate) => {
-    const eventStart = new Date(eventStartDate);
+    const eventStart = new Date(eventStartDate); //event start date is converted to local time of the server (if it was in utc before)
     const todayDate = new Date();
 
     /*isBefore includes both date and time in comparison

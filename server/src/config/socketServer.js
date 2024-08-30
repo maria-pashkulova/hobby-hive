@@ -206,7 +206,7 @@ function setupSocketServer(expressServer) {
                         notificationColor: updatedEventData.color,
                         fromGroup: groupInfo._id,
                         groupName: groupInfo.name,
-                        eventName: updatedEventData.title,
+                        eventName: updatedEventData.previousTitleChange ? `${updatedEventData.previousTitleChange} с ново име: ${updatedEventData.title}` : updatedEventData.title, // if event name changed, display both previous and new event name
                         eventStart: updatedEventData.start,
                         uniqueIdentifier: `event-${updatedEventData._id}-update-${Date.now()}`,
                         type: 'event',

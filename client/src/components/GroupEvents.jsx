@@ -121,11 +121,12 @@ const GroupEvents = () => {
             if (updatedIndex !== -1) {
 
                 //Unify updatedEvent with other events format (because groupId field of updatedEvent is populated because of notifications)
-                //Extract groupId from the updated event and override it in updatedEventWithGroupIdOnly object
                 //Exclude membersToNotify field
+                //Exclude previousTitleChanged field (used for notifications)
+                //Extract groupId from the updated event and override it in updatedEventWithGroupIdOnly object
                 const { _id: groupId } = updatedEvent.groupId;
-                const { membersToNotify, ...updatedEventWithoutMembersToNotify } = updatedEvent;
-                const updatedEventWithGroupIdOnly = { ...updatedEventWithoutMembersToNotify, groupId };
+                const { membersToNotify, previousTitleChange, ...updatedEventWithoutMembersToNotifyAndPrevTitle } = updatedEvent;
+                const updatedEventWithGroupIdOnly = { ...updatedEventWithoutMembersToNotifyAndPrevTitle, groupId };
 
                 //Create new array wih the updated event (new reference for state of reference type )
                 const newGroupEvents = [...prevGroupEvents];

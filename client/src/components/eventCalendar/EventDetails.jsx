@@ -1,11 +1,15 @@
-import { Avatar, AvatarGroup, Badge, Box, Circle, Flex, HStack, Icon, IconButton, Tag, Text, Tooltip, useBreakpointValue, useDisclosure } from '@chakra-ui/react';
-import React from 'react'
-import { FiCalendar, FiUsers, FiMapPin } from "react-icons/fi";
+import { Avatar, AvatarGroup, Badge, Box, Circle, Flex, HStack, Icon, IconButton, Tag, Text, Tooltip, useBreakpointValue, useDisclosure, useToast } from '@chakra-ui/react';
+import React, { useContext, useState } from 'react'
+import { FiCalendar, FiUsers, FiMapPin, FiRefreshCw } from "react-icons/fi";
+import { SiGooglecalendar } from "react-icons/si";
 import { formatEventTime } from '../../utils/formatEventDisplay';
 import EventButtons from './EventButtons';
 import MembersGoingModal from './MembersGoingModal';
 import { checkIsFutureEvent } from '../../utils/checkEventData';
 import { Link } from 'react-router-dom';
+import { addToCalendar } from '../../services/googleCalendarService';
+import ConflictModal from '../ConflictModal';
+import AuthContext from '../../contexts/authContext';
 
 const EventDetails = ({ event, isCurrUserAttending, groupAdmin, groupRegionCity, groupActivityTags, existingEvents, handleAddMemberGoing, handleRemoveMemberGoing, handleRemoveEvent, handleUpdateEvent, isMyCalendar }) => {
 
@@ -14,10 +18,49 @@ const EventDetails = ({ event, isCurrUserAttending, groupAdmin, groupRegionCity,
 
     //activityTags ->  for current event
     const { _id, title, color, start, end, description, specificLocation, activityTags, membersGoing, groupId, _ownerId } = event;
+    const [conflictEvents, setConflictEvents] = useState([]);
 
 
     const membersGoingModal = useDisclosure();
-    const goToGroupTooltipPlacement = useBreakpointValue({ base: 'right-start', md: 'bottom-end' });
+    const conflictEventsModal = useDisclosure();
+
+    const tooltipPlacement = useBreakpointValue({ base: 'right-start', md: 'bottom-end' });
+    const toast = useToast();
+    const { userId, logoutHandler } = useContext(AuthContext);
+
+
+    const handleSaveToGoogleCalendar = async () => {
+        try {
+            const response = await addToCalendar(event);
+
+            toast({
+                title: 'Успешно актуализирахте своя Гугъл календар!',
+                status: "success",
+                duration: 5000,
+                isClosable: true,
+                position: "bottom",
+            });
+            if (response.conflict) {
+                conflictEventsModal.onOpen();
+                setConflictEvents(response.overlappingEvents);
+            }
+
+
+        } catch (error) {
+            if (error.status === 401) {
+                logoutHandler(); //invalid or missing token 
+                navigate('/login');
+            } else {
+                toast({
+                    title: error.message,
+                    status: "error",
+                    duration: 5000,
+                    isClosable: true,
+                    position: "bottom",
+                });
+            } //TODO: handle missing invalid/token -> redirect to my calendar to authorize again
+        }
+    }
 
     return (
         <Flex
@@ -27,8 +70,9 @@ const EventDetails = ({ event, isCurrUserAttending, groupAdmin, groupRegionCity,
             <Box p='20px'>
                 <Flex
                     w='100%'
-                    mb='10px'
-                    justifyContent={'space-between'}>
+                    mb={2}
+                    justifyContent={'space-between'}
+                >
                     <Flex
                         gap={2}
                         alignItems={'center'}
@@ -41,7 +85,6 @@ const EventDetails = ({ event, isCurrUserAttending, groupAdmin, groupRegionCity,
                         </Text>
                     </Flex>
 
-
                     {/* Event buttons for larger screens */}
                     <Flex
                         display={{ base: 'none', md: 'flex' }}
@@ -51,7 +94,7 @@ const EventDetails = ({ event, isCurrUserAttending, groupAdmin, groupRegionCity,
                             groupId={groupId}
                             eventId={_id}
                             eventTitle={title}
-                            eventOwner={_ownerId}
+                            eventOwner={_ownerId._id} //event owner is populated to get its name and display it
                             groupAdmin={groupAdmin}
                             groupRegionCity={groupRegionCity}
                             groupActivityTags={groupActivityTags}
@@ -66,14 +109,20 @@ const EventDetails = ({ event, isCurrUserAttending, groupAdmin, groupRegionCity,
                         />
                     </Flex>
                 </Flex>
+
                 <HStack wrap='wrap' spacing='3'>
                     {activityTags?.map((tag) => (
                         <Tag key={tag} variant='outline'>
                             {tag}
                         </Tag>
                     ))}
-
                 </HStack>
+                {userId !== _ownerId._id &&
+                    <Badge mt={3} p={1} fontSize='0.7em' colorScheme='blue'>
+                        Предложено от: {_ownerId.fullName}
+                    </Badge>
+                }
+
             </Box >
             <Flex
                 w='100%'
@@ -147,7 +196,7 @@ const EventDetails = ({ event, isCurrUserAttending, groupAdmin, groupRegionCity,
 
                     {/* My calendar page - go to group button */}
                     {isMyCalendar &&
-                        <Tooltip label='Прегледай груповия календар' placement={goToGroupTooltipPlacement}>
+                        <Tooltip label='Прегледай груповия календар' placement={tooltipPlacement}>
                             <IconButton
                                 icon={<FiUsers />}
                                 fontSize='1em'
@@ -160,6 +209,15 @@ const EventDetails = ({ event, isCurrUserAttending, groupAdmin, groupRegionCity,
                         </Tooltip>
                     }
 
+                    <Tooltip label='Добави / Презапиши в Гугъл календар' placement={tooltipPlacement}>
+                        <IconButton
+                            icon={<SiGooglecalendar />}
+                            fontSize='1.5em'
+                            isDisabled={!checkIsFutureEvent(start)}
+                            onClick={handleSaveToGoogleCalendar}
+                        />
+                    </Tooltip>
+
                 </Flex>
 
                 {/* Event buttons for smaller screens */}
@@ -171,7 +229,7 @@ const EventDetails = ({ event, isCurrUserAttending, groupAdmin, groupRegionCity,
                         groupId={groupId}
                         eventId={_id}
                         eventTitle={title}
-                        eventOwner={_ownerId}
+                        eventOwner={_ownerId._id} //event owner is populated to get its name and display it
                         groupAdmin={groupAdmin}
                         groupRegionCity={groupRegionCity}
                         groupActivityTags={groupActivityTags}
@@ -193,6 +251,16 @@ const EventDetails = ({ event, isCurrUserAttending, groupAdmin, groupRegionCity,
                 onClose={membersGoingModal.onClose}
                 membersGoing={membersGoing}
             />}
+
+            {conflictEventsModal.isOpen && <ConflictModal
+                isOpen={conflictEventsModal.isOpen}
+                onClose={conflictEventsModal.onClose}
+                conflictHeading={'Припокриващи се събития!'}
+                conflictDescription={'Отбелязали сте други събития в по същото време в Гугъл календара си. Уверете се, че можете да присъствате на събитието от Хоби Кошер!'}
+                conflictEvents={conflictEvents}
+                isGoogleCalendarConflict={true}
+            />
+            }
         </Flex >
     );
 

@@ -72,7 +72,7 @@ const NotificationsMenuList = () => {
               borderLeftRadius={3}
               borderColor={notification.notificationColor || 'blue.300'}
               gap={2}
-              alignItems={'flex-start'} // so flex items won't stretch to fill flex container which is the default
+              alignItems={'flex-start'} // so flex items won't stretch to fill flex container which is the default (stretch)
             >
               <Heading as='h3' size='sm'>{notification.notificationAbout}</Heading>
               {notification.eventName && <Text fontStyle={'italic'}>{notification.eventName}</Text>}

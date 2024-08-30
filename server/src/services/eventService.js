@@ -33,7 +33,6 @@ exports.getByIdWithMembers = async (event) => {
             select: 'firstName lastName email profilePic'
         });
 
-    //populate requests for event change here
 
     return eventWithMembers;
 
@@ -61,6 +60,7 @@ exports.getByIdToValidate = (eventId) => {
     const event = Event
         .findById(eventId)
         .select('title color start end description specificLocation activityTags membersGoing groupId _ownerId')
+        .populate('_ownerId', 'firstName lastName');
 
     return event;
 }
@@ -167,7 +167,8 @@ exports.update = async (eventIdToUpdate, existingEvent, newEventData, groupId, c
         throw error;
     }
 
-    if ((existingEvent._ownerId.toString() !== currUserId && !isCurrUserGroupAdmin)) {
+    //OwnerId is populated when fetched from getEvent middleware
+    if ((existingEvent._ownerId._id.toString() !== currUserId && !isCurrUserGroupAdmin)) {
         const error = new Error('Само администраторът на групата и потребителят, създал събитието могат да го редактират!');
         error.statusCode = 403;
         throw error;
@@ -223,6 +224,10 @@ exports.update = async (eventIdToUpdate, existingEvent, newEventData, groupId, c
         }
     }
 
+    //check if existing event title is has changed and if so return it in the response for notifications
+    const previousTitleChange = existingEvent.title !== title ? existingEvent.title : '';
+
+
     existingEvent.title = title;
     existingEvent.color = color;
     existingEvent.description = description;
@@ -233,8 +238,10 @@ exports.update = async (eventIdToUpdate, existingEvent, newEventData, groupId, c
 
     //membersGoing, groupId and ownerId are left unchanged
 
+
     //Save changes
     const updatedEvent = await existingEvent.save();
+
 
     return {
         _id: updatedEvent._id,
@@ -250,7 +257,8 @@ exports.update = async (eventIdToUpdate, existingEvent, newEventData, groupId, c
             name: group.name
         },
         //used for notifications only
-        membersToNotify: updatedEvent.membersGoing
+        membersToNotify: updatedEvent.membersGoing,
+        previousTitleChange
     }
 
 }
