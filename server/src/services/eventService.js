@@ -91,7 +91,7 @@ exports.create = async (title, color, description, specificLocation, start, end,
     const existingEventWithSameColor = await Event.findOne({ color, groupId });
     if (!!existingEventWithSameColor) {
         const error = new Error('В груповия календар съществува събитие, обозначено с посочения цвят. Изберете друг цвят!');
-        error.statusCode = 400;
+        error.statusCode = 409;
         throw error;
     }
 
@@ -178,7 +178,7 @@ exports.update = async (eventIdToUpdate, existingEvent, newEventData, groupId, c
     const existingEventWithSameColor = await Event.findOne({ _id: { $ne: eventIdToUpdate }, color, groupId });
     if (!!existingEventWithSameColor) {
         const error = new Error('В груповия календар съществува събитие, обозначено с посочения цвят. Изберете друг цвят!');
-        error.statusCode = 400;
+        error.statusCode = 409;
         throw error;
     }
 

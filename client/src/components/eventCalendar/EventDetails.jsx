@@ -1,6 +1,6 @@
 import { Avatar, AvatarGroup, Badge, Box, Circle, Flex, HStack, Icon, IconButton, Tag, Text, Tooltip, useBreakpointValue, useDisclosure, useToast } from '@chakra-ui/react';
 import React, { useContext, useState } from 'react'
-import { FiCalendar, FiUsers, FiMapPin, FiRefreshCw } from "react-icons/fi";
+import { FiCalendar, FiUsers, FiMapPin } from "react-icons/fi";
 import { SiGooglecalendar } from "react-icons/si";
 import { formatEventTime } from '../../utils/formatEventDisplay';
 import EventButtons from './EventButtons';
@@ -43,6 +43,7 @@ const EventDetails = ({ event, isCurrUserAttending, groupAdmin, groupRegionCity,
                 isClosable: true,
                 position: "bottom",
             });
+
             if (response.conflict) {
                 conflictEventsModal.onOpen();
                 setConflictEvents(response.overlappingEvents);
@@ -60,7 +61,7 @@ const EventDetails = ({ event, isCurrUserAttending, groupAdmin, groupRegionCity,
                     navigate('/my-calendar');
                 }
                 toast({
-                    title: 'Позволете достъп до календара си!',
+                    // title: 'Позволете достъп до календара си!',
                     description: error.message,
                     status: "info",
                     duration: 10000,

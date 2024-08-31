@@ -92,18 +92,15 @@ exports.saveEventInGoogleCalendar = async (userId, { _id, summary, description, 
 
     if (eventExists) {
 
-        try {
-            // Update the existing event, whether its status was confirmed or cancelled (if it was soft deleted, still in trash bin, it will be restored)
-            await calendar.events.update({
-                calendarId: 'primary',
-                eventId: _id,
-                requestBody
-            });
 
-        } catch (error) {
+        // Update the existing event, if its status was confirmed or cancelled (if it was soft deleted, still in trash bin, it will be restored)
+        await calendar.events.update({
+            calendarId: 'primary',
+            eventId: _id,
+            requestBody
+        });
 
-            throw error;
-        }
+
 
     } else {
         //Create a new event in user's Google calendar

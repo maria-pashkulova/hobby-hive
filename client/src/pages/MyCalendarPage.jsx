@@ -1,4 +1,4 @@
-import { Box, Button, Heading, Text, useToast } from '@chakra-ui/react'
+import { Box, Button, Heading, Text, Tooltip, useToast } from '@chakra-ui/react'
 import { FcGoogle } from 'react-icons/fc';
 import React from 'react'
 import MyCalendar from '../components/MyCalendar'
@@ -98,11 +98,15 @@ const MyCalendarPage = () => {
         <>
             <Heading my='6' size='lg'>Събития, за които сте отбелязали присъствие</Heading>
             {/* Google */}
+
             <Box maxW={'60vw'}>
-                <Button maxW='full' variant={'outline'} leftIcon={<FcGoogle />} onClick={googleLoginAndAuthorization}>
-                    <Text>Позволи достъп до Google календар</Text>
-                </Button>
+                <Tooltip label='Добави / Презапиши в Гугъл календар' placement='bottom-end'>
+                    <Button maxW='full' variant={'outline'} leftIcon={<FcGoogle />} onClick={googleLoginAndAuthorization}>
+                        <Text display={{ base: 'none', md: 'inline-block' }}>Позволи достъп до Google календар</Text>
+                    </Button>
+                </Tooltip>
             </Box>
+
 
             <MyCalendar />
         </>
