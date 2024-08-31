@@ -1,7 +1,8 @@
 import { Box, Button, Flex, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Text } from "@chakra-ui/react"
 import { Link } from "react-router-dom"
 
-const ConflictModal = ({ isOpen, onClose, conflictHeading, conflictDescription, conflictEvents }) => {
+const ConflictModal = ({ isOpen, onClose, conflictHeading, conflictDescription, conflictEvents, isGoogleCalendarConflict = false }) => {
+
     return (
         <Modal isOpen={isOpen} onClose={onClose}>
             <ModalOverlay />
@@ -37,17 +38,21 @@ const ConflictModal = ({ isOpen, onClose, conflictHeading, conflictDescription, 
                 </ModalBody>
 
                 <ModalFooter>
-                    <Button
-                        mr={3}
-                        colorScheme='blue'
-                        as={Link}
-                        to={'/my-calendar'}
-                        state={
-                            { eventStart: conflictEvents[0].start }
-                        }
-                    >
-                        Към календара
-                    </Button>
+                    {!isGoogleCalendarConflict &&
+
+                        <Button
+                            mr={3}
+                            colorScheme='blue'
+                            as={Link}
+                            to={'/my-calendar'}
+                            state={
+                                { eventStart: conflictEvents[0].start }
+                            }
+                        >
+                            Към календара
+                        </Button>
+                    }
+
                     <Button variant='ghost' onClick={onClose}>Разбрах</Button>
                 </ModalFooter>
             </ModalContent>

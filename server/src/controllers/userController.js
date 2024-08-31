@@ -1,9 +1,7 @@
 const router = require('express').Router();
 const userService = require('../services/userService');
-const { oauth2Client, scopes } = require('../config/googleApiConfig.js');
 //middlewares
 const auth = require('../middlewares/authenticationMiddleware');
-
 
 
 //Hobby hive authentication related
@@ -81,55 +79,6 @@ router.get('/logout', auth, (req, res) => {
     res.clearCookie(process.env.COOKIE_NAME);
     res.status(204).end();
 });
-
-//Google API authorization related
-
-// router.get('/google-calendar/initialize', auth, (req, res) => {
-//     //try catch -> non auth errors
-
-//     try {
-//         // Generate a url that asks permissions for the Drive activity scope
-//         const authorizationUrl = oauth2Client.generateAuthUrl({
-//             // 'online' (default) or 'offline' (gets refresh_token)
-//             // access_type: 'offline',
-//             scope: scopes,
-//             // Enable incremental authorization. Recommended as a best practice.
-//             //include_granted_scopes: true,
-//             // Include the state parameter to reduce the risk of CSRF attacks.
-//             // state: state
-//         });
-//         res.json({ authorizationUrl });
-//     } catch (error) {
-//         console.log(error);
-
-//     }
-
-
-// })
-
-router.post('/google-calendar/redirect', async (req, res) => {
-
-    const { code } = req.body;
-
-    try {
-        const { tokens } = await oauth2Client.getToken(code);
-
-        console.log(tokens);
-
-
-        //return json to save in context - isGoogleAuthorized
-        //and show button only if it is false
-
-        res.json({ message: 'Успешно позволихте достъп до Вашия Гугъл календар!' });
-    } catch (error) {
-        res.status(500).json({
-            message: error.message
-        });
-
-    }
-
-});
-
 
 //users?search=Мария
 router.get('/', auth, async (req, res) => {

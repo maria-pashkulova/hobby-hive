@@ -69,7 +69,7 @@ const GroupEvents = () => {
 
     }
 
-    // Handler to update selected date and open modal
+    // Handler to update selected date and open create event modal
     const handleDateClick = (date) => {
         setSelectedDate(date);
         createEventModal.onOpen();

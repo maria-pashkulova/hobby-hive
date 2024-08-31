@@ -24,6 +24,7 @@ const auth = async (req, res, next) => {
         const decodedToken = await jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
 
         //Check if user still exists in DB after login
+        //TODO: handle user not found ?
         const user = await userService.getById(decodedToken._id);
 
         //записваме информацията от токена в req обекта + допълнителна информация за потребителят
@@ -53,11 +54,3 @@ const auth = async (req, res, next) => {
 
 
 module.exports = auth;
-//route guards - за всички пътища освен login и register
-//служи за проверка дали потребителят е автентикиран
-// exports.isAuthenticated = (req, res, next) => {
-//     if (!req.user) {
-//         return res.status(401).json({ message: 'Protected route - Unautorized!' });
-//     }
-//     next();
-// }

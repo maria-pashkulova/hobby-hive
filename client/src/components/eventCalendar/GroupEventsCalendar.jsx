@@ -58,8 +58,12 @@ const GroupEventsCalendar = ({ groupEvents, onDateClick, onEventClick, fetchEven
 
     const dayClickAction = (dateClickInfo) => {
 
-        const selectedDateAndDefaultTime = addDefaultTimeToSelectedDate(dateClickInfo.dateStr);
-        onDateClick(selectedDateAndDefaultTime);
+        //Group events component does provide onDateClick function prop, in order to open create event modal with selected date as event's start date
+        //My calendar component does not provide a prop function onDateClick (so it is undefined)
+        if (typeof onDateClick === 'function') {
+            const selectedDateAndDefaultTime = addDefaultTimeToSelectedDate(dateClickInfo.dateStr);
+            onDateClick(selectedDateAndDefaultTime);
+        }
 
     }
 

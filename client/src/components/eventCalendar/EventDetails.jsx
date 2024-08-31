@@ -6,7 +6,7 @@ import { formatEventTime } from '../../utils/formatEventDisplay';
 import EventButtons from './EventButtons';
 import MembersGoingModal from './MembersGoingModal';
 import { checkIsFutureEvent } from '../../utils/checkEventData';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { addToCalendar } from '../../services/googleCalendarService';
 import ConflictModal from '../ConflictModal';
 import AuthContext from '../../contexts/authContext';
@@ -19,6 +19,7 @@ const EventDetails = ({ event, isCurrUserAttending, groupAdmin, groupRegionCity,
     //activityTags ->  for current event
     const { _id, title, color, start, end, description, specificLocation, activityTags, membersGoing, groupId, _ownerId } = event;
     const [conflictEvents, setConflictEvents] = useState([]);
+    const [isSendToGoogleCalendarLoading, setIsSendToGoogleCalendarLoading] = useState(false);
 
 
     const membersGoingModal = useDisclosure();
@@ -26,11 +27,13 @@ const EventDetails = ({ event, isCurrUserAttending, groupAdmin, groupRegionCity,
 
     const tooltipPlacement = useBreakpointValue({ base: 'right-start', md: 'bottom-end' });
     const toast = useToast();
+    const navigate = useNavigate();
     const { userId, logoutHandler } = useContext(AuthContext);
 
 
-    const handleSaveToGoogleCalendar = async () => {
+    const handleSendToGoogleCalendar = async () => {
         try {
+            setIsSendToGoogleCalendarLoading(true);
             const response = await addToCalendar(event);
 
             toast({
@@ -47,10 +50,46 @@ const EventDetails = ({ event, isCurrUserAttending, groupAdmin, groupRegionCity,
 
 
         } catch (error) {
+
             if (error.status === 401) {
                 logoutHandler(); //invalid or missing token 
                 navigate('/login');
+            } else if ((error.status === 403 || error.status === 400) && error.message) {
+                //Custom errors handling
+                if (error.status === 403) {
+                    navigate('/my-calendar');
+                }
+                toast({
+                    title: 'Позволете достъп до календара си!',
+                    description: error.message,
+                    status: "info",
+                    duration: 10000,
+                    isClosable: true,
+                    position: "bottom",
+                });
+            } else if (error.error === 'invalid_grant') {
+                //Google calendar api errors handling
+                navigate('/my-calendar');
+                toast({
+                    title: 'Позволете достъп до календара си отново!',
+                    description: 'От съображения за сигурност се изисква повторното Ви потвърждение за достъп до Вашия Гугъл календар!',
+                    status: "info",
+                    duration: 10000,
+                    isClosable: true,
+                    position: "bottom",
+                });
+            } else if (error.statusText === 'Forbidden') {
+                //Google calendar api errors handling
+                toast({
+                    title: 'Изтрили сте събитието от Хоби Кошер и сте го премахнали перманентно от Кошче!',
+                    description: 'За съжаление, събитието не може да бъде добавено към Вашия календар. Опитайте по-късно.',
+                    status: "info",
+                    duration: 10000,
+                    isClosable: true,
+                    position: "bottom",
+                });
             } else {
+                //Handle other possible errors
                 toast({
                     title: error.message,
                     status: "error",
@@ -58,7 +97,9 @@ const EventDetails = ({ event, isCurrUserAttending, groupAdmin, groupRegionCity,
                     isClosable: true,
                     position: "bottom",
                 });
-            } //TODO: handle missing invalid/token -> redirect to my calendar to authorize again
+            }
+        } finally {
+            setIsSendToGoogleCalendarLoading(false);
         }
     }
 
@@ -214,7 +255,8 @@ const EventDetails = ({ event, isCurrUserAttending, groupAdmin, groupRegionCity,
                             icon={<SiGooglecalendar />}
                             fontSize='1.5em'
                             isDisabled={!checkIsFutureEvent(start)}
-                            onClick={handleSaveToGoogleCalendar}
+                            onClick={handleSendToGoogleCalendar}
+                            isLoading={isSendToGoogleCalendarLoading}
                         />
                     </Tooltip>
 

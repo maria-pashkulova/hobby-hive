@@ -162,7 +162,7 @@ exports.update = async (eventIdToUpdate, existingEvent, newEventData, groupId, c
     let { specificLocation } = newEventData;
 
     if (!checkIsFutureEvent(existingEvent.start)) {
-        const error = new Error('Събитието вече е започнало или е минало!! Не можете да редактирате вече започнали / минали събития, те могат да бъдат единствено изтрити от администратора на групата!');
+        const error = new Error('Събитието вече е започнало или е минало! Не можете да редактирате вече започнали / минали събития, те могат да бъдат единствено изтрити от администратора на групата!');
         error.statusCode = 400;
         throw error;
     }

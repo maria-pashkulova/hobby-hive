@@ -35,7 +35,11 @@ const userSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Event',
         default: []
-    }]
+    }],
+    googleCalendarRefreshToken: {
+        type: String,
+        default: ''
+    }
 
 }, { timestamps: true });
 
