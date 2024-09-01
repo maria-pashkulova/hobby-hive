@@ -196,13 +196,13 @@ const UpdateProfilePage = () => {
             <Flex align={"center"} justify={"center"} my={6}>
                 <Stack
                     spacing={4}
-                    w={"full"}
                     maxW={"md"}
+                    minW={'40vw'}
                     rounded={"xl"}
                     boxShadow={"lg"}
                     p={6}
                 >
-                    <Heading lineHeight={1.1} fontSize={{ base: "2xl", sm: "3xl" }}>
+                    <Heading lineHeight={1.1} fontSize={{ base: "xl", sm: "2xl" }}>
                         Редакция на профила
                     </Heading>
                     <FormControl>

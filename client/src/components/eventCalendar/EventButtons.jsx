@@ -324,7 +324,7 @@ const EventButtons = ({ isCurrUserAttending, groupId, eventId, eventTitle, event
                 isOpen={conflictEventsModal.isOpen}
                 onClose={conflictEventsModal.onClose}
                 conflictHeading={'Припокриващи се събития!'}
-                conflictDescription={'Заявили сте присъствие за друго/други събития по същото време. Проверете календара си!'}
+                conflictDescription={'Заявили сте присъствие за друго/други събития от Хоби Кошер по същото време. Проверете календара си!'}
                 conflictEvents={conflictEvents}
             />
             }

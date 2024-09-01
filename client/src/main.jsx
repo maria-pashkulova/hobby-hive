@@ -9,9 +9,6 @@ import App from './App.jsx'
 
 //extend default theme
 
-//TODO
-const colors = {}
-
 const fonts = {
   body: 'Rubik,sans-serif',
   heading: 'Rubik,sans-serif'
