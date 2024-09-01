@@ -5,6 +5,7 @@ const { checkIsFutureEvent } = require('../utils/validateEventData.js');
 
 exports.saveEventInGoogleCalendar = async (userId, { _id, summary, description, location, startDateTime, endDateTime }) => {
 
+
     const currUserRefreshToken = await User.findById(userId)
         .select('googleCalendarRefreshToken')
         .lean();
@@ -23,7 +24,7 @@ exports.saveEventInGoogleCalendar = async (userId, { _id, summary, description, 
     //Check if user is trying to save past events in his Google calendar
     //Start date time and end date time coming from client are in UTC
     if (!checkIsFutureEvent(startDateTime)) {
-        const error = new Error('Събитието вече е започнало или е минало! Не можете да го добавите към своя Гугъл календар.');
+        const error = new Error('Събитието вече е започнало или е минало! Не можете да го добавите / обновите в своя Гугъл календар.');
         error.statusCode = 400;
         throw error;
     }
@@ -52,8 +53,8 @@ exports.saveEventInGoogleCalendar = async (userId, { _id, summary, description, 
     //Does not include soft deleted events (status: cancelled) (default)
     const eventsResponse = await calendar.events.list({
         calendarId: 'primary',
-        timeMin: new Date(startDateTime), // Start of the time range; start time is converted to local time of the server; timeMin is exclusive
-        timeMax: new Date(endDateTime), // End of the time range; end time is converted to local time of the server: timeMax is exclusive
+        timeMin: startDateTime, // Start of the time range; utc date string; timeMin is exclusive
+        timeMax: endDateTime, // End of the time range; utc date string, timeMax is exclusive
         singleEvents: true, //Expand the recurring event into its individual instances in order to get its exact time and compare it properly in overlapping check
         orderBy: 'startTime', //Ascending order by start time
     });
@@ -83,15 +84,14 @@ exports.saveEventInGoogleCalendar = async (userId, { _id, summary, description, 
         location: location,
         colorId: '5', //Always set Yellow event color
         start: {
-            dateTime: new Date(startDateTime) // start time is converted to local time of the server (a time zone offset is required , because it is not explicitly specified)
+            dateTime: startDateTime // utc date string (a time zone offset is required , because it is not explicitly specified -> Z)
         },
         end: {
-            dateTime: new Date(endDateTime) // end time is converted to local time of the server (a time zone offset is required , because it is not explicitly specified)
+            dateTime: endDateTime // utc date string (a time zone offset is required , because it is not explicitly specified -> Z)
         }
     }
 
     if (eventExists) {
-
 
         // Update the existing event, if its status was confirmed or cancelled (if it was soft deleted, still in trash bin, it will be restored)
         await calendar.events.update({
@@ -99,8 +99,6 @@ exports.saveEventInGoogleCalendar = async (userId, { _id, summary, description, 
             eventId: _id,
             requestBody
         });
-
-
 
     } else {
         //Create a new event in user's Google calendar
