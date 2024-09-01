@@ -2,7 +2,8 @@ const { isBefore } = require('date-fns');
 
 
 exports.checkIsFutureEvent = (eventStartDate) => {
-    const eventStart = new Date(eventStartDate); //event start date is converted to local time of the server (if it was in utc before)
+    //eventStartDate is comes as utc date string which is valid argument for isBefore
+    //in all cases when checkIsFutureEvent is called
     const todayDate = new Date();
 
     /*isBefore includes both date and time in comparison
@@ -12,7 +13,7 @@ exports.checkIsFutureEvent = (eventStartDate) => {
     the event is considered as a past event
     because it has already started (and also it is even possible it has ended)
     */
-    return !isBefore(eventStart, todayDate)
+    return !isBefore(eventStartDate, todayDate)
 }
 
 //TODO: create utility to Validate start and end time for events

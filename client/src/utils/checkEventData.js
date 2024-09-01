@@ -64,7 +64,8 @@ export const checkForOverlappingEvents = (events, newEventStart, newEventEnd, ne
 }
 
 export const checkIsFutureEvent = (eventStartDate) => {
-    const eventStart = new Date(eventStartDate);
+    //eventStartDate is utc date string (coming from DB) or Date object (parsed from FullCalendar)
+    //which are both valid arguments to isBefore function
     const todayDate = new Date();
 
     /*isBefore includes both date and time in comparison
@@ -74,6 +75,6 @@ export const checkIsFutureEvent = (eventStartDate) => {
     the event is considered as a past event
     because it has already started (and also it is even possible it has ended)
     */
-    return !isBefore(eventStart, todayDate)
+    return !isBefore(eventStartDate, todayDate)
 }
 

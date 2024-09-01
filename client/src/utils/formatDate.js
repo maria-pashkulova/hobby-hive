@@ -2,29 +2,29 @@
 import { format } from 'date-fns';
 
 export const parseUtcDateString = (utcDateString) => {
-    const date = new Date(utcDateString); // Parse UTC date string - create a JavaScript Date object from the UTC date string 
-
     // Define the format for the date
-    const pattern = "dd.MM.yyyy";
+    const pattern = "dd.MM.yyyy г.";
 
     // Format the date using date-fns
-    return format(date, pattern);
+    // return format(date, pattern);
+    return format(utcDateString, pattern);
 
 }
 
 //Used for event create / update to
-// convert local date to UTC before sending it to the server
+//Convert local date to UTC before sending it to the server
+//Compulsory to maintain consistency across different regions and time zones.
 export const convertLocalToUtc = (localDate) => {
 
     return new Date(localDate).toISOString();
 }
 
-//used for populating event start and end dates in datetime-local field update details modal
+//used for populating event start and end dates in datetime-local field for update details modal
+//for create modal addDefaultTimeToSelectedDate is used in GroupEventsCalendar
 export const formatDateForDatetimeLocalField = (utcDateString) => {
-    const date = new Date(utcDateString); // Parse UTC date string - create a JavaScript Date object from the UTC date string 
 
     // Define the format for the 'datetime-local' input field
     const pattern = "yyyy-MM-dd'T'HH:mm";
     // Format the date using date-fns
-    return format(date, pattern);
+    return format(utcDateString, pattern);
 }

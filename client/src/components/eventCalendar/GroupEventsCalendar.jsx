@@ -117,6 +117,7 @@ const GroupEventsCalendar = ({ groupEvents, onDateClick, onEventClick, fetchEven
             mt={20}
             className={isLoading ? 'calendar-disabled' : ''}
         >
+            {/* timeZone prop is local - default for FullCalendar */}
             <FullCalendar
                 ref={calendarRef}
                 plugins={[dayGridPlugin, interactionPlugin]}

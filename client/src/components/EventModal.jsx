@@ -2,7 +2,7 @@ import React, { useContext } from 'react'
 import { useNavigate } from 'react-router-dom';
 import AuthContext from '../contexts/authContext';
 
-import { Button, Flex, FormControl, FormLabel, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Spinner, useToast } from "@chakra-ui/react"
+import { Button, FormControl, FormLabel, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, useToast } from "@chakra-ui/react"
 
 import { Form, Formik } from "formik";
 import { EventKeys } from "../formKeys/formKeys";
