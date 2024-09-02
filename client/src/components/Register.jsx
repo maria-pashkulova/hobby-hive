@@ -44,10 +44,7 @@ const Register = () => {
 
         } catch (error) {
             //409 - user with the same email exists
-            //400 - непопълнени полета - въпреки че мисля че е излишно
-            //защото сложих клиентска валидация за това
-            //а тази сървърната си остава за заявки от клиенти като постман (освен ако клиентската не може да се прескочи)
-            if (error.status === 409 || error.status === 400) {
+            if (error.status === 409) {
                 toast({
                     title: error.message,
                     status: "error",
@@ -56,9 +53,9 @@ const Register = () => {
                     position: "bottom",
                 });
             } else {
-                //грешка при свързването със сървъра
+                //Error connecting with server or other errors
                 toast({
-                    title: 'Възникна грешка при свързване!',
+                    title: 'Нещо се обърка! Опитайте по-късно!',
                     status: "error",
                     duration: 5000,
                     isClosable: true,

@@ -37,7 +37,7 @@ const SearchUser = ({ mt, handleFunction }) => {
                     //и localStorage за да станеш неаутентикиран и за клиента и тогава редиректваш
                     navigate('/login');
                 } else {
-                    console.log(error);
+                    //Handle other possible errors
                     toast({
                         title: "Възникна грешка!",
                         description: "Не успяхме да изведем резултата от търсенето",

@@ -113,7 +113,7 @@ const UpdateProfilePage = () => {
             } else if (error.status === 401) {
                 logoutHandler(); //invalid or missing token
                 navigate('/login');
-            } else if (error.status === 403) {
+            } else if (error.status === 403 || error.status === 409) {
                 toast({
                     title: error.message,
                     status: "error",
@@ -122,10 +122,9 @@ const UpdateProfilePage = () => {
                     position: "bottom",
                 });
             } else {
-
-                //TODO: handle other types of errors when you create BE validation (if any)
+                //Error connecting with server or other errors
                 toast({
-                    title: "Възникна грешка при свързване!",
+                    title: "Нещо се обърка! Опитайте по-късно!",
                     description: "Не успяхме да обновим данните Ви!",
                     status: "error",
                     duration: 5000,

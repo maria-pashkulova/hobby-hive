@@ -2,25 +2,18 @@ const router = require('express').Router();
 const userService = require('../services/userService');
 //middlewares
 const auth = require('../middlewares/authenticationMiddleware');
+const { validateUserInputData } = require('../middlewares/inputValidationMiddlewares/userInputValidationMiddlewares');
+const { registerInputSchema, loginInputSchema, updateUserInputSchema } = require('../inputValidationShemas/userInputValidationSchema');
 
 
-//Hobby hive authentication related
+router.post('/login', validateUserInputData(loginInputSchema), async (req, res, next) => {
 
-router.post('/login', async (req, res) => {
-    const { email, password } = req.body;
-
-    //Invalid inputs by the user (server responds with a 400 response code);
-    if (!email || !password) {
-        return res.status(400).json({ message: 'Имейла и паролата са задължителни!' })
-    }
 
     try {
-        const userData = await userService.login(email, password);
+        const userData = await userService.login(req.body);
 
-
-        //httpOnly: true + React ?
         //15*60*1000 = 900 000 ms = 15 min - cookie expiration - used for debugging purposes
-        //60*60*1000 = 3 600 000 ms = 60 min = 1 hour
+        //60*60*1000 = 3 600 000 ms = 60 min = 1 hour; TODO: refresh token 
         res.cookie(process.env.COOKIE_NAME, userData.accessToken, { httpOnly: true, maxAge: 60 * 60 * 1000 });
 
         res.json({
@@ -31,30 +24,16 @@ router.post('/login', async (req, res) => {
         });
 
     } catch (error) {
-        res.status(401).json({
-            message: error.message
-        })
+        next(error)
     }
 
 })
 
-router.post('/register', async (req, res) => {
-    const { firstName, lastName, email, password } = req.body;
-
-    //Invalid inputs by the user(server responds with a 400 response code);
-    if (!firstName || !lastName || !email || !password) {
-        return res.status(400).json({ message: 'Име, фамилия, имейл и парола са задължителни!' })
-    }
-
-    //TODO: validate email format
-    // console.log(req.body);
+router.post('/register', validateUserInputData(registerInputSchema), async (req, res, next) => {
 
     try {
+        const userData = await userService.register(req.body);
 
-        const userData = await userService.register(firstName, lastName, email, password);
-
-        //15*60*1000 = 900 000 ms = 15 min - cookie expiration
-        //60*60*1000 = 3 600 000 ms = 60 min = 1 hour
         res.cookie(process.env.COOKIE_NAME, userData.accessToken, { httpOnly: true, maxAge: 60 * 60 * 1000 });
 
         res.json({
@@ -65,23 +44,20 @@ router.post('/register', async (req, res) => {
         });
 
     } catch (error) {
-
-        res.status(error.statusCode || 500).json({
-            message: error.message,
-        });
+        next(error);
     }
 
 });
 
 
 router.get('/logout', auth, (req, res) => {
-    //TO DO - invalidate token - да се измисли механизъм за инвалидиране на токена
+    //TODO - mechanism for token invalidation
     res.clearCookie(process.env.COOKIE_NAME);
     res.status(204).end();
 });
 
 //users?search=Мария
-router.get('/', auth, async (req, res) => {
+router.get('/', auth, async (req, res, next) => {
     const { search } = req.query;
     const currUserId = req.user._id;
 
@@ -89,7 +65,7 @@ router.get('/', auth, async (req, res) => {
         const users = await userService.getAll(search, currUserId);
         res.json(users);
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        next(error);
     }
 
 });
@@ -110,8 +86,7 @@ router.get('/my-groups', auth, async (req, res) => {
         res.json(userGroupsResult);
 
     } catch (error) {
-        res.status(500).json({ message: error.message });
-        console.log('Error in get user groups:', error.message);
+        next(error);
     }
 });
 
@@ -142,25 +117,21 @@ router.get('/my-calendar', auth, async (req, res) => {
 })
 
 
-//оставям :userId да се взима от параметрите за да се запази
+//:userId да се взима от параметрите, за да се запази
 //Uniform interface (REST)
 
-router.put('/:userId', auth, async (req, res) => {
+router.put('/:userId', auth, validateUserInputData(updateUserInputSchema), async (req, res, next) => {
 
-    const { firstName, lastName, email, password, newProfilePic, currProfilePic } = req.body;
     const currUserId = req.user._id; //този който прави заявката
     const userIdToUpdate = req.params.userId; //този който ще бъде редактиран
 
     try {
-        const userData = await userService.updateUser(currUserId, userIdToUpdate, firstName, lastName, email, password, newProfilePic, currProfilePic);
+        const userData = await userService.updateUser(currUserId, userIdToUpdate, req.body);
 
         res.json(userData);
 
     } catch (error) {
-        //500 status code -> ако cloudinary върне грешка
-
-        res.status(error.statusCode || 500).json({ message: error.message });
-        console.log('Error in update user:', error.message);
+        next(error);
     }
 });
 

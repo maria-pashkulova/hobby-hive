@@ -5,13 +5,8 @@ const userService = require('../services/userService');
 //използвам го за protected routes, а не е глобален midlleware, тъй като само login и  register са публични
 //служи за да автентикира потребителя
 const auth = async (req, res, next) => {
-    //TODO - клиентът да закача в хедърс с определено име токена (custom header name)
-    //сървъра да не го търси в кукитата, а в req.headers('име на хедъра:пр: X-Authorization')
-    //бисквитка или хедърс?
-    const token = req.cookies[process.env.COOKIE_NAME];
 
-    //headers
-    //const token = req.header('X-Authorization');
+    const token = req.cookies[process.env.COOKIE_NAME];
 
     if (!token) {
         return res.status(401).json({ message: 'Действията изискват вписване в системата!' });
@@ -46,7 +41,6 @@ const auth = async (req, res, next) => {
         //сървърът връща статус код 401 и клиента да проверява
         //какъв е статус кода и самия клиент да редиректва
         res.status(401).json({ message: 'Действията изискват вписване в системата!' });
-        console.log(error.message);
     }
 
 

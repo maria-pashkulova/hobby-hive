@@ -1,38 +1,16 @@
 const bcrypt = require('bcrypt');
-const jwt = require('../lib/jwt');
 const User = require('../models/User');
 const Group = require('../models/Group');
 const mongoose = require('mongoose');
 const escapeRegExp = require('../utils/escapeRegExp');
 const { uploadToCloudinary, destroyFromCloudinary } = require('../utils/cloudinaryUtils');
+const { getAuthResult } = require('../utils/authenticationUtils');
 const PROFILE_PICS_FOLDER = 'user-profile-pics';
 
 
+exports.register = async ({ firstName, lastName, email, password }) => {
 
-//TODO: validate form inputs with express validator
-
-//подавам отделните пропърита
-//за по ясен интерфейс
-//евентуално за валидация на ниво сървис
-exports.register = async (firstName, lastName, email, password) => {
-    //password === repeatPass може да се провери на ниво сървис
-    //проверка за съществуващ user със същия имейл
-    //ако проверката password === repeatPass е тук, може да се направи хеширането
-    //на паролата тук
-    //за момента няма да пращам на сървъра repeat pass
-
-    //validate if user exists (със същия имейл)
-    //findOne() връща null, ако не намери търсен запис в колекцията
-    const duplicate = await User.findOne({ email });
-    if (duplicate) {
-        const error = new Error('Съществува потребител с този имейл!');
-        error.statusCode = 409 //status 409 - conflict
-        throw error;
-    }
-
-    //TODO: validate fields - password length for example
-
-    //hash password
+    //Hash password before saving in DB
     //всеки път ще използва 10 rounds и ще генерира уникална сол
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -42,27 +20,28 @@ exports.register = async (firstName, lastName, email, password) => {
     return result;
 }
 
-exports.login = async (email, password) => {
+exports.login = async ({ email, password }) => {
 
-    //TODO: index on email field for optimization?
     //find user (проверка дали изобщо съществува)
     //findOne() връща null, ако не намери търсен запис в колекцията
     const user = await User.findOne({ email }).select('_id firstName lastName email password profilePic');
 
     if (!user) {
-        throw new Error('Грешен имейл или парола!');
+        const error = new Error('Грешен имейл или парола!');
+        error.statusCode = 401;
+        throw error;
     }
 
-    //validate password (правилна парола)
-
+    //Validate password (правилна парола)
     const isValid = await bcrypt.compare(password, user.password);
 
     if (!isValid) {
-        throw new Error('Грешен имейл или парола!');
+        const error = new Error('Грешен имейл или парола!');
+        error.statusCode = 401;
+        throw error;
     }
 
-    //create token + return user data as js object
-
+    //Create token + return user data as js object
     const result = getAuthResult(user);
 
     return result;
@@ -130,7 +109,7 @@ exports.getById = async (userId) => {
     return user;
 }
 
-exports.updateUser = async (currUserId, userIdToUpdate, firstName, lastName, email, password, newProfilePic, currProfilePic) => {
+exports.updateUser = async (currUserId, userIdToUpdate, { firstName, lastName, email, password, newProfilePic, currProfilePic }) => {
 
     //ако userIdToUpdate не невалидно (user-a със сиг не съществува), то няма да съвпада с id на текущия потребител (който със сигурност съществува)
     //и му връщаме само 403 грешка. Защото единствения случай в който искаме да позволим edit е само ако човек редактира себе си.
@@ -189,18 +168,15 @@ exports.updateUser = async (currUserId, userIdToUpdate, firstName, lastName, ema
     //си остава с '' -> let imageUrl = user.profilePic;
 
 
-    //handling patch request
-    user.firstName = firstName || user.firstName;
-    user.lastName = lastName || user.lastName;
+    user.firstName = firstName;
+    user.lastName = lastName;
 
-    //TODO : проверка дали има потребител със същия имейл - както при регистрация ако ще може да си сменя имейла
-    //или да бъде на ниво model with Mongoose errors -> виж workshop
-    user.email = email || user.email;
+    user.email = email;
     user.profilePic = imageUrl;
 
     user = await user.save();
 
-    //update user in all the groups he is a member to
+    //Update user in all the groups he is a member to - data duplication
     //TODO: transaction
 
     await Group.updateMany(
@@ -324,24 +300,4 @@ exports.getUserAttendingEventsInRange = async (currUserId, startISO, endISO) => 
 
     return userWithAttendingEvents.attendingEvents;
 
-}
-
-async function getAuthResult(user) {
-    //create token
-
-    //900 sec = 15 min - used for debugging purposes
-    //3600 sec = 60 min - until refresh token is implemented
-    const accessToken = await jwt.sign({ _id: user._id }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: 3600 });
-    //const refreshToken = await jwt.sign(payload, process.env.REFRESH_TOKEN_SECRET, { expiresIn: '1d' });
-
-
-    const result = {
-        _id: user._id,
-        fullName: user.fullName,
-        email: user.email,
-        profilePic: user.profilePic,
-        accessToken
-    }
-
-    return result;
 }

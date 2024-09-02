@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 
 
-
 //Create schema
 const userSchema = new mongoose.Schema({
 
@@ -43,8 +42,17 @@ const userSchema = new mongoose.Schema({
 
 }, { timestamps: true });
 
-//TODO: validate if user exists (със същия имейл)- направих го на ниво service
-//тук сложих unique, което пак би хвърлило грешка
+//Duplicate emails - uniqueness constraint is handled by Mongo DB server
+//Custom error message for uniqueness constraint violation in MongoDB
+userSchema.post('save', function (error, doc, next) {
+    const uniqueEmailViolationErr = new Error('В системата вече съществува потребител с този имейл!');
+    uniqueEmailViolationErr.statusCode = 409;
+    if (error.name === 'MongoServerError' && error.code === 11000) {
+        next(uniqueEmailViolationErr);
+    } else {
+        next(error);
+    }
+});
 
 
 userSchema.virtual('fullName').get(function () {
@@ -55,11 +63,9 @@ userSchema.virtual('fullName').get(function () {
 
 userSchema.set("toJSON", {
     virtuals: true,
-    versionKey: false,
     transform: function (doc, dataInMongoDb) {
         delete dataInMongoDb.firstName;
         delete dataInMongoDb.lastName;
-        delete dataInMongoDb.id;
     }
 });
 

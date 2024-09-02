@@ -8,7 +8,7 @@ const eventSchema = new mongoose.Schema({
     },
     color: {
         type: String,
-        required: [true, 'Изберете цвят за обозначаване на събитието']
+        required: [true, 'Изберете цвят за обозначаване на събитието!']
     },
     description: {
         type: String,

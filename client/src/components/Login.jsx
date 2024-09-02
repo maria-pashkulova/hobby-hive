@@ -46,13 +46,8 @@ const Login = () => {
             navigate('/')
 
         } catch (error) {
-
             //401 - incorrect email or password
-            //400 - непопълнени полета - въпреки че мисля че е излишно
-            //защото сложих клиентска валидация за това
-            //а тази сървърната си остава за заявки от клиенти като постман (освен ако клиентската не може да се прескочи)
-
-            if (error.status === 401 || error.status === 400) {
+            if (error.status === 401) {
                 toast({
                     title: error.message,
                     status: "error",
@@ -62,9 +57,9 @@ const Login = () => {
                 });
 
             } else {
-                //грешка при свързването със сървъра
+                //Error connecting with server or other errors
                 toast({
-                    title: 'Възникна грешка при свързване!',
+                    title: 'Нещо се обърка! Опитайте по-късно!',
                     status: "error",
                     duration: 5000,
                     isClosable: true,
