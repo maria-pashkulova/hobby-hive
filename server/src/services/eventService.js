@@ -85,7 +85,7 @@ exports.getByIdToValidatePastEventActions = (eventId) => {
 // -------------------------------------
 
 
-exports.create = async (title, color, description, specificLocation, start, end, activityTags, groupId, _ownerId) => {
+exports.create = async ({ title, color, description, specificLocation, start, end, activityTags }, groupId, _ownerId) => {
 
     //Check if there is an event in current group calendar with the same color
     const existingEventWithSameColor = await Event.findOne({ color, groupId });
@@ -94,8 +94,6 @@ exports.create = async (title, color, description, specificLocation, start, end,
         error.statusCode = 409;
         throw error;
     }
-
-    //TODO: валидна дата която е преди текущото време
 
     //Check if event's activityTags are unique (client input itself)
     checkForDuplicateTags(activityTags)
@@ -182,7 +180,6 @@ exports.update = async (eventIdToUpdate, existingEvent, newEventData, groupId, c
         throw error;
     }
 
-    //TODO: валидна дата която е преди текущото време
 
     //Check if event's activityTags are unique (client input itself)
     checkForDuplicateTags(activityTags)

@@ -81,9 +81,9 @@ const UpdateGroupModal = ({ isOpen, onClose, groupIdToUpdate, name, category, lo
                     position: "bottom",
                 });
             } else {
-                //грешка при свързването със сървъра
+                //handle case : error connecting with server or other possible server errors
                 toast({
-                    title: 'Възникна грешка при свързване!',
+                    title: 'Нещо се обърка! Опитайте по-късно!',
                     status: "error",
                     duration: 5000,
                     isClosable: true,
@@ -101,6 +101,7 @@ const UpdateGroupModal = ({ isOpen, onClose, groupIdToUpdate, name, category, lo
                 <ModalOverlay />
                 <ModalContent
                     maxWidth={{ base: '90vw', md: '80vw', lg: '50vw', xl: '35vw' }}
+                    minW={'50vw'}
                 >
                     <ModalHeader>Редактиране на данните за групата</ModalHeader>
                     <ModalCloseButton />

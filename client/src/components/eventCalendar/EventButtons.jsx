@@ -103,7 +103,7 @@ const EventButtons = ({ isCurrUserAttending, groupId, eventId, eventTitle, event
             } else {
                 //handle case : error connecting with server or server errors with other statuses
                 toast({
-                    title: error.message || 'Възникна грешка при свързване!',
+                    title: 'Нещо се обърка! Опитайте по-късно!',
                     status: "error",
                     duration: 5000,
                     isClosable: true,
@@ -183,7 +183,7 @@ const EventButtons = ({ isCurrUserAttending, groupId, eventId, eventTitle, event
             } else {
                 //handle case : error connecting with server or other possible server errors
                 toast({
-                    title: error.message || 'Възникна грешка при свързване!',
+                    title: 'Нещо се обърка! Опитайте по-късно!',
                     status: "error",
                     duration: 5000,
                     isClosable: true,

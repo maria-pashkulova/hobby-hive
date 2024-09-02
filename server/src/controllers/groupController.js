@@ -16,15 +16,14 @@ const groupService = require('../services/groupService');
 
 //path /groups/[...]
 
-//TODO : Search and filter
+//Search and filter
 //http://localhost:5000/groups?name=...&category=...&location=...&page=...&limit=...
 
 //READ
-router.get('/', async (req, res) => {
+router.get('/', async (req, res, next) => {
     const { name, category, location } = req.query;
     const page = parseInt(req.query.page || '0');
     const limit = parseInt(req.query.limit || '3')
-    // console.log(req.query);
 
     try {
         const groupsResult = await groupService.getAll(name, category, location, page, limit);
@@ -32,14 +31,13 @@ router.get('/', async (req, res) => {
         res.json(groupsResult);
 
     } catch (error) {
-        //error handling just in case for edge cases
-        res.status(500).json({ message: error.message });
+        next(error);
     }
 
 });
 
 
-router.get('/:groupId', getGroup, async (req, res) => {
+router.get('/:groupId', getGroup, async (req, res, next) => {
 
     try {
 
@@ -49,26 +47,19 @@ router.get('/:groupId', getGroup, async (req, res) => {
 
     } catch (error) {
         //We are sure group exists because it is fetched in group middleware
-        res.status(500).json({ message: 'Сървърна грешка' });
+        next(error);
     }
 
 });
 
 //CREATE
-router.post('/', async (req, res) => {
-    // console.log(req.body);
-    //деструктурираме за да валидираме данните идващи от request-a
-    const { name, category, location, description, imageUrl, members, activityTags } = req.body;
+router.post('/', async (req, res, next) => {
+
+    //TODO: validate group input data
     const currUser = req.user;
 
-    //TODO: validate user input - required fields!!!
-    if (!name || !category || !location) {
-        return res.status(400).json({ message: 'Името, категорията дейност и локацията за групата са задължителни!' })
-    }
-
-
     try {
-        const createdGroup = await groupService.create(name, category, location, description, imageUrl, members, activityTags, currUser);
+        const createdGroup = await groupService.create(req.body, currUser);
 
 
         res.status(201).json(createdGroup);
@@ -76,35 +67,27 @@ router.post('/', async (req, res) => {
     } catch (error) {
         //case: грешка при upload на снимка в cloudinary
         //case: опит за добавяне на невалидни членове в новосъздавана група
-        res.status(500).json({
-            message: error.message,
-        });
+        next(error)
     }
 
 
 });
 
 //UPDATE GROUP DETAILS
-router.put('/:groupId', getGroup, isAdminMiddleware, async (req, res) => {
+router.put('/:groupId', getGroup, isAdminMiddleware, async (req, res, next) => {
+
+    //TODO: validate group input data
 
     const groupIdToUpdate = req.params.groupId;
     const isCurrUserGroupAdmin = req.isAdmin;
-    const { name, category, location, description, addedActivityTags, newImg, currImg } = req.body;
-
-    if (!name || !category || !location) {
-        return res.status(400).json({ message: 'Името, категорията дейност и локацията за групата са задължителни!' })
-    }
 
     try {
-        const updatedGroup = await groupService.update(groupIdToUpdate, isCurrUserGroupAdmin, name, category, location, description, addedActivityTags, newImg, currImg);
+        const updatedGroup = await groupService.update(groupIdToUpdate, isCurrUserGroupAdmin, req.body);
 
         res.status(200).json(updatedGroup);
 
     } catch (error) {
-        //500 status code -> ако cloudinary върне грешка
-
-        res.status(error.statusCode || 500).json({ message: error.message });
-        console.log('Error in update group details:', error.message);
+        next(error)
     }
 
 
@@ -112,7 +95,7 @@ router.put('/:groupId', getGroup, isAdminMiddleware, async (req, res) => {
 
 //JOIN GROUP / ADD ANOTHER MEMBER TO A GROUP
 
-router.put('/:groupId/addMember', getGroup, async (req, res) => {
+router.put('/:groupId/addMember', getGroup, async (req, res, next) => {
     const groupId = req.params.groupId;
     //текущо вписания потребител
     const currUserId = req.user._id;
@@ -125,14 +108,12 @@ router.put('/:groupId/addMember', getGroup, async (req, res) => {
             message: 'Успешно добавихте нов член към групата.'
         })
     } catch (error) {
-        res.status(error.statusCode || 500).json({
-            message: error.message,
-        });
+        next(error);
     }
 });
 
 //REMOVE MEMBER FROM A GROUP - само администратора на групата може да премахва потребители от групата
-router.put('/:groupId/removeMember', getGroup, isAdminMiddleware, async (req, res) => {
+router.put('/:groupId/removeMember', getGroup, isAdminMiddleware, async (req, res, next) => {
     const groupId = req.params.groupId;
     const isCurrUserGroupAdmin = req.isAdmin;
     //текущо вписания потребител
@@ -146,10 +127,7 @@ router.put('/:groupId/removeMember', getGroup, isAdminMiddleware, async (req, re
             message: 'Успешно премахнахте член от групата.'
         })
     } catch (error) {
-        console.log(error);
-        res.status(error.statusCode || 500).json({
-            message: error.message,
-        });
+        next(error)
     }
 
 })

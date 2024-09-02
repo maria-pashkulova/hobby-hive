@@ -11,7 +11,7 @@ const changeRequestService = require('../services/changeRequestService');
 
 
 //only group admin can view group event requests (for all groups he is admin of)
-router.get('/', isAdminMiddleware, async (req, res) => {
+router.get('/', isAdminMiddleware, async (req, res, next) => {
     const isCurrUserGroupAdmin = req.isAdmin;
     const groupId = req.groupId;
     const page = parseInt(req.query.page || '0');
@@ -23,16 +23,14 @@ router.get('/', isAdminMiddleware, async (req, res) => {
         res.json(changeRequestsResult);
 
     } catch (error) {
-        res.status(error.statusCode || 500).json({
-            message: error.message
-        });
+        next(error)
     }
 })
 
 
 //req object -> req.eventId and req.eventOwnerId for requests with method: post
 
-router.post('/', getEventForChangeRequest, isAdminMiddleware, forbidPastEventActions, async (req, res) => {
+router.post('/', getEventForChangeRequest, isAdminMiddleware, forbidPastEventActions, async (req, res, next) => {
 
     const groupId = req.groupId;
     const eventId = req.eventId
@@ -46,16 +44,14 @@ router.post('/', getEventForChangeRequest, isAdminMiddleware, forbidPastEventAct
         const newRequest = await changeRequestService.create(currUserId, isCurrUserGroupAdmin, groupId, eventId, eventOwnerId, description);
         res.status(200).json(newRequest);
     } catch (error) {
-        res.status(error.statusCode || 500).json({
-            message: error.message
-        })
+        next(error)
     }
 
 })
 
 
 //only group admin can delete (= mark as done) group event request (for all groups he is admin of)
-router.delete('/:requestId', validateRequest, isAdminMiddleware, async (req, res) => {
+router.delete('/:requestId', validateRequest, isAdminMiddleware, async (req, res, next) => {
     const isCurrUserGroupAdmin = req.isAdmin;
     const requestIdToDelete = req.params.requestId;
 
@@ -63,9 +59,7 @@ router.delete('/:requestId', validateRequest, isAdminMiddleware, async (req, res
         await changeRequestService.delete(isCurrUserGroupAdmin, requestIdToDelete);
         res.status(204).end();
     } catch (error) {
-        res.status(error.statusCode || 500).json({
-            message: error.message
-        })
+        next(error);
     }
 
 })

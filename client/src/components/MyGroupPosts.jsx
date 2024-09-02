@@ -79,10 +79,9 @@ const MyGroupPosts = () => {
                         position: "bottom",
                     });
                 } else {
-                    //handle other errors
+                    //handle case : error connecting with server or other possible server errors
                     toast({
-                        title: "Възникна грешка!",
-                        description: "Опитайте по-късно",
+                        title: 'Нещо се обърка! Опитайте по-късно!',
                         status: "error",
                         duration: 5000,
                         isClosable: true,
@@ -130,10 +129,9 @@ const MyGroupPosts = () => {
                 } else if (error.status === 404) {
                     navigate('/not-found');
                 } else {
-                    //handle other errors
+                    //handle case : error connecting with server or other possible server errors
                     toast({
-                        title: "Възникна грешка!",
-                        description: "Опитайте по-късно",
+                        title: 'Нещо се обърка! Опитайте по-късно!',
                         status: "error",
                         duration: 5000,
                         isClosable: true,

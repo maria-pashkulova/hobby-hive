@@ -2,7 +2,7 @@ const router = require('express').Router();
 const userService = require('../services/userService');
 //middlewares
 const auth = require('../middlewares/authenticationMiddleware');
-const { validateUserInputData } = require('../middlewares/inputValidationMiddlewares/userInputValidationMiddlewares');
+const { validateUserInputData } = require('../middlewares/userInputValidationMiddlewares');
 const { registerInputSchema, loginInputSchema, updateUserInputSchema } = require('../inputValidationShemas/userInputValidationSchema');
 
 

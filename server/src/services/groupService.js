@@ -99,7 +99,7 @@ exports.getByIdToValidate = (groupId) => {
     return group;
 }
 
-exports.create = async (name, category, location, description, imageUrl, members, activityTags, currUser) => {
+exports.create = async ({ name, category, location, description, imageUrl, members, activityTags }, currUser) => {
 
     //check for invalid category and location object ids
     await validateCategoryAndLocation(category, location);
@@ -171,7 +171,7 @@ exports.create = async (name, category, location, description, imageUrl, members
     return newGroupWithSelectedFields;
 }
 
-exports.update = async (groupIdToUpdate, isCurrUserGroupAdmin, name, category, location, description, addedActivityTags, newImg, currImg) => {
+exports.update = async (groupIdToUpdate, isCurrUserGroupAdmin, { name, category, location, description, addedActivityTags, newImg, currImg }) => {
 
     //groupIdToEdit is valid - checked in groupMiddleware
     //currUserId is valid and existing user (checked in authMiddleware!)

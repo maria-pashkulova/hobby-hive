@@ -7,8 +7,6 @@ const responseErrorMiddleware = (error, req, res, next) => {
         });
     }
 
-    //Google apis library throw errors
-
     //Server errors, Mongo DB Server errors; Cloudinary errors
     return res.status(500).json({ message: 'Нещо се обърка! Опитайте по-късно!' });
 }

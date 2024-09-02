@@ -99,9 +99,10 @@ const CreateGroupModal = ({ isOpen, onClose, setRefetch, handleCurrentPageChange
                 logoutHandler();
                 navigate('/login');
             } else {
-                //грешка при свързването със сървъра
+                //handle case : error connecting with server or other possible server errors
+
                 toast({
-                    title: 'Възникна грешка при свързване!',
+                    title: 'Нещо се обърка! Опитайте по-късно!',
                     description: 'Групата не беше създадена',
                     status: "error",
                     duration: 5000,
@@ -120,6 +121,7 @@ const CreateGroupModal = ({ isOpen, onClose, setRefetch, handleCurrentPageChange
                 <ModalOverlay />
                 <ModalContent
                     maxWidth={{ base: '90vw', md: '80vw', lg: '50vw', xl: '35vw' }}
+                    minW={'50vw'}
                 >
                     <ModalHeader>Попълнете данни за групата</ModalHeader>
                     <ModalCloseButton />

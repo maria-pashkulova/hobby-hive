@@ -38,6 +38,7 @@ exports.getById = async (postId) => {
 
     let post;
 
+    //TODO: create middleware to check
     //оптимизация -> не се правят заявки с невалидни objectId,
     //а директно се хвърля грешка
     if (mongoose.Types.ObjectId.isValid(postId)) {

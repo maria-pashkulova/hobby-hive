@@ -4,7 +4,7 @@ const isMemberMiddleware = require('../middlewares/isMemberMiddleware');
 const postService = require('../services/postService');
 
 //get posts with pagination (as infinite scroll at the front end)
-router.get('/', async (req, res) => {
+router.get('/', async (req, res, next) => {
 
     const groupId = req.groupId;
     const page = parseInt(req.query.page || '1');
@@ -16,9 +16,7 @@ router.get('/', async (req, res) => {
         res.json(postsResult);
 
     } catch (error) {
-        //case : Mongoose грешка - ако groupId e невалидно ObjectId - todo проверка преди заявка
-        res.status(404).json({ message: error.message });
-        console.log('Error in get group events:', error.message);
+        next(error);
     }
 
 })
@@ -29,7 +27,7 @@ router.get('/', async (req, res) => {
 //a parametric path inserted just before a literal one takes the precedence over the literal one.
 
 //get posts with pagination (as infinite scroll at the front end)
-router.get('/user-posts', isMemberMiddleware, async (req, res) => {
+router.get('/user-posts', isMemberMiddleware, async (req, res, next) => {
 
     const groupId = req.groupId;
     const currUser = req.user;
@@ -42,13 +40,13 @@ router.get('/user-posts', isMemberMiddleware, async (req, res) => {
 
         res.json(userPostsResult);
     } catch (error) {
-        res.status(error.statusCode || 500).json({ message: error.message });
+        next(error)
     }
 });
 
 
 //get one
-router.get('/:postId', async (req, res) => {
+router.get('/:postId', async (req, res, next) => {
     try {
         const post = await postService.getById(req.params.postId);
         res.json(post);
@@ -57,12 +55,12 @@ router.get('/:postId', async (req, res) => {
 
         //грешка ако върне null - аз я хвърлям
         //Mongoose грешка - ако е подаден невалиден стринг който да се кастне към objectID
-        res.status(error.statusCode || 500).json({ message: error.message });
+        next(error);
     }
 })
 
 //CREATE POST
-router.post('/', isMemberMiddleware, async (req, res) => {
+router.post('/', isMemberMiddleware, async (req, res, next) => {
     try {
 
         const { text, img } = req.body;
@@ -71,7 +69,7 @@ router.post('/', isMemberMiddleware, async (req, res) => {
         //1. той съвпада ли с текущо логнатия потребител
         const groupId = req.groupId;
 
-        //TODO validate -> да има или снимка или текстово описание, а не задължително текстово описание
+        //validate -> да има или снимка или текстово описание, а не задължително текстово описание
         if (!text && !img) {
             return res.status(400).json({ message: 'Изисква се публикацията да съдържа поне или снимка, или описание' });
         }
@@ -88,15 +86,14 @@ router.post('/', isMemberMiddleware, async (req, res) => {
 
     } catch (error) {
 
-        //евентуално грешки от cloudinary
-        res.status(error.statusCode || 500).json({ message: error.message });
-        console.log('Error in create post:', error.message);
+        //cloudinary errors
+        next(error);
     }
 });
 
 //EDIT POST
 
-router.put('/:postId', isMemberMiddleware, async (req, res) => {
+router.put('/:postId', isMemberMiddleware, async (req, res, next) => {
     const currUserId = req.user._id;
     const postIdToEdit = req.params.postId;
     const { text, newImg, currImg } = req.body;
@@ -120,16 +117,12 @@ router.put('/:postId', isMemberMiddleware, async (req, res) => {
 
         res.json(updatedPost);
     } catch (error) {
-
-        //500 status code -> ако cloudinary върне грешка
-
-        res.status(error.statusCode || 500).json({ message: error.message });
-        console.log('Error in update post:', error.message);
+        next(error);
     }
 })
 
 //DELETE POST
-router.delete('/:postId', isMemberMiddleware, async (req, res) => {
+router.delete('/:postId', isMemberMiddleware, async (req, res, next) => {
     const currUserId = req.user._id;
     try {
         await postService.delete(req.params.postId, currUserId);
@@ -140,7 +133,7 @@ router.delete('/:postId', isMemberMiddleware, async (req, res) => {
         //грешка ако върне null - аз я хвърлям
         //Mongoose грешка - ако е подаден невалиден стринг който да се кастне към objectID
         //500 status code -> ако cloudinary върне грешка
-        res.status(error.statusCode || 500).json({ message: error.message });
+        next(error)
     }
 })
 

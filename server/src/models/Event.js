@@ -3,7 +3,6 @@ const mongoose = require('mongoose');
 const eventSchema = new mongoose.Schema({
     title: {
         type: String,
-        trim: true,
         required: [true, 'Името на събитието е задължително!']
     },
     color: {
@@ -13,7 +12,6 @@ const eventSchema = new mongoose.Schema({
     description: {
         type: String,
         maxLength: 500,
-        trim: true,
         required: [true, 'Описанието на събитието е задължително!']
     },
     specificLocation: {
