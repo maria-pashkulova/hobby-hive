@@ -3,7 +3,7 @@ const Group = require('../models/Group');
 const User = require('../models/User');
 const EventChangeRequest = require('../models/EventChangeRequest');
 const { checkForDuplicateTags } = require('../utils/validateGroupData');
-const { validateEventTags, normalizeLocationCoordinates, checkIsFutureEvent } = require('../utils/validateEventData');
+const { validateEventTags, normalizeLocationCoordinates, checkIsEventEditable } = require('../utils/validateEventData');
 const checkIsObjectEmpty = require('../utils/checkIsObjectEmpty');
 
 
@@ -156,11 +156,12 @@ exports.create = async ({ title, color, description, specificLocation, start, en
 //Group administrator and event creator can update event
 exports.update = async (eventIdToUpdate, existingEvent, newEventData, groupId, currUserId, isCurrUserGroupAdmin) => {
 
+
     const { title, color, description, start, end, activityTags } = newEventData;
     let { specificLocation } = newEventData;
 
-    if (!checkIsFutureEvent(existingEvent.start)) {
-        const error = new Error('Събитието вече е започнало или е минало! Не можете да редактирате вече започнали / минали събития, те могат да бъдат единствено изтрити от администратора на групата!');
+    if (!checkIsEventEditable(existingEvent.start)) {
+        const error = new Error('Можете да променяте детайли за събитието най-късно 2 часа преди неговото започване! Редакцията Ви не беше отразена!');
         error.statusCode = 400;
         throw error;
     }

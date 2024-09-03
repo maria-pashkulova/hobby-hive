@@ -83,7 +83,7 @@ const EventModal = ({ isOpen, onClose, groupId, groupRegionCity, groupActivityTa
                 //edge case : try to update past event before UI disabled it
                 onClose();
                 toast({
-                    title: error.message, // message comes from server in user-friendly format
+                    description: error.message, // message comes from server in user-friendly format
                     status: "error",
                     duration: 10000,
                     isClosable: true,

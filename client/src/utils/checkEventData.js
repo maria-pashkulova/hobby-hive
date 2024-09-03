@@ -64,7 +64,7 @@ export const checkForOverlappingEvents = (events, newEventStart, newEventEnd, ne
 }
 
 export const checkIsFutureEvent = (eventStartDate) => {
-    //eventStartDate is utc date string (coming from DB) or Date object (parsed from FullCalendar)
+    //eventStartDate is utc date string (coming from DB (buttons for actions with event validation)) or Date object (parsed from FullCalendar (EventInCalendarDateBox))
     //which are both valid arguments to isBefore function
     const todayDate = new Date();
 
@@ -76,5 +76,18 @@ export const checkIsFutureEvent = (eventStartDate) => {
     because it has already started (and also it is even possible it has ended)
     */
     return !isBefore(eventStartDate, todayDate)
+}
+
+export const checkIsEventEditable = (eventStartDate) => {
+    //eventStartDate is comes as utc date string when called for check to disable Update event button
+
+    // Get the current time
+    const now = new Date();
+
+    // Add 2 hours to the current time (added in ms)
+    const twoHoursFromNow = new Date(now.getTime() + 2 * 60 * 60 * 1000);
+
+    // Return true if the date is at least two hours from now, false otherwise
+    return new Date(eventStartDate).getTime() >= twoHoursFromNow;
 }
 

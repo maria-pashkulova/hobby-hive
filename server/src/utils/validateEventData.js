@@ -16,7 +16,19 @@ exports.checkIsFutureEvent = (eventStartDate) => {
     return !isBefore(eventStartDate, todayDate)
 }
 
-//TODO: create utility to Validate start and end time for events
+exports.checkIsEventEditable = (eventStartDate) => {
+    //eventStartDate is comes as utc date string when called upon event update
+    // Get the current time
+    const now = new Date();
+
+    // Add 2 hours to the current time (added in ms)
+    const twoHoursFromNow = new Date(now.getTime() + 2 * 60 * 60 * 1000);
+
+    // Return true if the date is at least two hours from now, false otherwise
+    return new Date(eventStartDate).getTime() >= twoHoursFromNow;
+}
+
+//TODO: create utility to Validate start and end time for events -> use yup validation schema instead
 
 //Round lat and lon values returned by Openstreetmap to 5 decimal places
 //to ensure consistency, storage efficiency and precision control

@@ -5,7 +5,7 @@ import { SiGooglecalendar } from "react-icons/si";
 import { formatEventTime } from '../../utils/formatEventDisplay';
 import EventButtons from './EventButtons';
 import MembersGoingModal from './MembersGoingModal';
-import { checkIsFutureEvent } from '../../utils/checkEventData';
+import { checkIsEventEditable, checkIsFutureEvent } from '../../utils/checkEventData';
 import { Link, useNavigate } from 'react-router-dom';
 import { addToCalendar } from '../../services/googleCalendarService';
 import ConflictModal from '../ConflictModal';
@@ -147,6 +147,7 @@ const EventDetails = ({ event, isCurrUserAttending, groupAdmin, groupRegionCity,
                             handleUpdateEvent={handleUpdateEvent}
                             isMyCalendar={isMyCalendar}
                             isFutureEvent={checkIsFutureEvent(start)}
+                            isEditableEvent={checkIsEventEditable(start)}
                             currentEventDataForUpdateModal={event}
                         />
                     </Flex>
@@ -283,6 +284,7 @@ const EventDetails = ({ event, isCurrUserAttending, groupAdmin, groupRegionCity,
                         handleUpdateEvent={handleUpdateEvent}
                         isMyCalendar={isMyCalendar}
                         isFutureEvent={checkIsFutureEvent(start)}
+                        isEditableEvent={checkIsEventEditable(start)}
                         currentEventDataForUpdateModal={event}
                     />
                 </Flex>

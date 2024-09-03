@@ -15,9 +15,9 @@ export const eventSchema = (groupRegionCity, isUpdateAction) => yup.object().sha
         .min(new Date(), 'Събитието може да се проведе най-рано днес, задължително след текущия час!')
         .test(
             'validate-time',
-            'Часът на събитието трябва да бъде поне 2 часа след текущия час!',
+            'Часът на започване на събитието трябва да бъде поне 2 часа след текущия час!',
             (startDateTime) => {
-
+                //startDateTime is parsed to Date object by Yup
                 if (isUpdateAction) {
                     return true;
                 }

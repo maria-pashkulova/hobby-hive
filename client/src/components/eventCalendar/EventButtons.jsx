@@ -14,7 +14,7 @@ import ConflictModal from "../ConflictModal";
 // Event actions : update, delete, request change according to user role in a group
 //Future events are considered events with start date after the current date and time. 
 //Today's events are considered as future or past depending on their start time compared to the current time
-const EventButtons = ({ isCurrUserAttending, groupId, eventId, eventTitle, eventOwner, groupAdmin, groupRegionCity, groupActivityTags, existingEvents, handleAddMemberGoing, handleRemoveMemberGoing, handleRemoveEvent, handleUpdateEvent, isMyCalendar = false, isFutureEvent, currentEventDataForUpdateModal }) => {
+const EventButtons = ({ isCurrUserAttending, groupId, eventId, eventTitle, eventOwner, groupAdmin, groupRegionCity, groupActivityTags, existingEvents, handleAddMemberGoing, handleRemoveMemberGoing, handleRemoveEvent, handleUpdateEvent, isMyCalendar = false, isFutureEvent, isEditableEvent, currentEventDataForUpdateModal }) => {
 
     const [conflictEvents, setConflictEvents] = useState([]);
 
@@ -258,7 +258,7 @@ const EventButtons = ({ isCurrUserAttending, groupId, eventId, eventTitle, event
                                 ?
                                 <>
                                     <MenuItem
-                                        isDisabled={!isFutureEvent}
+                                        isDisabled={!isEditableEvent}
                                         onClick={updateEventModal.onOpen}
                                     >
                                         Редактирай
