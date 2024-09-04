@@ -7,8 +7,8 @@ import './App.css'
 
 import GuestLayout from './layouts/GuestLayout.jsx';
 import AuthLayout from './layouts/AuthLayout.jsx';
-import ProtectedRouteMembers from './components/protected-route/ProtectedRouteMembers.jsx';
-import ProtectedRouteAdmin from './components/protected-route/ProtectedRouteAdmin.jsx';
+import ProtectedRouteMembers from './layouts/ProtectedRouteMembers.jsx';
+import ProtectedRouteAdmin from './layouts/ProtectedRouteAdmin.jsx';
 
 import GroupsPage from './pages/GroupsPage';
 import MyGroupsPage from './pages/MyGroupsPage';

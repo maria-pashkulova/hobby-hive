@@ -1,7 +1,7 @@
 import { Navigate, Outlet, useLocation, useOutletContext, useParams } from 'react-router-dom';
 
 
-const ProtectedRoute = () => {
+const ProtectedRouteMembers = () => {
 
     const { groupId } = useParams();
     const { isMember, activityTags, groupRegionCity, groupAdmin } = useOutletContext();
@@ -26,4 +26,4 @@ const ProtectedRoute = () => {
     return <Outlet context={{ isMember, activityTags, groupRegionCity, groupAdmin }} />
 }
 
-export default ProtectedRoute
+export default ProtectedRouteMembers
