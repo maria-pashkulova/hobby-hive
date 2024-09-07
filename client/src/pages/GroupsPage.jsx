@@ -15,9 +15,7 @@ import { GroupKeys } from '../formKeys/formKeys';
 import Pagination from '../components/common/Pagination';
 import Loading from '../components/common/Loading';
 import useFetchCategoriesAndLocations from '../hooks/useFetchCategoriesAndLocations';
-
-
-const GROUPS_PER_PAGE = 6;
+import { ITEMS_PER_PAGE as GROUPS_PER_PAGE } from '../constants/resource-constants';
 
 
 const GroupsPage = () => {

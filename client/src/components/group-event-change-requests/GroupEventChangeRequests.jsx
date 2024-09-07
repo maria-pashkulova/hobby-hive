@@ -6,8 +6,8 @@ import AuthContext from '../../contexts/authContext';
 
 import * as changeRequestService from '../../services/changeRequestService';
 import Pagination from '../common/Pagination';
+import { ITEMS_PER_PAGE as REQUESTS_PER_PAGE } from '../../constants/resource-constants';
 
-const REQUESTS_PER_PAGE = 6;
 
 const GroupEventChangeRequests = () => {
     const { groupId } = useParams();

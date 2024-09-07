@@ -5,8 +5,7 @@ import { Container, Flex, Spinner, Text, useToast } from "@chakra-ui/react";
 import Post from "./Post";
 
 import * as postService from '../../services/postService';
-
-const POSTS_PER_PAGE = 10;
+import { ITEMS_PER_PAGE_POSTS as POSTS_PER_PAGE } from "../../constants/resource-constants";
 
 const MyGroupPosts = () => {
 

@@ -10,8 +10,7 @@ import AuthContext from "../contexts/authContext";
 import CardsGrid from "../components/groups/CardsGrid";
 import Pagination from "../components/common/Pagination";
 import Loading from "../components/common/Loading";
-
-const GROUPS_PER_PAGE = 6;
+import { ITEMS_PER_PAGE as GROUPS_PER_PAGE } from '../constants/resource-constants';
 
 
 const MyGroupsPage = () => {

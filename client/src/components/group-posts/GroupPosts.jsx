@@ -7,8 +7,7 @@ import AuthContext from "../../contexts/authContext";
 import { Box, Text, Button, Container, Flex, Spinner, useDisclosure, useToast } from "@chakra-ui/react";
 import { FiPlus } from "react-icons/fi";
 import CreatePostModal from "./CreatePostModal";
-
-const POSTS_PER_PAGE = 10;
+import { ITEMS_PER_PAGE_POSTS as POSTS_PER_PAGE } from "../../constants/resource-constants";
 
 const GroupPosts = () => {
 
