@@ -13,7 +13,7 @@ import {
 
 import { Formik } from 'formik';
 import { LoginFormKeys } from '../formKeys/formKeys';
-import { loginFormSchema } from '../schemas/userAuthenticationSchema';
+import { loginFormSchema } from '../schemas/userSchema';
 
 import CustomInput from './input-fields/CustomInput';
 import PasswordInput from './input-fields/PasswordInput';

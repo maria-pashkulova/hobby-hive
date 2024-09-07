@@ -26,7 +26,7 @@ import { Link, useNavigate } from "react-router-dom";
 import usePreviewImage from "../hooks/usePreviewImage";
 
 import { RegisterFormKeys as UpdateProfileFormKeys } from "../formKeys/formKeys";
-import { updateUserDataSchema } from "../schemas/userAuthenticationSchema";
+import { updateUserDataSchema } from "../schemas/userSchema";
 
 import * as userService from "../services/userService";
 
