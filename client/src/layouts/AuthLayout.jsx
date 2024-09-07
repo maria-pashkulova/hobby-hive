@@ -1,7 +1,7 @@
 import { Outlet, Navigate } from 'react-router-dom';
 import { Box, Drawer, DrawerContent, useDisclosure } from '@chakra-ui/react';
 import Sidebar from '../components/navigation/Sidebar';
-import Header from '../components/navigation/Header';
+import Header from '../components/header/Header';
 import { useContext } from 'react';
 import AuthContext from "../contexts/authContext";
 

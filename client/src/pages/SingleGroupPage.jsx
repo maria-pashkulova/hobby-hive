@@ -7,8 +7,8 @@ import * as groupService from '../services/groupService';
 
 import AuthContext from '../contexts/authContext';
 
-import UpdateGroupModal from "../components/update-group/UpdateGroupModal";
-import GroupMembersModal from "../components/GroupMembersModal";
+import UpdateGroupModal from "../components/groups/update-group/UpdateGroupModal";
+import GroupMembersModal from "../components/group-members/GroupMembersModal";
 
 
 const SingleGroupPage = () => {
@@ -292,7 +292,7 @@ const SingleGroupPage = () => {
                         }
 
                         {(userId === group.groupAdmin) && (
-                            <Tooltip label='Заявки за промяна или изтриване на събитие от членовете на групата' placement="bottom-end">
+                            <Tooltip label='Заявки за промяна на събития от членовете на групата' placement="bottom-end">
                                 <Button width={{ base: '100%', sm: 'auto' }} bgColor={"yellow.400"} as={Link} to={`/groups/${groupId}/event-change-requests`}>Заявки за събития</Button>
                             </Tooltip>
                         )}

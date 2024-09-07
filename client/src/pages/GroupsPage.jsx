@@ -5,15 +5,15 @@ import AuthContext from '../contexts/authContext';
 
 import * as groupService from '../services/groupService';
 
-import CardsGrid from '../components/CardsGrid';
+import CardsGrid from '../components/groups/CardsGrid';
 import { Box, Button, Flex, FormControl, Input, Select, Spinner, Text, useToast } from '@chakra-ui/react';
 import useForm from '../hooks/useForm';
 
 import { GroupKeys } from '../formKeys/formKeys';
 
 
-import Pagination from '../components/Pagination';
-import Loading from '../components/Loading';
+import Pagination from '../components/common/Pagination';
+import Loading from '../components/common/Loading';
 import useFetchCategoriesAndLocations from '../hooks/useFetchCategoriesAndLocations';
 
 

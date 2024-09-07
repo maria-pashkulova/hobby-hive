@@ -1,5 +1,5 @@
 import { Box, Button, Flex, Heading, Text, useDisclosure, useToast } from "@chakra-ui/react"
-import CreateGroupModal from "../components/create-group/CreateGroupModal"
+import CreateGroupModal from "../components/groups/create-group/CreateGroupModal"
 import { FiPlus } from "react-icons/fi";
 
 import { useContext, useEffect, useState } from 'react';
@@ -7,9 +7,9 @@ import { useNavigate } from "react-router-dom";
 
 import * as userService from '../services/userService';
 import AuthContext from "../contexts/authContext";
-import CardsGrid from "../components/CardsGrid";
-import Pagination from "../components/Pagination";
-import Loading from "../components/Loading";
+import CardsGrid from "../components/groups/CardsGrid";
+import Pagination from "../components/common/Pagination";
+import Loading from "../components/common/Loading";
 
 const GROUPS_PER_PAGE = 6;
 

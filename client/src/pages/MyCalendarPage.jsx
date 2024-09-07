@@ -1,7 +1,7 @@
 import { Box, Button, Heading, Text, Tooltip, useToast } from '@chakra-ui/react'
 import { FcGoogle } from 'react-icons/fc';
 import React from 'react'
-import MyCalendar from '../components/MyCalendar'
+import MyCalendar from '../components/current-user/MyCalendar'
 import { useGoogleLogin } from '@react-oauth/google';
 import { sendAuthorizationCode } from '../services/googleCalendarService';
 import { SCOPE, FLOW } from '../constants/google-calendar';

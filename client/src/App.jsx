@@ -5,25 +5,27 @@ import { CLIENT_ID } from './constants/google-calendar.js';
 
 import './App.css'
 
-import GuestLayout from './layouts/GuestLayout.jsx';
-import AuthLayout from './layouts/AuthLayout.jsx';
-import ProtectedRouteMembers from './layouts/ProtectedRouteMembers.jsx';
-import ProtectedRouteAdmin from './layouts/ProtectedRouteAdmin.jsx';
+import GuestLayout from './layouts/GuestLayout';
+import AuthLayout from './layouts/AuthLayout';
+import ProtectedRouteMembers from './layouts/ProtectedRouteMembers';
+import ProtectedRouteAdmin from './layouts/ProtectedRouteAdmin';
 
+import UpdateProfilePage from './pages/UpdateProfilePage';
 import GroupsPage from './pages/GroupsPage';
 import MyGroupsPage from './pages/MyGroupsPage';
 import MyCalendarPage from './pages/MyCalendarPage';
 import SingleGroupPage from './pages/SingleGroupPage';
-import Login from './components/Login.jsx';
-import Register from './components/Register.jsx';
-import Logout from './components/Logout';
-import GroupEvents from './components/GroupEvents.jsx';
-import GroupEventChangeRequests from './components/GroupEventChangeRequests';
-import GroupPosts from './components/GroupPosts.jsx';
-import UpdateProfilePage from './pages/UpdateProfilePage.jsx';
-import MyGroupPosts from './components/MyGroupPosts.jsx';
-import GroupChat from './components/group-chat/GroupChat.jsx';
-import NotFoundPage from './components/NotFoundPage.jsx';
+import NotFoundPage from './pages/NotFoundPage.jsx';
+
+import Login from './components/authentication/Login';
+import Register from './components/authentication/Register';
+import Logout from './components/authentication/Logout';
+
+import GroupPosts from './components/group-posts/GroupPosts.jsx';
+import MyGroupPosts from './components/group-posts/MyGroupPosts.jsx';
+import GroupEvents from './components/group-events/GroupEvents.jsx';
+import GroupEventChangeRequests from './components/group-event-change-requests/GroupEventChangeRequests.jsx';
+import GroupChat from './components/group-chat/GroupChat';
 
 
 function App() {
