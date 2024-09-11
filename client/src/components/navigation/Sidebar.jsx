@@ -18,6 +18,7 @@ const Sidebar = ({ onClose, display }) => {
             w={{ base: 'full', lg: 60 }}
             position="fixed"
             h="full"
+            //h='100vh'
             display={display}
         >
             <Flex h="20" alignItems="center" mx='8' justifyContent="space-between">
