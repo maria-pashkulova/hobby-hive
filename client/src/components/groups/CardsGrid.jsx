@@ -21,12 +21,8 @@ const CardsGrid = ({ groups, partialLinkToGroup }) => {
                     />}
 
                     <Flex direction='column' width='100%' >
-                        <CardBody>
+                        <CardBody minH={'95px'}>
                             <Heading size='md'>{group.name}</Heading>
-
-                            <Text py='2'>
-                                {group.description}
-                            </Text>
                         </CardBody>
 
                         <CardFooter alignItems='center' gap='4' >

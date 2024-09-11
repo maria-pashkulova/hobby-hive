@@ -206,19 +206,23 @@ const SingleGroupPage = () => {
                         </Flex>
                         <Text>{group.description}</Text>
                     </Flex>
-                    <Flex direction='column' gap={2} alignItems={{ base: 'left', lg: 'center' }}>
-                        <Flex direction='column' gap={2}>
+                    <Flex direction='column' gap={2} alignItems={{ base: 'stretch', lg: 'flex-end' }}>
+                        <Flex direction='column' gap={2} alignItems={{ base: 'stretch', lg: 'flex-end' }}>
                             <Tag size='lg'
                                 variant='outline'
                                 colorScheme="blue"
+                                padding={2}
                             >
-                                Категория хоби: {group.category.name}
+                                Локация: {group.location.name}
                             </Tag>
                             <Tag size='lg'
                                 variant='outline'
-                                colorScheme="blue">
-                                Локация: {group.location.name}
+                                colorScheme="blue"
+                                padding={2}
+                            >
+                                Категория хоби: {group.category.name}
                             </Tag>
+
                         </Flex>
                         <AvatarGroup mt={2} size='md' max={2} cursor='pointer' onClick={groupMembersModal.onOpen}>
                             {group.members?.map((member) => (
@@ -232,34 +236,38 @@ const SingleGroupPage = () => {
 
                     </Flex>
 
-                </Flex>
+                </Flex >
                 <Divider my={5} />
 
                 {/* update group modal */}
-                {editGroupDetailsModal.isOpen && <UpdateGroupModal
-                    isOpen={editGroupDetailsModal.isOpen}
-                    onClose={editGroupDetailsModal.onClose}
-                    groupIdToUpdate={groupId}
-                    name={group.name}
-                    category={group.category._id}
-                    location={group.location._id}
-                    description={group.description}
-                    groupImg={group.imageUrl}
-                    activityTags={group.activityTags}
-                    handleUpdateGroupDetails={handleUpdateGroupDetails}
-                />}
+                {
+                    editGroupDetailsModal.isOpen && <UpdateGroupModal
+                        isOpen={editGroupDetailsModal.isOpen}
+                        onClose={editGroupDetailsModal.onClose}
+                        groupIdToUpdate={groupId}
+                        name={group.name}
+                        category={group.category._id}
+                        location={group.location._id}
+                        description={group.description}
+                        groupImg={group.imageUrl}
+                        activityTags={group.activityTags}
+                        handleUpdateGroupDetails={handleUpdateGroupDetails}
+                    />
+                }
 
                 {/* see current and add members modal */}
-                {groupMembersModal.isOpen && <GroupMembersModal
-                    isOpen={groupMembersModal.isOpen}
-                    onClose={groupMembersModal.onClose}
-                    groupMembers={group.members}
-                    groupAdmin={group.groupAdmin}
-                    isMember={isMember}
-                    groupId={groupId}
-                    handleAddMember={handleAddMember}
-                    handleRemoveMember={handleRemoveMember}
-                />}
+                {
+                    groupMembersModal.isOpen && <GroupMembersModal
+                        isOpen={groupMembersModal.isOpen}
+                        onClose={groupMembersModal.onClose}
+                        groupMembers={group.members}
+                        groupAdmin={group.groupAdmin}
+                        isMember={isMember}
+                        groupId={groupId}
+                        handleAddMember={handleAddMember}
+                        handleRemoveMember={handleRemoveMember}
+                    />
+                }
 
                 <Flex direction={{ base: 'column', sm: 'row' }} gap={5} justifyContent='space-between'>
                     <Flex

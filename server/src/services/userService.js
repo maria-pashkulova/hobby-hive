@@ -231,7 +231,6 @@ exports.getGroupsWithMembership = async (userId, page, limit) => {
                     {
                         $project: {
                             name: 1,
-                            description: 1,
                             imageUrl: 1,
                             createdAt: 1,
                             membersCount: { $size: "$members" }
