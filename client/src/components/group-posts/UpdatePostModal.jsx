@@ -9,9 +9,7 @@ import * as postService from '../../services/postService';
 import checkForRequiredFields from "../../utils/checkPostData";
 
 import { PostKeys } from "../../formKeys/formKeys";
-
-
-const MAX_CHAR = 500;
+import { MAX_CHAR } from "../../constants/resource-constants";
 
 const UpdatePostModal = ({ postIdToUpdate, changeMyPostsOnDbUpdate, groupId, isOpen, onClose }) => {
 
@@ -70,7 +68,9 @@ const UpdatePostModal = ({ postIdToUpdate, changeMyPostsOnDbUpdate, groupId, isO
             setLoadingUpdate(true);
 
             const editedPost = await postService.editPost(groupId, postIdToUpdate, postEditInputData);
+            //to do - send it to socket server for real-time update in group newsfeed (all group posts)
 
+            //local state update
             changeMyPostsOnDbUpdate(editedPost);
             onClose();
             toast({

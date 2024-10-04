@@ -49,7 +49,7 @@ const GroupPosts = () => {
             setCurrentPage(2);
         }
 
-        //on post create or delete
+        //on post create or delete //TODO add on update also
         socket?.on('update group posts', handleChangeGroupPosts);
 
         // Cleanup function to leave the room when the component unmounts / or dependencies change

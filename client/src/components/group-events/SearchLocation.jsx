@@ -64,7 +64,7 @@ const SearchLocation = ({ initialEventLocationName }) => {
             })
     };
 
-    //Form's filed specificLocation is set only if user selects an option from Openstreet map results
+    //Form's field specificLocation is set only if user selects an option from Openstreet map results
     const handleSelectLocation = (location) => {
         const locationData = getLocationData(location);
 

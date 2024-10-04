@@ -6,7 +6,7 @@ import { bg } from 'date-fns/locale'; // Import the Bulgarian locales
 const formatSingleDayEventTime = (dateAndTime) => format(dateAndTime, 'HH:mm ч.');
 
 
-//for single day events extract date and time
+//for multi day events extract date and time
 const formatMultiDayEventTime = (dateAndTime) => format(dateAndTime, 'dd MMM, HH:mm ч.', { locale: bg });
 
 

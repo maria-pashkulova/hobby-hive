@@ -9,8 +9,7 @@ import * as postService from '../../services/postService';
 import checkForRequiredFields from "../../utils/checkPostData";
 
 import { PostKeys } from "../../formKeys/formKeys";
-
-const MAX_CHAR = 500;
+import { MAX_CHAR } from "../../constants/resource-constants";
 
 
 const CreatePostModal = ({ isOpen, onClose, groupId, handleAddNewCreatedPost }) => {

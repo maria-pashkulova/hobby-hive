@@ -20,7 +20,10 @@ const groupSchema = new mongoose.Schema({
         ref: 'Location',
         required: true
     },
-    imageUrl: String,
+    imageUrl: {
+        type: String,
+        default: ''
+    },
     members: [
         {
             _id: {

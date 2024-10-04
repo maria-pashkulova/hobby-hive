@@ -75,7 +75,7 @@ router.post('/', isMemberMiddleware, async (req, res, next) => {
         }
 
         //check max length of text
-        const maxLength = 500;
+        const maxLength = 3000;
         if (text.length > maxLength) {
             return res.status(400).json({ message: `Твръде дълъг текст на публикацията! Лимит : ${maxLength} символа` });
         }
@@ -106,7 +106,7 @@ router.put('/:postId', isMemberMiddleware, async (req, res, next) => {
     }
 
     //check max length of text
-    const maxLength = 500;
+    const maxLength = 3000;
     if (text.length > maxLength) {
         return res.status(400).json({ message: `Твръде дълъг текст на публикацията! Лимит : ${maxLength} символа` });
     }

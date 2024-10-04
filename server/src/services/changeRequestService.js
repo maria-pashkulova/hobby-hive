@@ -8,8 +8,6 @@ exports.getAll = async (isCurrUserGroupAdmin, groupId, page, limit) => {
     }
 
     const skip = page * limit;
-
-
     const requests = await EventChangeRequest
         .find({ groupId })
         .select('-updatedAt -__v')

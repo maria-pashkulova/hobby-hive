@@ -21,7 +21,6 @@ const EventDetails = ({ event, isCurrUserAttending, groupAdmin, groupRegionCity,
     const [conflictEvents, setConflictEvents] = useState([]);
     const [isSendToGoogleCalendarLoading, setIsSendToGoogleCalendarLoading] = useState(false);
 
-
     const membersGoingModal = useDisclosure();
     const conflictEventsModal = useDisclosure();
 
@@ -37,7 +36,7 @@ const EventDetails = ({ event, isCurrUserAttending, groupAdmin, groupRegionCity,
             const response = await addToCalendar(event);
 
             toast({
-                title: 'Успешно актуализирахте своя Гугъл календар!',
+                title: 'Успешно актуализирахте своя Google календар!',
                 status: "success",
                 duration: 5000,
                 isClosable: true,
@@ -73,7 +72,7 @@ const EventDetails = ({ event, isCurrUserAttending, groupAdmin, groupRegionCity,
                 navigate('/my-calendar');
                 toast({
                     title: 'Позволете достъп до календара си отново!',
-                    description: 'От съображения за сигурност се изисква повторното Ви потвърждение за достъп до Вашия Гугъл календар!',
+                    description: 'От съображения за сигурност се изисква повторното Ви потвърждение за достъп до Вашия Google календар!',
                     status: "info",
                     duration: 10000,
                     isClosable: true,
@@ -252,7 +251,7 @@ const EventDetails = ({ event, isCurrUserAttending, groupAdmin, groupRegionCity,
                         </Tooltip>
                     }
 
-                    <Tooltip label='Добави / Презапиши в Гугъл календар' placement={tooltipPlacement}>
+                    <Tooltip label='Добави / Презапиши в Google календар' placement={tooltipPlacement}>
                         <IconButton
                             icon={<SiGooglecalendar />}
                             fontSize='1.5em'
@@ -301,7 +300,7 @@ const EventDetails = ({ event, isCurrUserAttending, groupAdmin, groupRegionCity,
                 isOpen={conflictEventsModal.isOpen}
                 onClose={conflictEventsModal.onClose}
                 conflictHeading={'Припокриващи се събития!'}
-                conflictDescription={'Отбелязали сте други събития в по същото време в Гугъл календара си. Уверете се, че можете да присъствате на събитието от Хоби Кошер!'}
+                conflictDescription={'Отбелязали сте други събития по същото време в Google календара си. Уверете се, че можете да присъствате на събитието от Хоби Кошер!'}
                 conflictEvents={conflictEvents}
                 isGoogleCalendarConflict={true}
             />

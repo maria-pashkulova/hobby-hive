@@ -25,7 +25,7 @@ const MyCalendarPage = () => {
             if (!codeResponse.scope.includes('https://www.googleapis.com/auth/calendar.events.owned')) {
 
                 toast({
-                    title: 'Изисква се позволение за достъп до Вашия Гугъл календар! Пропуснали сте тази стъпка. Опитайте отново!',
+                    title: 'Изисква се позволение за достъп до Вашия Google календар! Пропуснали сте тази стъпка. Опитайте отново!',
                     status: 'info',
                     duration: 5000,
                     isClosable: true,
@@ -73,7 +73,7 @@ const MyCalendarPage = () => {
         },
         onError: (errorResponse) => {
             toast({
-                title: 'Не предоставихте необходимото позволение за достъп до Вашия Гугъл календар! Няма да може да добавяте събития от Хоби Кошер към него.',
+                title: 'Не предоставихте необходимото позволение за достъп до Вашия Google календар! Няма да може да добавяте събития от Хоби Кошер към него.',
                 status: "warning",
                 duration: 10000,
                 isClosable: true,
@@ -100,7 +100,7 @@ const MyCalendarPage = () => {
             {/* Google */}
 
             <Box maxW={'60vw'}>
-                <Tooltip label='Добави / Презапиши в Гугъл календар' placement='bottom-end'>
+                <Tooltip label='За лесното добавяне на събития към Вашия Google календар' placement='bottom-end'>
                     <Button maxW='full' variant={'outline'} leftIcon={<FcGoogle />} onClick={googleLoginAndAuthorization}>
                         <Text display={{ base: 'none', md: 'inline-block' }}>Позволи достъп до Google календар</Text>
                     </Button>

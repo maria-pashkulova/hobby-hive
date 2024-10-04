@@ -12,7 +12,7 @@ exports.saveEventInGoogleCalendar = async (userId, { _id, summary, description, 
 
     //Handle by /my-calendar and button -> consent
     if (currUserRefreshToken.googleCalendarRefreshToken === '') {
-        const error = new Error('Възможно е да не сте предоставяли достъп до сега или да е изминало много време от последния път, в който сте го направили! От съображения за сигурност се изисква повторното Ви потвърждение за достъп до Вашия Гугъл календар!');
+        const error = new Error('Възможно е да не сте предоставяли достъп до сега или да е изминало много време от последния път, в който сте го направили! От съображения за сигурност се изисква повторното Ви потвърждение за достъп до Вашия Google календар!');
         error.statusCode = 403;
         throw error;
     }
@@ -24,7 +24,7 @@ exports.saveEventInGoogleCalendar = async (userId, { _id, summary, description, 
     //Check if user is trying to save past events in his Google calendar
     //Start date time and end date time coming from client are in UTC
     if (!checkIsFutureEvent(startDateTime)) {
-        const error = new Error('Събитието вече е започнало или е минало! Не можете да го добавите / обновите в своя Гугъл календар.');
+        const error = new Error('Събитието вече е започнало или е минало! Не можете да го добавите / обновите в своя Google календар.');
         error.statusCode = 400;
         throw error;
     }

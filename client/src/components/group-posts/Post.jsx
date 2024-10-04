@@ -46,7 +46,7 @@ const Post = ({ postId, text, img, isOwner, postedByName, postedByProfilePic, cr
 
                     </Flex>
 
-                    <Text maxWidth={'lg'} fontSize='sm'>{text}</Text>
+                    <Text maxWidth={'lg'} fontSize='sm' whiteSpace="pre-wrap">{text}</Text>
 
                     {img && (
                         <Box

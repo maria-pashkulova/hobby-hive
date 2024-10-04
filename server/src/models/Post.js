@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 const postSchema = new mongoose.Schema({
     text: {
         type: String,
-        maxLength: 500
+        maxLength: 3000
     },
     img: {
         type: String

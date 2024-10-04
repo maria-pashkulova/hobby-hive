@@ -16,7 +16,7 @@ router.post('/google-calendar/oauth2callback', async (req, res) => {
         // store the refresh_token in my database!
         await saveRefreshTokenToDatabase(currUserId, tokens.refresh_token);
 
-        res.json({ message: 'Успешно позволихте достъп до Вашия Гугъл календар!' });
+        res.json({ message: 'Успешно позволихте достъп до Вашия Google календар!' });
 
     } catch (googleapisLibError) {
         res.status(googleapisLibError.status).json(googleapisLibError.response.data);

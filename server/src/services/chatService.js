@@ -1,4 +1,3 @@
-const Group = require('../models/Group');
 const Message = require('../models/Message');
 
 exports.getGroupChat = async (groupId) => {
